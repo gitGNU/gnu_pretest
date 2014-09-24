@@ -7,7 +7,7 @@
 @setchapternewpage odd
 
 @ifinfo
-This is a short example of a complete Texinfo file.
+PreTest CookBook
 
 Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org).
 @end ifinfo
@@ -15,50 +15,64 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org).
 @titlepage
 @sp 10
 @comment The title is printed in a large font.
-@center @titlefont{Sample Title}
+@center @titlefont{PreTest CookBook}
 
 @c The following two commands start the copyright page.
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1990 Free Software Foundation, Inc.
+Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 @end titlepage
 
-@node    Top,       First Chapter, (dir),    (dir)
+@node    Top,       Introduction, (dir),    (dir)
 @comment node-name, next,          previous, up
 
 @menu
-* First Chapter::    The first chapter is the 
-                     only chapter in this sample.
-* Concept Index::    This index has two entries.
-* Future Improvements:: stuff
+* Introduction::         What this Pretest is all aobut
+* Getting Started::      Using PreTest images
+* Usage::                Effective use of these VMs
+* Build Recipes::        How each VM was built
+* Future Improvements::  The TODO List
+* Concept Index::        The Index
 @end menu
 
 @contents
 
-@node    First Chapter, Future Improvements, Top,      Top
+@c ***********************************************************
+@c Introduction
+@c ***********************************************************
+@node    Introduction, Getting Started, Top,      Top
 @comment node-name,     next,          previous, up
-@chapter First Chapter
-@cindex Sample index entry
+@chapter Introduction
+@cindex Introduction
 
-This is the contents of the first chapter. 
-@cindex Another sample index entry
+@c ***********************************************************
+@c Getting Started
+@c ***********************************************************
+@node    Getting Started, Usage, Introduction,      Top
+@comment node-name,     next,          previous, up
+@chapter Getting Started
+@cindex Getting Started
 
-Here is a numbered list.
+@c ***********************************************************
+@c Usage
+@c ***********************************************************
+@node    Usage, Build Recipes, Getting Started, Top
+@comment node-name,     next,          previous, up
+@chapter Usage
+@cindex Usage
 
-@enumerate
-@item
-This is the first item.
+@c ***********************************************************
+@c Build Recipces
+@c ***********************************************************
+@node    Build Recipes, Future Improvements, Usage, Top
+@comment node-name,     next,          previous, up
+@chapter Build Recipes
+@cindex Build Recipes
 
-@item
-This is the second item.
-@end enumerate
-
-The @code{makeinfo} and @code{texinfo-format-buffer}
-commands transform a Texinfo file such as this into 
-an Info file; and @TeX{} typesets it for a printed 
-manual.
-
-@node Future Improvements, Concept Index, First Chapter, Top
+@c ***********************************************************
+@c Future Improvements
+@c ***********************************************************
+@node Future Improvements, Concept Index, Build Recipes, Top
 @chapter Future Improvements
 @cindex Future Improvements
 
