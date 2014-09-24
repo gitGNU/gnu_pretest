@@ -733,6 +733,138 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex Downloads
 @cindex Pre-build VMs
 
+@cindex Clean-Install Images downloads
+@cindex downloads, clean-install images
+@section Clean-Install Images
+
+The following @sc{qcow2} virtual machine images correspond to the
+'clean-install' step:
+@itemize
+@item VM uses @emph{virtio} disk,networks drivers (except HURD)
+@item VM uses serial console (for qemu's @option{-nographic})
+@item Root password is @var{12345} (or empty on MINIX,HURD)
+@item Non-Root user is @var{miles} password @var{12345}
+@item user @var{miles} can @command{sudo} without a password (except MINIX)
+@end itemize
+
+The typical @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
+download image file, after decompressing with with @command{unxz}):
+@example
+kvm -nographic -m 384 \
+    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
+@end example
+
+Or use the supplied @file{pretest_run.sh} for more options:
+@example
+pretest_run.sh XXXX.qcow2
+@end example
+
+Available pre-build virtual machines:
+
+@table @asis
+@item OpenBSD 5.5
+@url{http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz}
+
+@item NetBSD 6.1.4
+@url{http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz}
+
+@item FreeBSD 10
+@url{http://files.housegordon.org/pretest/v0.1/freebsd10.clearn-install.qcow2.xz}
+
+@item MINIX R3.3.0
+@url{http://files.housegordon.org/pretest/v0.1/minixR330.clean-install.qcow2.xz}
+
+@item GNU Hurd/Debian
+GNU Hurd/Debian does not have a 'clean-install' image.
+
+@end table
+
+
+
+
+@cindex Build-Ready Images downloads
+@cindex downloads, Build-ready images
+@section Build-ready images
+
+The following @sc{qcow2} virtual machine images correspond to the
+'build-ready' step. In addition to the 'clean-install' settings (e.g.
+user names and passwords) the following are installed:
+@itemize
+@item The default compiler for the OS (e.g. @command{gcc} or @command{clang})
+@item @command{make}, and optionally @command{gmake} (if @command{make} is not GNU make)
+@item autotools programs (@command{automake}, @command{autoconf}, @command{authoreconf})
+@item texinfo (@command{makeinfo})
+@item @command{pkg-config}, @command{gperf}
+@item @command{git}, @command{rync}, @command{wget}, @command{xz}
+
+@item @emph{NOTE}: The version of the above programs vary widely between OSes.
+The installed versions used are the defaults available for the OS.
+
+@item All OSes can compile @command{GNU Hello}:
+@example
+cd /tmp
+wget http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
+tar xzf hello-2.9.tar.gz
+cd hello-2.9
+./configure && make && make check
+@end example
+
+@item All OSes can start to compile @command{GNU Coreutils}:
+@example
+cd /tmp
+wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+xzcat coreutils-8.23.tar.xz | tar -xf -
+cd coreutils-8.23
+./configure && make && make check
+@end example
+NOTE: On some OSes (e.g. MINIX, NetBSD6.1.4) compilation fails half-way
+through.
+
+@item Some (but not all) OSes can build GNU programs from GIT:
+@example
+cd /tmp
+git clone git://git.sv.gnu.org/datamash
+cd datamash
+./bootstrap && ./configure && make
+@end example
+NOTE: Building from git (using gnuli's @file{bootstrap}) usually requires
+a recent version of autotools programs which are not always available.
+
+@end itemize
+
+The typical @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
+download image file, after decompressing with with @command{unxz}):
+@example
+kvm -nographic -m 384 \
+    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
+@end example
+
+Or use the supplied @file{pretest_run.sh} for more options:
+@example
+pretest_run.sh XXXX.qcow2
+@end example
+
+Available pre-build virtual machines:
+
+@table @asis
+
+@item OpenBSD 5.5
+@url{http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz}
+
+@item NetBSD 6.1.4
+@url{http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz}
+
+@item GNU Hurd/Debian
+@url{http://files.housegordon.org/pretest/v0.1/hurd.build-ready.qcow2.xz}
+
+@item MINIX R3.3.0
+@url{http://files.housegordon.org/pretest/v0.1/minixR330.build-ready-v1.qcow2.xz}
+
+@item FreeBSD 10
+@url{http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz}
+
+@end table
+
 
 @c ***********************************************************
 @c Future Improvements
