@@ -1,0 +1,17 @@
+# Ignore texinfo-generated files
+
+pretest.aux
+pretest.cp
+pretest.cps
+pretest.fn
+pretest.html
+pretest.info
+pretest.ky
+pretest.log
+pretest.pdf
+pretest.pg
+pretest.toc
+pretest.tp
+pretest.vr
+
+pretest/*.html
