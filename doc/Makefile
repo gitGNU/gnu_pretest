@@ -10,7 +10,9 @@ all: $(HTML) $(PDF) $(INFO)
 	makeinfo --pdf $<
 
 %.html: %.texi
-	makeinfo --html --no-split $<
+	texi2any --set-customization-variable WORDS_IN_PAGE=0 \
+	         --html --no-split \
+	         -- $<
 
 %.info: %.texi
 	makeinfo $<

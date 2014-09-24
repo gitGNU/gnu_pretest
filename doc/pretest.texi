@@ -69,6 +69,429 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 @chapter Build Recipes
 @cindex Build Recipes
 
+@menu
+* GNU Hurd::      Preparing GNU Hurd VM
+* OpenBSD 5.5::   Installing OpenBSD 5.5 VM
+* NetBSD 6.1.4::  Installing NetBSD 6.1.4 VM
+* FreeBSD 10::    Installing FreeBSD 10 VM
+* Minix R3.3.0::  Installing Minix R3.3.0 VM
+@end menu
+
+
+@c ***********************************************************
+@c GNU Hurd
+@c ***********************************************************
+@node GNU Hurd, OpenBSD 5.5, Build Recipes, Build Recipes
+@section GNU Hurd
+@cindex GNU Hurd, build recipe
+@cindex build recipe, GNU Hurd
+
+More information:
+@url{https://www.gnu.org/software/hurd/hurd/running/qemu.html}.
+
+GNU-Hurd post-installation information:
+@url{http://www.debian.org/ports/hurd/hurd-install}.
+
+NOTE: !! can't use virtio drivers
+
+root: no password
+
+    adduser miles
+        password for miles: 12345
+    adduser miles sudo
+
+    ## Enable 'sudo' without password
+@example
+    sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+@end example
+
+After first boot:
+    # Boot from console
+    # See: https://www.gnu.org/software/hurd/faq/serial_console.html
+@example
+    echo 'GRUB_CMDLINE_GNUMACH="console=com0"' >> /etc/default/grub
+    update-grub
+@end example
+
+halt, save image
+
+@c ***********************************************************
+@c Open BSD 5.5
+@c ***********************************************************
+@node OpenBSD 5.5, NetBSD 6.1.4, GNU Hurd, Build Recipes
+@section OpenBSD 5.5
+@cindex OpenBSD 5.5, build recipe
+@cindex build recipe, OpenBSD 5.5
+
+ISO Source: @url{ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/amd64/install55.iso}
+
+## During Setup
+  vio0 - dhcp, no ip6
+  no X11
+  root pw: 12345
+  sshd/root - disabled
+  change default console to com0 [no] (will be set later)
+  Setup a user: yes [miles]
+  non-root user: miles
+  non-root pw: 12345
+  disable ssh logins to root: [no]
+
+@example
+The auto-allocated layout for sd0 is:
+   #                size           offset  fstype [fsize bsize  cpg]
+     a:           953.9M               64  4.2BSD   2048 16384    1 # /
+     b:           256.0M          1953664    swap
+     c:          5120.0M                0  unused
+     d:          3072.0M          2477952  4.2BSD   2048 16384    1 # /usr
+     e:           832.5M          8769408  4.2BSD   2048 16384    1 # /home
+@end example
+  location of sets: [ftp] (or [cd]?)
+
+  Change sets:
+     +bsd.mp
+     -game55.tgz
+     -xfont55.tgz
+     -xserv55.tgz
+     -xshare55.tgz
+
+NOTE:
+  Installing packages from CD failed with 'dc_attach' errors (and reboot).
+  New installation from FTP
+
+  Type "Reboot" when done, system will reboot using disk
+
+## First Boot
+    # Enable Serial Console for amd64/i386 targets
+    # see http://www.openbsd.org/faq/faq7.html#SerCon
+    # NOTE:
+    #  Using "com0" will prevent "-curses" from showing console log (though login still possible)
+@example
+    echo "set tty com0" >> /etc/boot.conf
+@end example
+
+Enable Login on Serial Console
+@example
+sed '/^console/s/off secure/on secure/' /etc/ttys > /tmp/t && mv /tmp/t /etc/ttys
+@end example
+
+Shorten boot-loader timeout
+@example
+echo "set timeout 1" >> /etc/boot.conf
+@end example
+
+Enable Sudo without password for 'wheel' members
+@example
+sed '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers > /tmp/s \
+    && mv /tmp/s /etc/sudoers && chmod 0440 /etc/sudoers
+@end example
+
+Halt, and save as clean setup
+
+
+## Install development packages
+
+@example
+echo 'PKG_PATH="ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/packages/$(machine -a)/"' >> .profile
+echo 'export PKG_PATH' >> .profile
+
+echo autoconf-2.69p1 automake-1.14.1 gperf wget \
+     xz rsync-3.1.0 git bison | xargs -n1 pkg_add -v
+@end example
+
+Setup autotools for user miles
+@example
+echo AUTOMAKE_VERSION=1.14 >> ~miles/.profile
+echo AUTOCONF_VERSION=2.69 >> ~miles/.profile
+echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
+@end example
+
+Halt, qmeu "commit all".
+
+@c ***********************************************************
+@c Net BSD 6.1.4
+@c ***********************************************************
+@node NetBSD 6.1.4, Minix R3.3.0, OpenBSD 5.5, Build Recipes
+@section NetBSD 6.1.4
+@cindex NetBSD 6.1.4, build recipe
+@cindex build recipe, NetBSD 6.1.4
+
+HACK NOTE:
+  "-drive" with disk image with virtio drive MUST APPEAR BEFORE "-cdrom",
+  otherwise NETBSD will not properly detect the disk size.
+
+HACK NOTE:
+  Don't know how to install a working clang/gcc,
+  so can't use "minimal install". Choose "installation without X11" to automaticall get Gcc installed in "/usr/bin/gcc"
+
+During installation, vrtio network drive will return "%100 packet loss" when pinging to QEMU's 10.0.2.3 - ignore it.
+
+Setup:
+ choose "Installation without X11"
+ choose "Use Entire DisK"
+ Use only one (root) partition (the default) - do not add space to other parittions
+
+ Install From: Select CD-ROM
+
+ in "configure additional items" menu:
+    1. choose "enable sSHd" = YEs
+    2. select "configure network", enable DHCP, but it will fail (because QEMU user-mode network doesn't allow pings)
+    3. don't bother with "binary packages" (it will fail, will be setup after boot).
+    4. click "exit"
+
+ when back in the shell, run "reboot".
+ After reboot, system will boot from installed disk.
+
+## After first boot
+   1. Edit "/etc/rc.conf" , add "dhclient=YES" line at the bottom. Reboot and run "/sbin/ifconfig" to verify DHCP was OK (or run "/sbin/dhclient vioif0" to force dhclient update)
+Setup DHCP:
+@example
+echo "dhclient=YES" >> /etc/rc.conf
+@end example
+reboot (to verify and enable DHCP)
+
+
+Add "pkgin" system
+See @url{http://www.unixmen.com/howto-install-pkgin-on-netbsd-6/}
+@example
+echo 'export "PKG_PATH=http://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/$(uname -m)/6.1.4/All;$@{PKG_PATH@}"' >> ~/.profile
+. ~/.profile
+pkg_add -v pkgin
+pkgin -y update
+@end example
+
+Install sudo, enable 'wheel' group members to sudo without password:
+@example
+pkgin -y install sudo
+sed '/^# %wheel.*NOPASSWD:/s/^# //' /usr/pkg/etc/sudoers > /tmp/s \
+  && mv /tmp/s /usr/pkg/etc/sudoers
+@end example
+
+Add user miles:
+@example
+useradd -G wheel -m miles
+passwd miles (12345, type it 4 times because it's weak)
+@end example
+
+Enable console mode
+# Show console on serial console (allows login with "-curses" but not kernel/console/log messages)
+# no need to update /etc/ttys - "console" is "on" by default
+@example
+echo "consdev=auto" >> /boot.cfg
+@end example
+
+Shorten boot delay
+@example
+sed '/^timeout=/s/=.*/=1/' /boot.cfg > /tmp/b && mv /tmp/b /boot.cfg
+@end example
+
+Halt, Save image as 'clean install'.
+
+After second reboot
+@example
+echo git-base binutils bison perl autoconf \
+     automake wget rsync pkg-config bash gperf \
+     gettext gmake bmake gtexinfo | xargs -n1 pkgin -y install
+@end example
+
+run "halt" to shutdown,
+press "CTRL-A C" to switch to QEMU monitor
+run "commit all" to save changes
+run "quit" to quit QEMU
+
+@c ***********************************************************
+@c FreeBSD 10
+@c ***********************************************************
+@node FreeBSD 10, Minix R3.3.0, NetBSD 6.1.4, Build Recipes
+@section FreeBSD 10
+@cindex FreeBSD 10, build recipe
+@cindex build recipe, FreeBSD 10
+
+## During Setup
+   Hostname: freebsd10
+   Distribution select: none
+   Partitioning: guided
+   Parition: Entire disk
+   Partition Editor: vtbd0 + finish + commit
+   root password: 12345
+   Network config: vtnet0
+   IPv6: no
+
+@example
+vtbd0           5.0 GB  GPT
+  vtbd0p1       64 KB   freebsd-boot
+  vtbd0p2       4.7 GB  freebsd-ufs    /
+  vtbd0p3       256 MB  freebsd-swap   none
+@end example
+
+  root password: 12345
+  dhcp
+  ipv6: no
+  non-root user: miles
+  invite user into other groups: wheel
+  non-root password: 12345
+
+Select "reboot" to reboot using the new disk
+
+## After First boot:
+
+Install SUDO and setup 'wheel' group:
+@example
+env ASSUME_ALWAYS_YES=YES pkg update
+env ASSUME_ALWAYS_YES=YES pkg install sudo
+sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
+@end example
+
+Enable Console Login on serial port (for qemu -nographic)
+See @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}
+@example
+echo 'consolcomconsole,vidconsole"' >> /boot/loader.conf
+sed -i.bak -e '/^ttyu0/s/off/on/' -e '/^ttyu0/s/dialup/vt100/' /etc/ttys
+@end example
+
+Reduce bootloader wait time
+@example
+echo 'autoboot_delay="1"' >> /boot/loader.conf
+@end example
+
+Halt, stop KVM ,save image as 'clean-install'
+
+Install Build tools:
+
+Start image using @command{./run_scripts/pretest_run.sh freebsd10.qcow2},
+Then run:
+@example
+echo pkgconf gperf autoconf automake git bison wget rsync \
+     | xargs -n1 env ASSUME_ALWAYS_YES=YES pkg install
+@end example
+
+Run @command{/sbin/halt} to stop the machine, press @kbd{CTRL-A,c} to switch
+to QEMU's monitor, run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+ave the disk image as 'build-ready'.
+
+
+
+@c ***********************************************************
+@c Minix R3.3.0
+@c ***********************************************************
+@node Minix R3.3.0, Future Improvements, FreeBSD 10, Build Recipes
+@section Minix R3.3.0
+@cindex Minix R3.3.0, build recipe
+@cindex build recipe, Minix R3.3.0
+
+Downloaded from: @url{http://www.minix3.org/download/}
+
+NOTE:
+First boot must use "-hda" and "-cdrom", can't use "virtio" during installation.
+Only after installation, re-configure as virto, see :
+@url{http://wiki.minix3.org/UsersGuide/RunningOnQemu}
+
+Root: no password
+
+No sudo package ?
+
+Setup:
+  1. Boot from CD
+  2. Login with "Root" (no password)
+  3. On ISO CD console run:
+@example
+     sed '/^ROOTMB=128/s/=128/=2048/' /bin/setup > /bin/mysetup
+     chmod a+x /bin/mysetup
+     /bin/mysetup:
+@end example
+	Choose 'us-std' keyboard
+	choose 'auto' mode to use custom disk partitioning
+	Choose "/home" partition to be ~1100 MB
+
+	All other questions use default answers.
+	Network card: [12] (virtio)
+	Network configuration: DHCP [1]
+   4. Once installation completes, type "reboot"
+   5. The system will reboot using the installed drive.
+
+After first boot:
+
+Setup serial console
+
+Show console on serial console (allows login with "-curses" but not kernel/console/log messages)
+See @url{https://groups.google.com/forum/#!topic/Minix3/cyY9NX6SLeo}.
+# no need to update /etc/ttys - "console"is "on" by default
+@example
+sed '/rootdevname=c0d0p0s0 $/s/$/console=tty00 /' /boot.cfg > /tmp/a \
+    && mv /tmp/a /boot.cfg
+@end example
+
+Shorten boot delay
+@example
+sed '/^timeout=/s/=.*/=1/' /boot.cfg > /tmp/b \
+    && mv /tmp/b /boot.cfg
+@end example
+
+Setup user
+@example
+useradd -m miles
+passwd miles (12345, type it 3 times)
+@end example
+
+Stop the machine
+@example
+       /sbin/halt
+@end example
+
+Stop 'kvm', save qcow2 file as "clean-install".
+
+Use "pretest_run.sh" start minix:
+
+@example
+./run_scripts/pretest_run.sh minixR330.qcow2
+@end example
+   
+After Second Boot
+Install development-related packages:
+See @url{http://wiki.minix3.org/en/UsersGuide/InstallingBinaryPackages}
+@example
+pkgin -y update
+echo vim openssh git-base binutils clang bison perl \
+     autoconf automake wget rsync pkg-config bash \
+     gperf gettext gmake bmake | xargs -n1 pkgin -y install
+@end example
+
+Minix does not have 'cc' by default (requires "./configure CC=clang"),
+so a default link
+@example
+ln -s $(which clang) /usr/bin/cc
+@end example
+
+# WGET problems:
+A lot of this is happening:
+  http://www.perzl.org/aix/index.php?n=FAQs.FAQs#wget-warning-msg
+   libidn: warning: libiconv not installed, cannot convert data to UTF-8
+ Andd then:
+  The solution, as explained here:
+     https://groups.google.com/d/msg/minix3/t1G13l4WJcQ/-Y6WfFAXCYkJ
+Is to use a very old WGET version which doesn't need "MSG_PEEK" support in recv(2).
+   Install from source:
+   See   http://wiki.minix3.org/UsersGuide/InstallingSourcePackages
+
+@example
+cd /tmp/
+curl -o wget-1.9.tar.gz http://ftp.gnu.org/gnu/wget/wget-1.9.tar.gz
+tar -xzf wget-1.9.tar.gz
+cd wget-1.9
+./configure CC=clang --without-ssl --disable-threads
+make
+make install
+cd ..
+rm -r ./wget-1.9*
+@end example
+
+Stop Minix with @command{/sbin/halt}, then commit the data using
+QEMU monitor's @command{commit all}. Exit QEMU and save the disk image as
+'build-ready'.
+
+
+
 @c ***********************************************************
 @c Future Improvements
 @c ***********************************************************
