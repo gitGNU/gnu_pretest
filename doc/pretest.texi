@@ -31,6 +31,7 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 * Getting Started::      Using PreTest images
 * Usage::                Effective use of these VMs
 * Build Recipes::        How each VM was built
+* Downloads::            Available downloads of pre-built VMs
 * Future Improvements::  The TODO List
 * Concept Index::        The Index
 @end menu
@@ -70,50 +71,155 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 @cindex Build Recipes
 
 @menu
-* GNU Hurd::      Preparing GNU Hurd VM
-* OpenBSD 5.5::   Installing OpenBSD 5.5 VM
-* NetBSD 6.1.4::  Installing NetBSD 6.1.4 VM
-* FreeBSD 10::    Installing FreeBSD 10 VM
-* Minix R3.3.0::  Installing Minix R3.3.0 VM
+* Build Recipe Introduction::   Information relevant to all build recipes
+* GNU Hurd::                    Preparing GNU Hurd VM
+* OpenBSD 5.5::                 Installing OpenBSD 5.5 VM
+* NetBSD 6.1.4::                Installing NetBSD 6.1.4 VM
+* FreeBSD 10::                  Installing FreeBSD 10 VM
+* Minix R3.3.0::                Installing Minix R3.3.0 VM
 @end menu
+
+@c ***********************************************************
+@c Build Recipe Introduction
+@c ***********************************************************
+@node Build Recipe Introduction, GNU Hurd, Build Recipes, Build Recipes
+@section Build Recipe Introduction
+@cindex Introduction, build recipe
+@cindex build recipe, introduction
+
+Build recipes follow a common structure:
+
+@table @asis
+@item Information
+General Information (such as Home page and Download page) for this operating
+system.
+
+@item Download
+Where to find the CD ISO image file used for this VM installation.
+
+Scripts to download the ISO and run QEMU/KVM for the initial installation
+are provided in the @file{build_scripts} directory.
+
+@item QMEU/KVM Notes ('build_scripts')
+Some OSes need special QEMU/KVM flags for initial installation.
+This section will list any critical issues.
+
+Scripts to download the ISO and run QEMU/KVM for the initial installation
+are provided in the @file{build_scripts} directory.
+
+@item Installation from CD/ISO
+Notes regarding special setup/installation options required during
+the setup process.
+In the future, this step should be automated, see @xref{Future Improvements}.
+
+@item First boot ('clean-install')
+After the installation from the ISO file is complete, the system should be
+rebooted (still running under the same QEMU/KVM process).
+The build scripts are configured to boot from the installed drive.
+This section lists commands to be run at this stage, to prepare the image
+to be run with the @command{pretest_run.sh} scripts with similar settings
+(e.g. same password for user @var{root} and non-root user @var{miles},
+@command{sudo} without password for user @var{miles},
+boot using serial console, etc.).
+
+When this step is complete, QEMU/KVM should be stopped, and the QCOW2
+file are tagged as 'clean-install'. Such pre-built images are
+available for download, see @xref{Downloads}.
+
+@item Setup build tools ('build-ready')
+This section lists commands required to install build tools (e.g.
+@command{autoconf}, @command{git}, @command{make}, etc.).
+The VMs are started using @command{pretest_run.sh}, and after installation is
+complete, the QCOW2 files are tagged as 'build-ready'. Such pre-build images
+are available for download, see @xref{Downloads}.
+
+@end table
+
 
 
 @c ***********************************************************
 @c GNU Hurd
 @c ***********************************************************
-@node GNU Hurd, OpenBSD 5.5, Build Recipes, Build Recipes
+@node GNU Hurd, OpenBSD 5.5, Build Recipe Introduction, Build Recipes
 @section GNU Hurd
 @cindex GNU Hurd, build recipe
 @cindex build recipe, GNU Hurd
 
-More information:
-@url{https://www.gnu.org/software/hurd/hurd/running/qemu.html}.
+GNU Hurd home page: @url{http://www.gnu.org/software/hurd/}
 
-GNU-Hurd post-installation information:
-@url{http://www.debian.org/ports/hurd/hurd-install}.
+GNU Hurd is the OS kernel, and several different user-space OSes are availble.
+The instructions below use GNU Hurd/Debian,
+see @url{http://www.debian.org/ports/hurd/hurd-install}.
 
-NOTE: !! can't use virtio drivers
+@cindex GNU Hurd, download
+@unnumberedsubsec Download
+The VM setup for GNU Hurd starts with a pre-build Hurd/Debian system (not a
+CDROM ISO image file). The pre-build image was prepared by Debian User
+@code{~sthibault}, see @url{https://people.debian.org/~sthibault/hurd-i386/README}.
 
-root: no password
+The raw disk image used was
+@url{https://people.debian.org/~sthibault/hurd-i386/debian-hurd-20140529.img.gz}
 
-    adduser miles
-        password for miles: 12345
-    adduser miles sudo
+After download and uncompressing the image, @command{qemu-img} was used to
+convert the image from @sc{RAW} format to @sc{qcow2} format.
 
-    ## Enable 'sudo' without password
+Download and initial QEMU invocation commands are available in the
+@file{build_scripts/build_hurd-20140529.sh} file, see @xref{Downloads}.
+
+@cindex GNU Hurd, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+GNU Hurd can not use @option{virtio} drivers for disk or networking.
+The installation script (@file{build_scripts/build_hurd-20140529.sh}) and the
+run script (@file{pretest_run.sh}) use @sc{IDE} for disk emulation,
+and @sc{rtl8139} for network emulation.
+
+See @url{http://www.gnu.org/software/hurd/hurd/running/qemu.html}
+
+@cindex GNU Hurd, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+There are no installation instructions, the GNU Hurd/Debian image is already
+installed.
+
+@cindex GNU Hurd, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (no password).
+
+Add user @var{miles}:
 @example
-    sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+adduser miles
+passwd miles      # enter '12345' for the password
 @end example
 
-After first boot:
-    # Boot from console
-    # See: https://www.gnu.org/software/hurd/faq/serial_console.html
+Add user @var{miles} to @var{sudo} group:
 @example
-    echo 'GRUB_CMDLINE_GNUMACH="console=com0"' >> /etc/default/grub
-    update-grub
+adduser miles sudo
 @end example
 
-halt, save image
+Enable @command{sudo} without password for @var{sudo} group members:
+@example
+sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+@end example
+
+Configure booting using serial console
+(see @url{https://www.gnu.org/software/hurd/faq/serial_console.html}):
+@example
+echo 'GRUB_CMDLINE_GNUMACH="console=com0"' >> /etc/default/grub
+update-grub
+@end example
+
+Stop GNU-Hurd VM:
+@example
+/sbin/halt
+@end example
+
+Note: since the downloaded image is already installed, there is no
+`clean-install` version of of GNU Hurd VM.
+
+Tag the @file{hurd.qcow2} as `build-ready`. A pre-build image is available for
+download, see @xref{Downloads}.
+
 
 @c ***********************************************************
 @c Open BSD 5.5
@@ -123,58 +229,76 @@ halt, save image
 @cindex OpenBSD 5.5, build recipe
 @cindex build recipe, OpenBSD 5.5
 
-ISO Source: @url{ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/amd64/install55.iso}
+OpenBSD 5.5 Homepage: @url{http://www.openbsd.org/55.html}.
 
-## During Setup
-  vio0 - dhcp, no ip6
-  no X11
-  root pw: 12345
-  sshd/root - disabled
-  change default console to com0 [no] (will be set later)
-  Setup a user: yes [miles]
-  non-root user: miles
-  non-root pw: 12345
-  disable ssh logins to root: [no]
+@cindex OpenBSD 5.5, download
+@unnumberedsubsec Download
+ISO : @url{ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/amd64/install55.iso}
 
+@cindex OpenBSD 5.5, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+OpenBSD 5.5 installation works well with default QEMU/KVM settings and
+@option{virtio} drivers.
+See the installation script (@file{build_scripts/build_openbsd55.sh}) for
+download and QMEU/KVM commands.
+
+@cindex OpenBSD 5.5, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, select the following options:
+
+@itemize
+@item
+network interface: @var{vio0}, enable @var{dhcp}, no @var{ipv6}
+@item
+X11: @var{no}
+@item
+root pw: @var{12345}
+@item
+change default console to com0 @var{no} (will be set later)
+@item
+Setup a user: @var{yes} (user @var{miles})
+@item
+non-root pw: @var{12345}
+@item
+disable ssh logins to root: @var{no}
+@item
+location of sets: [ftp] (or [cd]?) @var{ftp}
+
+NOTE: I chose @var{ftp} as installing packages from CD failed with
+'dc_attach' errors (and reboot). YMMV.
+@item
+Change sets to install:
+@code{+bsd.mp}
+@code{-game55.tgz}
+@code{-xfont55.tgz}
+@code{-xserv55.tgz}
+@code{-xshare55.tgz}
+@end itemize
+
+When installation is complete, type "Reboot", to reboot into the newly
+installed system (from disk).
+
+@cindex OpenBSD 5.5, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Enable Serial Console for amd64/i386 targets
+(see @url{http://www.openbsd.org/faq/faq7.html#SerCon}):
 @example
-The auto-allocated layout for sd0 is:
-   #                size           offset  fstype [fsize bsize  cpg]
-     a:           953.9M               64  4.2BSD   2048 16384    1 # /
-     b:           256.0M          1953664    swap
-     c:          5120.0M                0  unused
-     d:          3072.0M          2477952  4.2BSD   2048 16384    1 # /usr
-     e:           832.5M          8769408  4.2BSD   2048 16384    1 # /home
+echo "set tty com0" >> /etc/boot.conf
 @end example
-  location of sets: [ftp] (or [cd]?)
+NOTE: Using @var{com0} will prevent QEMU's @option{-curses} from showing
+console log on the screen (though login will still be possible).
 
-  Change sets:
-     +bsd.mp
-     -game55.tgz
-     -xfont55.tgz
-     -xserv55.tgz
-     -xshare55.tgz
-
-NOTE:
-  Installing packages from CD failed with 'dc_attach' errors (and reboot).
-  New installation from FTP
-
-  Type "Reboot" when done, system will reboot using disk
-
-## First Boot
-    # Enable Serial Console for amd64/i386 targets
-    # see http://www.openbsd.org/faq/faq7.html#SerCon
-    # NOTE:
-    #  Using "com0" will prevent "-curses" from showing console log (though login still possible)
+Enable Login on Serial Console:
 @example
-    echo "set tty com0" >> /etc/boot.conf
+sed '/^console/s/off secure/on secure/' /etc/ttys > /tmp/t \
+    && mv /tmp/t /etc/ttys
 @end example
 
-Enable Login on Serial Console
-@example
-sed '/^console/s/off secure/on secure/' /etc/ttys > /tmp/t && mv /tmp/t /etc/ttys
-@end example
-
-Shorten boot-loader timeout
+Shorten boot-loader timeout:
 @example
 echo "set timeout 1" >> /etc/boot.conf
 @end example
@@ -185,11 +309,19 @@ sed '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers > /tmp/s \
     && mv /tmp/s /etc/sudoers && chmod 0440 /etc/sudoers
 @end example
 
-Halt, and save as clean setup
+Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{openbsd55.qcow2}
+ as 'clean-install'. A pre-build image is available for
+download, see @xref{Downloads}.
 
 
-## Install development packages
+@cindex OpenBSD 5.5, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
 
+Start @file{openbsd55.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
 @example
 echo 'PKG_PATH="ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/packages/$(machine -a)/"' >> .profile
 echo 'export PKG_PATH' >> .profile
@@ -198,14 +330,23 @@ echo autoconf-2.69p1 automake-1.14.1 gperf wget \
      xz rsync-3.1.0 git bison | xargs -n1 pkg_add -v
 @end example
 
-Setup autotools for user miles
+Setup autotools for user miles:
 @example
 echo AUTOMAKE_VERSION=1.14 >> ~miles/.profile
 echo AUTOCONF_VERSION=2.69 >> ~miles/.profile
 echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
 @end example
+Without these settings, running @command{autoconf} will terminate with an
+error message complaining about having to select a specific version.
 
-Halt, qmeu "commit all".
+
+Stop the VM with @command{/sbin/halt},
+Enter QEMU's monitor mode (type @kbd{CTRL-A, c}),
+Run @command{commit all} to save changes to @file{openbsd55.qcow2},
+Then @command{quit} to terminate QEMU.
+
+Tag the @file{openbsd55.qcow2} as `build-ready`.
+A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
 @c Net BSD 6.1.4
@@ -215,43 +356,85 @@ Halt, qmeu "commit all".
 @cindex NetBSD 6.1.4, build recipe
 @cindex build recipe, NetBSD 6.1.4
 
-HACK NOTE:
-  "-drive" with disk image with virtio drive MUST APPEAR BEFORE "-cdrom",
-  otherwise NETBSD will not properly detect the disk size.
+NetBSD Homepage: @url{http://www.netbsd.org}.
 
-HACK NOTE:
-  Don't know how to install a working clang/gcc,
-  so can't use "minimal install". Choose "installation without X11" to automaticall get Gcc installed in "/usr/bin/gcc"
+NetBSD 6.1.4 Release Announcement:
+@url{http://netbsd.org/releases/formal-6/NetBSD-6.1.4.html}.
 
-During installation, vrtio network drive will return "%100 packet loss" when pinging to QEMU's 10.0.2.3 - ignore it.
+@cindex NetBSD 6.1.4, download
+@unnumberedsubsec Download
 
-Setup:
- choose "Installation without X11"
- choose "Use Entire DisK"
- Use only one (root) partition (the default) - do not add space to other parittions
+ISO: @url{ftp://iso.netbsd.org/pub/NetBSD/iso/6.1.4/NetBSD-6.1.4-amd64.iso}
 
- Install From: Select CD-ROM
+@cindex NetBSD 6.1.4, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
 
- in "configure additional items" menu:
-    1. choose "enable sSHd" = YEs
-    2. select "configure network", enable DHCP, but it will fail (because QEMU user-mode network doesn't allow pings)
-    3. don't bother with "binary packages" (it will fail, will be setup after boot).
-    4. click "exit"
+Notes:
+@itemize
+@item
+@option{-drive} with disk image with virtio drive MUST APPEAR BEFORE
+@option{-cdrom}, otherwise NETBSD will not properly detect the disk size.
 
- when back in the shell, run "reboot".
- After reboot, system will boot from installed disk.
+@item
+During installation, vrtio network drive will return "%100 packet loss"
+when pinging to QEMU's 10.0.2.3 - ignore it. QEMU's @option{-nic user}
+emulates user-level networking which only allows TCP or UDP, but not ICMP
+@end itemize
 
-## After first boot
-   1. Edit "/etc/rc.conf" , add "dhclient=YES" line at the bottom. Reboot and run "/sbin/ifconfig" to verify DHCP was OK (or run "/sbin/dhclient vioif0" to force dhclient update)
-Setup DHCP:
+See the installation script (@file{build_scripts/build_netbsd614.sh}) for
+download and QMEU/KVM commands.
+
+@cindex NetBSD 6.1.4, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item
+choose "Installation without X11" (instead of "minimal installation"). This
+will automatically install @command{gcc} in @file{/usr/bin/gcc}.
+Installing GCC later proved to be challenging (fixes are welcomed).
+
+@item
+When setting up disk, choose "Use Entire DisK".
+
+@item
+Use only one (root) partition (the default) - do not add space to other parittions
+
+@item
+Install From: Select @var{CD-ROM}
+
+@item
+In "configure additional items" menu:
+
+@itemize
+@item Choose "enable sshd" = @var{yes}
+@item Select "configure network", enable DHCP, but it will fail (because QEMU user-mode network doesn't allow pings)
+@item Don't bother with "binary packages" (it will fail, will be setup after boot).
+@item Select "exit" to complete the installation.
+@end itemize
+
+@end itemize
+
+When back in the shell, run @command{reboot}.
+After reboot, system will boot from installed disk.
+
+@cindex NetBSD 6.1.4, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Enable DHCP:
 @example
 echo "dhclient=YES" >> /etc/rc.conf
 @end example
-reboot (to verify and enable DHCP)
 
+And immediately reboot (run @command{reboot}) to verify DHCP settings work.
+Alternatively, run @command{/sbin/dhclient viof0} to force dhclient update.
 
 Add "pkgin" system
-See @url{http://www.unixmen.com/howto-install-pkgin-on-netbsd-6/}
+(see @url{http://www.unixmen.com/howto-install-pkgin-on-netbsd-6/}):
 @example
 echo 'export "PKG_PATH=http://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/$(uname -m)/6.1.4/All;$@{PKG_PATH@}"' >> ~/.profile
 . ~/.profile
@@ -266,37 +449,53 @@ sed '/^# %wheel.*NOPASSWD:/s/^# //' /usr/pkg/etc/sudoers > /tmp/s \
   && mv /tmp/s /usr/pkg/etc/sudoers
 @end example
 
-Add user miles:
+Add user @var{miles}:
 @example
 useradd -G wheel -m miles
-passwd miles (12345, type it 4 times because it's weak)
+passwd miles # user password '12345', type it 4 times because it's weak
 @end example
 
-Enable console mode
-# Show console on serial console (allows login with "-curses" but not kernel/console/log messages)
-# no need to update /etc/ttys - "console" is "on" by default
+Enable console on serial port:
 @example
 echo "consdev=auto" >> /boot.cfg
 @end example
 
-Shorten boot delay
+NOTE 1: allows login with QEMU's @option{-curses} but not kernel/console/log
+messages.
+
+NOTE 2: no need to update @file{/etc/ttys} - "console" is on by default.
+
+Shorten boot delay:
 @example
-sed '/^timeout=/s/=.*/=1/' /boot.cfg > /tmp/b && mv /tmp/b /boot.cfg
+sed '/^timeout=/s/=.*/=1/' /boot.cfg > /tmp/b \
+    && mv /tmp/b /boot.cfg
 @end example
 
-Halt, Save image as 'clean install'.
+Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{netbsd614.qcow2}
+ as 'clean-install'. A pre-build image is available for
+download, see @xref{Downloads}.
 
-After second reboot
+@cindex NetBSD 6.1.4, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{netbsd614.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
 @example
 echo git-base binutils bison perl autoconf \
      automake wget rsync pkg-config bash gperf \
      gettext gmake bmake gtexinfo | xargs -n1 pkgin -y install
 @end example
 
-run "halt" to shutdown,
-press "CTRL-A C" to switch to QEMU monitor
-run "commit all" to save changes
-run "quit" to quit QEMU
+Stop the VM with @command{/sbin/halt},
+Enter QEMU's monitor mode (type @kbd{CTRL-A, c}),
+Run @command{commit all} to save changes to @file{netbsd614.qcow2},
+Then @command{quit} to terminate QEMU.
+
+Tag the @file{netbsd614.qcow2} as `build-ready`.
+A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
 @c FreeBSD 10
@@ -306,59 +505,75 @@ run "quit" to quit QEMU
 @cindex FreeBSD 10, build recipe
 @cindex build recipe, FreeBSD 10
 
-## During Setup
-   Hostname: freebsd10
-   Distribution select: none
-   Partitioning: guided
-   Parition: Entire disk
-   Partition Editor: vtbd0 + finish + commit
-   root password: 12345
-   Network config: vtnet0
-   IPv6: no
+@cindex FreeBSD 10, download
+@unnumberedsubsec Download
 
-@example
-vtbd0           5.0 GB  GPT
-  vtbd0p1       64 KB   freebsd-boot
-  vtbd0p2       4.7 GB  freebsd-ufs    /
-  vtbd0p3       256 MB  freebsd-swap   none
-@end example
+ISO @url{ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/amd64/ISO-IMAGES/10.0/FreeBSD-10.0-RELEASE-amd64-disc1.iso}
 
-  root password: 12345
-  dhcp
-  ipv6: no
-  non-root user: miles
-  invite user into other groups: wheel
-  non-root password: 12345
+@cindex FreeBSD 10, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+FreeBSD 10 works well with the default QEMU/KVM settings.
 
-Select "reboot" to reboot using the new disk
+See the installation script (@file{build_scripts/build_freebsd10.sh}) for
+download and QMEU/KVM commands.
 
-## After First boot:
+@cindex FreeBSD 10, CD Installation
+@unnumberedsubsec CD Installation/Setup
 
-Install SUDO and setup 'wheel' group:
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item Hostname: @var{freebsd10}
+@item Distribution select: @var{none}
+@item Partitioning: @var{guided}
+@item Parition: @var{Entire disk}
+@item Partition Editor: Use disk @var{vtbd0}, select @var{finish} then @var{commit}
+@item root password: @var{12345}
+@item Network config: Use @var{vtnet0}, DHCP: @var{yes}, IPv6: @var{no}.
+@item Create non-root user: @var{miles}
+@item invite user into other groups: @var{wheel}
+@item non-root password: @var{12345}
+@end itemize
+
+Select @var{reboot} to reboot with the newly installed system.
+
+@cindex FreeBSD 10, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Install @command{sudo} and setup 'wheel' group to sudo without password:
 @example
 env ASSUME_ALWAYS_YES=YES pkg update
 env ASSUME_ALWAYS_YES=YES pkg install sudo
 sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
 @end example
 
-Enable Console Login on serial port (for qemu -nographic)
-See @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}
+Enable Console Login on serial port
+(see @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}):
 @example
 echo 'consolcomconsole,vidconsole"' >> /boot/loader.conf
 sed -i.bak -e '/^ttyu0/s/off/on/' -e '/^ttyu0/s/dialup/vt100/' /etc/ttys
 @end example
 
-Reduce bootloader wait time
+Reduce bootloader wait time:
 @example
 echo 'autoboot_delay="1"' >> /boot/loader.conf
 @end example
 
-Halt, stop KVM ,save image as 'clean-install'
+Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{freebsd10.qcow2}
+ as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
 
-Install Build tools:
+@cindex FreeBSD 10, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
 
-Start image using @command{./run_scripts/pretest_run.sh freebsd10.qcow2},
-Then run:
+Start @file{freebsd10.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
 @example
 echo pkgconf gperf autoconf automake git bison wget rsync \
      | xargs -n1 env ASSUME_ALWAYS_YES=YES pkg install
@@ -368,9 +583,8 @@ Run @command{/sbin/halt} to stop the machine, press @kbd{CTRL-A,c} to switch
 to QEMU's monitor, run @command{commit all} to save changes, then @command{quit}
 to terminate QEMU.
 
-ave the disk image as 'build-ready'.
-
-
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
 @c Minix R3.3.0
@@ -380,76 +594,96 @@ ave the disk image as 'build-ready'.
 @cindex Minix R3.3.0, build recipe
 @cindex build recipe, Minix R3.3.0
 
+Home Page: @url{http://www.minix3.org/}
+
+@cindex MINIX R3.3.0, download
+@unnumberedsubsec Download
+
 Downloaded from: @url{http://www.minix3.org/download/}
 
-NOTE:
+ISO @url{http://download.minix3.org/iso/minix_R3.3.0-588a35b.iso.bz2}
+
+@cindex MINIX R3.3.0, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
 First boot must use "-hda" and "-cdrom", can't use "virtio" during installation.
-Only after installation, re-configure as virto, see :
+After installation, re-configure as virto, see
 @url{http://wiki.minix3.org/UsersGuide/RunningOnQemu}
 
-Root: no password
+See the installation script (@file{build_scripts/build_minixR330.sh}) for
+download and QMEU/KVM commands.
 
-No sudo package ?
+@cindex MINIX R3.3.0, CD Installation
+@unnumberedsubsec CD Installation/Setup
 
-Setup:
-  1. Boot from CD
-  2. Login with "Root" (no password)
-  3. On ISO CD console run:
+Hack note: The default MINIX3 setup allocates 128MB for the root partition,
+with the rest of the space for @file{/usr} and @file{/home}.
+For @emph{pretest}, we prefer a large @file{/tmp} directory, and so we modify
+the setup script to allocate larger root partition.
+
+Setup steps:
+@itemize
+@item Boot from CD (or run @file{build_minixR330.sh})
+@item Login with "Root" (no password)
+@item run:
 @example
      sed '/^ROOTMB=128/s/=128/=2048/' /bin/setup > /bin/mysetup
      chmod a+x /bin/mysetup
-     /bin/mysetup:
 @end example
-	Choose 'us-std' keyboard
-	choose 'auto' mode to use custom disk partitioning
-	Choose "/home" partition to be ~1100 MB
+This will create a new setup script (@file{/bin/mysetup}) which defaults to
+a large (2GB) root partition.
+@item Start the MINIX installation program by running @command{/bin/mysetup}
+@item Choose 'us-std' keyboard
+@item Choose 'auto' mode to use custom disk partitioning
+@item Choose @file{/home} partition to be ~1100 MB
+@item Use default answers for other questions
+@item Network card: @var{virtio}
+@item Network configuration: @var{DHCP}
+@end itemize
 
-	All other questions use default answers.
-	Network card: [12] (virtio)
-	Network configuration: DHCP [1]
-   4. Once installation completes, type "reboot"
-   5. The system will reboot using the installed drive.
+Once installation completes, run @command{reboot} to reboot with the
+newly installed system.
 
-After first boot:
+@cindex MINIX R3.3.0, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (no password).
 
 Setup serial console
-
-Show console on serial console (allows login with "-curses" but not kernel/console/log messages)
-See @url{https://groups.google.com/forum/#!topic/Minix3/cyY9NX6SLeo}.
-# no need to update /etc/ttys - "console"is "on" by default
+(see @url{https://groups.google.com/forum/#!topic/Minix3/cyY9NX6SLeo}):
 @example
 sed '/rootdevname=c0d0p0s0 $/s/$/console=tty00 /' /boot.cfg > /tmp/a \
     && mv /tmp/a /boot.cfg
 @end example
+NOTE 1: allows login with "-curses" but not kernel/console/log messages
 
-Shorten boot delay
+NOTE 2: no need to update /etc/ttys - "console"is "on" by default
+
+Shorten boot delay:
 @example
 sed '/^timeout=/s/=.*/=1/' /boot.cfg > /tmp/b \
     && mv /tmp/b /boot.cfg
 @end example
 
-Setup user
+Setup non-root user @var{miles}:
 @example
 useradd -m miles
-passwd miles (12345, type it 3 times)
+passwd miles     # use @var{12345}, type it 3 times
 @end example
 
-Stop the machine
-@example
-       /sbin/halt
-@end example
+Stop the VM with @command{halt},
+tag the QCOW2 file @file{minixR330.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
 
-Stop 'kvm', save qcow2 file as "clean-install".
+@cindex MINIX R3.3.0, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
 
-Use "pretest_run.sh" start minix:
+Start @file{minixR330.qcow2} with the @command{pretest_run.sh} script.
 
-@example
-./run_scripts/pretest_run.sh minixR330.qcow2
-@end example
-   
-After Second Boot
-Install development-related packages:
-See @url{http://wiki.minix3.org/en/UsersGuide/InstallingBinaryPackages}
+Once booted, login with @var{root} (no password).
+
+Install development-related packages
+(see @url{http://wiki.minix3.org/en/UsersGuide/InstallingBinaryPackages}):
 @example
 pkgin -y update
 echo vim openssh git-base binutils clang bison perl \
@@ -457,23 +691,20 @@ echo vim openssh git-base binutils clang bison perl \
      gperf gettext gmake bmake | xargs -n1 pkgin -y install
 @end example
 
-Minix does not have 'cc' by default (requires "./configure CC=clang"),
-so a default link
+Minix uses @command{clang} but does not have @command{cc} by default,
+add a soft link (for easier @command{./configure} usage):
 @example
 ln -s $(which clang) /usr/bin/cc
 @end example
 
-# WGET problems:
-A lot of this is happening:
-  http://www.perzl.org/aix/index.php?n=FAQs.FAQs#wget-warning-msg
-   libidn: warning: libiconv not installed, cannot convert data to UTF-8
- Andd then:
-  The solution, as explained here:
-     https://groups.google.com/d/msg/minix3/t1G13l4WJcQ/-Y6WfFAXCYkJ
-Is to use a very old WGET version which doesn't need "MSG_PEEK" support in recv(2).
-   Install from source:
-   See   http://wiki.minix3.org/UsersGuide/InstallingSourcePackages
+Replace defective @command{wget} with a working older version:
 
+The default @command{wget} on MINIX3 exhibits two problems:
+@url{http://www.perzl.org/aix/index.php?n=FAQs.FAQs#wget-warning-msg} and
+@url{https://groups.google.com/d/msg/minix3/t1G13l4WJcQ/-Y6WfFAXCYkJ}.
+
+A temporary work-around is to install an old @command{wget} which doesn't use
+@code{MSG_PEEK} in @code{recv(2)}.
 @example
 cd /tmp/
 curl -o wget-1.9.tar.gz http://ftp.gnu.org/gnu/wget/wget-1.9.tar.gz
@@ -486,16 +717,27 @@ cd ..
 rm -r ./wget-1.9*
 @end example
 
-Stop Minix with @command{/sbin/halt}, then commit the data using
-QEMU monitor's @command{commit all}. Exit QEMU and save the disk image as
-'build-ready'.
+Run @command{/sbin/halt} to stop the machine,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
 
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
+@c Downloads
+@c ***********************************************************
+@node Downloads, Future Improvements, Build Recipes , Top
+@chapter Downloads
+@cindex Downloads
+@cindex Pre-build VMs
 
 
 @c ***********************************************************
 @c Future Improvements
 @c ***********************************************************
-@node Future Improvements, Concept Index, Build Recipes, Top
+@node Future Improvements, Concept Index, Downloads, Top
 @chapter Future Improvements
 @cindex Future Improvements
 
