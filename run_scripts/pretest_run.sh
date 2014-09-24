@@ -53,7 +53,7 @@ test -z "$QCOW2_FILE" \
     && die "missing QCOW2 file name. See -h for more information"
 test -e "$QCOW2_FILE" \
     || die "QCOW2 file '$QCOW2_FILE' not found"
-qemu-img check -q "$QCOW2_FILE" \
+qemu-img check "$QCOW2_FILE" \
     || die "file '$QCOW2_FILE' does not appear to be a valid QCOW2 image"
 
 ## Set names based on QCOW2 filename
@@ -67,22 +67,34 @@ SNAPSHOT_PARAM=
 DAEMON_PARAM=
 DISPLAY_PARAM=
 PID_PARAM=
+SERIAL_PARAM=
 test "x$snapshot"  = xyes && SNAPSHOT_PARAM="-snapshot"
 test "x$daemonize" = xyes && DAEMON_PARAM="-daemonize"
 test "x$daemonize" = xyes && PID_PARAM="-pidfile '$PIDFILE'"
 test "x$nographic" = xyes && DISPLAY_PARAM="-nographic"
 test "x$curses"    = xyes && DISPLAY_PARAM="-curses"
 test "x$display"   = xyes && DISPLAY_PARAM="-vga cirrus"
+test "x$display"   = xyes && SERIAL_PARAM="-serial stdio"
 
 ## Ugly Hacks to accomodate some OSes
 DISK_IF=virtio
 NET_IF=virtio
+KVM_PARAMS=
 
 # Hack for GNU-Hurd: can't handle virtio
 if echo "$NAME" | grep -q '[Hh]urd' ; then
     DISK_IF=ide
     NET_IF=rtl8139
 fi
+# Hack for NetBSD on older QEMUs: boot hangs.
+# Seems related to this (but mentioned work-arounds don't work for me):
+#  https://mail-index.netbsd.org/port-amd64/2013/02/19/msg001860.html
+if echo "$NAME" | grep -qi 'netbsd' ; then
+    # TODO: only disable on kvm < 2.0.0 (or specific CPUs?)
+    KVM_PARAMS="-no-kvm"
+fi
+
+rm -f "$NAME.booted" "$NAME.par"
 
 kvm -name "$NAME" \
     -drive file="$QCOW2_FILE",if=$DISK_IF,media=disk,index=0 \
@@ -91,10 +103,17 @@ kvm -name "$NAME" \
     -net user \
     -boot "$boot_from" \
     -redir tcp:${ssh_port}::22 \
+    -nodefaults \
     $PID_PARAM \
     $SNAPSHOT_PARAM \
     $DAEMON_PARAM \
-    $DISPLAY_PARAM
+    $DISPLAY_PARAM \
+    $SERIAL_PARAM \
+    $KVM_PARAMS \
+    -vga std \
+    -serial mon:stdio \
+    -serial file:"$NAME.booted" \
+    -serial file:"$NAME.par"
 
 ## vim: set shiftwidth=4:
 ## vim: set tabstop=4:

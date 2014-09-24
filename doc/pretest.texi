@@ -62,12 +62,37 @@ manual.
 @chapter Future Improvements
 @cindex Future Improvements
 
+@section Scripts
+
+Check mimimum version of QEMU/KVM (missing @option{-q} on old @command{qemu-img}).
+
+@section Guest VMs
+
 CloudInit/KickStart automation - passing commands to guest (perhaps with iso)
 
 Communicate with host when boot process is done, and login through SSH is possible.
 
 Add "-serial file:" device (as second serial port), allow dumping data from guest to host
 without network.
+
+Fix NetBSD (boot withot -no-kvm on Debian7), fix /root/.profile 's invalid export command
+
+@verbatim
+Multiple-Serials:
+http://lists.gnu.org/archive/html/qemu-devel/2010-01/msg00458.html
+
+    -nodefaults \
+    -vga std \
+    -serial mon:stdio \
+    -serial file:"$NAME.booted" \
+    -serial file:"$NAME.par"
+@end verbatim
+
+@section Manual
+
+Root passwod exception: minix,hurd (no password)
+
+Sudo: minix
 
 @node    Concept Index,    ,  Future Improvements, Top
 @comment node-name,    next,  previous,      up
