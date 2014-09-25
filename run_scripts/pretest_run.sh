@@ -20,13 +20,13 @@ daemonize=no
 while getopts zCDSm:p:h name
 do
         case $name in
-        m)      echo "$OPT_ARG" | grep -q '^[0-9][0-9]*$' \
-                    || die "invalid RAM size '$OPT_ARG'"
+        m)      echo "$OPTARG" | grep -q '^[0-9][0-9]*$' \
+                    || die "invalid RAM size '$OPTARG'"
                 ram_size="OPT_ARG"
                 ;;
-        p)      echo "$OPT_ARG" | grep -q '^[0-9][0-9]*$' \
-                    || die "invalid SSH redirection port '$OPT_ARG'"
-                ssh_port="OPT_ARG"
+        p)      echo "$OPTARG" | grep -q '^[0-9][0-9]*$' \
+                    || die "invalid SSH redirection port '$OPTARG'"
+                ssh_port="$OPTARG"
                 ;;
         S)      snapshot=no
                 ;;
