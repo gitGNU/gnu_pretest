@@ -1,0 +1,77 @@
+@c ***********************************************************
+@c OS Name and Version
+@c ***********************************************************
+@node OS_NAME_VERSION, (next node), (previous node), (up node)
+@section OS_NAME_VERSION
+@cindex OS_NAME_VERSION, build recipe
+@cindex build recipe, OS_NAME_VERSION
+
+Home Page: @url{}
+
+Version Announcement: @url{}
+
+@cindex OS_NAME_VERSION, download
+@unnumberedsubsec Download
+
+ISO @url{}
+
+@cindex OS_NAME_VERSION, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+XXX works well with the default QEMU/KVM settings.
+
+See the installation script (@file{build_scripts/build_XXX.sh}) for
+download and QMEU/KVM commands.
+
+@cindex OS_NAME_VERSION, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item Hostname: @var{XXX}
+@end itemize
+
+Once installation completes, run @command{reboot} to reboot with the
+newly installed system.
+
+@cindex OS_NAME_VERSION, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Install @command{sudo} and setup 'wheel' group to sudo without password:
+@example
+@end example
+
+Enable Console Login on serial port:
+@example
+@end example
+
+Reduce bootloader wait time:
+@example
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{XXX.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex OS_NAME_VERSION, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{XXX.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+@end example
+
+Run @command{/sbin/halt} to stop the machine,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
