@@ -28,7 +28,8 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 
 @menu
 * Introduction::         What this Pretest is all aobut
-* Getting Started::      Using PreTest images
+* Quick Start::          Try it out now
+* VM Configuration::     Using PreTest images
 * Usage::                Effective use of these VMs
 * Build Recipes::        How each VM was built
 * Downloads::            Available downloads of pre-built VMs
@@ -41,28 +42,179 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 @c ***********************************************************
 @c Introduction
 @c ***********************************************************
-@node    Introduction, Getting Started, Top,      Top
+@node    Introduction, Quick Start, Top,      Top
 @comment node-name,     next,          previous, up
 @chapter Introduction
 @cindex Introduction
 
+The goal of @emph{pretest} is to provide virtual-machine images of
+Free-Software POSIX-compliant operating systems, for portability testing of
+GNU software (or any other @command{autotools}-based software).
+
+The virtual-machine images are pre-configured to have similar settings and
+similar tools installed.
+
+This version of @emph{pretest} provides images for quick and easy manual
+testing. Future versions will add automated testing facilities.
+
+@c ***********************************************************
+@c Quick Start
+@c ***********************************************************
+@node    Quick Start, VM Configuration, Introduction,      Top
+
+@comment node-name,     next,          previous, up
+@chapter Quick Start
+@cindex Quick Start
+
+Download one of the images in the @ref{Downloads} section, and decompress
+the image
+@example
+wget http://files.housegordon.org/pretest/v0.1/minixR330.build-ready-v1.qcow2.xz
+unxz minixR330.build-ready-v1.qcow2.xz
+@end example
+
+Run the image:
+@example:
+kvm -nographic -m 384 \
+    -net user -net nic,model=virtio \
+    -drive if=virtio,media=disk,index=0,file=minixR330.build-ready-v1.qcow2.xz
+@end example
+
+User name is @var{miles}, password is @var{12345}.
+
+While the virtual machine is running, type @kbd{CTRL-A, C} to switch
+to QEMU Monitor mode (@url{http://en.wikibooks.org/wiki/QEMU/Monitor}).
+Type @kbd{CTRL-A, c} to return to the virtual machine's console.
+
+A helper script (@file{pretest_run.sh}) provides more KVM/QEMU options.
+
 @c ***********************************************************
 @c Getting Started
 @c ***********************************************************
-@node    Getting Started, Usage, Introduction,      Top
+@node    VM Configuration, Usage, Quick Start,      Top
 @comment node-name,     next,          previous, up
-@chapter Getting Started
-@cindex Getting Started
+@chapter VM Configuration
+@cindex VM Configuration
+
+This version of @emph{pretest} provides two types of pre-built virtual-macihne
+images:
+@table @asis
+@item Clean-Install
+Minimal configuration, after a clean install from a CD ISO image, using
+(mostly) default settings for the installation process.
+
+@item Build-Ready
+Based on the 'clean-install' images, with additional packages installed to
+enable compilation of GNU software (or other @command{autotool}-based pacakges).
+@end table
+
+@menu
+* Clean-Install VMs::        Minimally configurated VMs
+* Build-Ready VMs::          GNU-autotools configured VMs
+@end menu
+
+@node    Clean-Install VMs, Build-Ready VMs, VM Configuration, VM Configuration
+@section Clean-Install VMs
+@cindex  Clean-Install VMs
+
+@emph{Pretest}'s virtual machine in 'clean-install' state are configured with
+the following items:
+@itemize
+@item uses @emph{virtio} disk interface, with QEMU's @option{-drive if=virtio} (except HURD)
+@item uses @emph{virtio} network interface, with QEMU's @option{-net nic,model=virtio} (except HURD)
+@item Network interface configured with DHCP, works with QEMU's @option{-net user}.
+@item VM uses serial console (for qemu's @option{-nographic} or @option{-serial stdio})
+@item Root password is @var{12345} (or empty on MINIX,HURD)
+@item Non-Root user is @var{miles} password @var{12345}
+@item user @var{miles} can @command{sudo} without a password (except MINIX)
+@end itemize
+
+The minimal @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
+download image file, after decompressing with with @command{unxz}):
+@example
+kvm -nographic -m 384 \
+    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
+@end example
+
+Or use the supplied @file{pretest_run.sh} for more options:
+@example
+pretest_run.sh XXXX.qcow2
+@end example
+
+see @ref{Clean-Install VM downloads} for list of available VM images.
+
+@node    Build-Ready VMs, Build Recipes, Clean-Install VMs, VM Configuration
+@section Build-Ready VMs
+@cindex  Build-Ready VMs
+
+@emph{Pretest}'s virtual machine in 'build-ready' state are configured with
+the following items (in addition to all '@ref{Clean-Install VMs}' settings):
+@itemize
+@item The default compiler for the OS (e.g. @command{gcc} or @command{clang})
+@item @command{make}, and optionally @command{gmake} (if @command{make} is not GNU make)
+@item autotools programs (@command{automake}, @command{autoconf}, @command{authoreconf})
+@item texinfo (@command{makeinfo})
+@item @command{pkg-config}, @command{gperf}
+@item @command{git}, @command{rync}, @command{wget}, @command{xz}
+
+@item @emph{NOTE}: The version of the above programs vary widely between OSes.
+The installed versions used are the defaults available for the OS.
+
+@item All OSes can compile @command{GNU Hello}:
+@example
+cd /tmp
+wget http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
+tar xzf hello-2.9.tar.gz
+cd hello-2.9
+./configure && make && make check
+@end example
+
+@item All OSes can start to compile @command{GNU Coreutils}:
+@example
+cd /tmp
+wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+xzcat coreutils-8.23.tar.xz | tar -xf -
+cd coreutils-8.23
+./configure && make && make check
+@end example
+NOTE: On some OSes (e.g. MINIX, NetBSD6.1.4) compilation fails half-way
+through.
+
+@item Some (but not all) OSes can build GNU programs from GIT:
+@example
+cd /tmp
+git clone git://git.sv.gnu.org/datamash
+cd datamash
+./bootstrap && ./configure && make
+@end example
+NOTE: Building from git (using gnuli's @file{bootstrap}) usually requires
+a recent version of autotools programs which are not always available.
+
+@end itemize
+
+The typical @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
+downloaded image file, after decompressing with with @command{unxz}):
+@example
+kvm -nographic -m 384 \
+    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
+@end example
+
+Or use the supplied @file{pretest_run.sh} for more options:
+@example
+pretest_run.sh XXXX.qcow2
+@end example
+
+see @ref{Build-Ready VM downloads} for list of available VM images.
 
 @c ***********************************************************
 @c Usage
 @c ***********************************************************
-@node    Usage, Build Recipes, Getting Started, Top
+@node    Usage, Build Recipes, VM Configuration, Top
 @comment node-name,     next,          previous, up
 @chapter Usage
 @cindex Usage
 
-@c ***********************************************************
+@c **********************************************************o
 @c Build Recipces
 @c ***********************************************************
 @node    Build Recipes, Future Improvements, Usage, Top
@@ -733,33 +885,18 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex Downloads
 @cindex Pre-build VMs
 
+@menu
+* Clean-Install VM downloads::        List of available VMs
+* Build-Ready VM downloads::          List of available VMs
+@end menu
+
+@node Clean-Install VM downloads, Build-Ready VM downloads, Downloads, Downloads
 @cindex Clean-Install Images downloads
 @cindex downloads, clean-install images
-@section Clean-Install Images
+@section Clean-Install VM downloads
 
-The following @sc{qcow2} virtual machine images correspond to the
-'clean-install' step:
-@itemize
-@item VM uses @emph{virtio} disk,networks drivers (except HURD)
-@item VM uses serial console (for qemu's @option{-nographic})
-@item Root password is @var{12345} (or empty on MINIX,HURD)
-@item Non-Root user is @var{miles} password @var{12345}
-@item user @var{miles} can @command{sudo} without a password (except MINIX)
-@end itemize
-
-The typical @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
-download image file, after decompressing with with @command{unxz}):
-@example
-kvm -nographic -m 384 \
-    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
-@end example
-
-Or use the supplied @file{pretest_run.sh} for more options:
-@example
-pretest_run.sh XXXX.qcow2
-@end example
-
-Available pre-build virtual machines:
+Available pre-build virtual machines are congiured as described in
+@ref{Clean-Install VMs} section:
 
 @table @asis
 @item OpenBSD 5.5
@@ -782,70 +919,13 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 
 
 
+@node Build-Ready VM downloads, Future Improvements, Clean-Install VM downloads, Downloads
 @cindex Build-Ready Images downloads
 @cindex downloads, Build-ready images
 @section Build-ready images
 
-The following @sc{qcow2} virtual machine images correspond to the
-'build-ready' step. In addition to the 'clean-install' settings (e.g.
-user names and passwords) the following are installed:
-@itemize
-@item The default compiler for the OS (e.g. @command{gcc} or @command{clang})
-@item @command{make}, and optionally @command{gmake} (if @command{make} is not GNU make)
-@item autotools programs (@command{automake}, @command{autoconf}, @command{authoreconf})
-@item texinfo (@command{makeinfo})
-@item @command{pkg-config}, @command{gperf}
-@item @command{git}, @command{rync}, @command{wget}, @command{xz}
-
-@item @emph{NOTE}: The version of the above programs vary widely between OSes.
-The installed versions used are the defaults available for the OS.
-
-@item All OSes can compile @command{GNU Hello}:
-@example
-cd /tmp
-wget http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
-tar xzf hello-2.9.tar.gz
-cd hello-2.9
-./configure && make && make check
-@end example
-
-@item All OSes can start to compile @command{GNU Coreutils}:
-@example
-cd /tmp
-wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
-xzcat coreutils-8.23.tar.xz | tar -xf -
-cd coreutils-8.23
-./configure && make && make check
-@end example
-NOTE: On some OSes (e.g. MINIX, NetBSD6.1.4) compilation fails half-way
-through.
-
-@item Some (but not all) OSes can build GNU programs from GIT:
-@example
-cd /tmp
-git clone git://git.sv.gnu.org/datamash
-cd datamash
-./bootstrap && ./configure && make
-@end example
-NOTE: Building from git (using gnuli's @file{bootstrap}) usually requires
-a recent version of autotools programs which are not always available.
-
-@end itemize
-
-The typical @command{kvm} usage would be (replace @file{XXXX.qcow2} with the
-download image file, after decompressing with with @command{unxz}):
-@example
-kvm -nographic -m 384 \
-    -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
-@end example
-
-Or use the supplied @file{pretest_run.sh} for more options:
-@example
-pretest_run.sh XXXX.qcow2
-@end example
-
-Available pre-build virtual machines:
-
+Available pre-build virtual machines are congiured as described in
+@ref{Build-Ready VMs} section:
 @table @asis
 
 @item OpenBSD 5.5
@@ -902,6 +982,8 @@ http://lists.gnu.org/archive/html/qemu-devel/2010-01/msg00458.html
 New run script which waits until the system has booted (with daemon,pid,ssh access).
 
 MOTD in each VM, pointing back to PreTest
+
+Remove undeeded daemons (exim4, rpc in debian?)
 
 @section Manual
 
