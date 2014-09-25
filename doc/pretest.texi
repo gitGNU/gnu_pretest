@@ -1522,37 +1522,52 @@ Check mimimum version of QEMU/KVM (missing @option{-q} on old @command{qemu-img}
 
 @section Guest VMs
 
-CloudInit/KickStart automation - passing commands to guest (perhaps with iso)
+@itemize
 
-Communicate with host when boot process is done, and login through SSH is possible.
+@item CloudInit/KickStart automation - passing commands to guest (perhaps with iso)
 
-Add "-serial file:" device (as second serial port), allow dumping data from guest to host
-without network.
+@item Communicate with host when boot process is done, and login through SSH is possible.
+Perhaps with a serial device -> file on host
 
-Fix NetBSD (boot withot -no-kvm on Debian7), fix /root/.profile 's invalid export command
+@item add "-serial file:" device (as second serial port), allow dumping data from guest to host
+without network. Write instructions with @command{base64/uuencode -m}, and 
+decoding commands with @command{tr -d '\r'}.
 
-@verbatim
-Multiple-Serials:
-http://lists.gnu.org/archive/html/qemu-devel/2010-01/msg00458.html
+@item Fix NetBSD (boot withot -no-kvm on Debian7), fix /root/.profile 's invalid export command
+
+@item Investigate multiple serial devices
+
+@url{http://lists.gnu.org/archive/html/qemu-devel/2010-01/msg00458.html}
+
+@example
     -nodefaults \
     -vga std \
     -serial mon:stdio \
     -serial file:"$NAME.booted" \
     -serial file:"$NAME.par"
-@end verbatim
+@end example
 
-
+@item
 New run script which waits until the system has booted (with daemon,pid,ssh access).
 
+@item
 MOTD in each VM, pointing back to PreTest
 
-Remove undeeded daemons (exim4, rpc in debian?)
+@item
+Remove undeeded daemons (exim4, rpc in debian?).
+
+@item
+Remove unneeded files (perhaps @command{virt-sparsify} or @command{virt-syspre}).
+
+@end itemize
 
 @section Manual
 
-Root passwod exception: minix,hurd (no password)
-
-Sudo: minix
+@itemize
+@item Root passwod exception: minix,hurd (no password)
+@item Mention no sudo on minix
+@item Add 'thanks' section, for DilOS and Minix
+@end itemize
 
 @node    Concept Index,    ,  Future Improvements, Top
 @comment node-name,    next,  previous,      up
