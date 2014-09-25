@@ -77,7 +77,7 @@ Run the image:
 @example:
 kvm -nographic -m 384 \
     -net user -net nic,model=virtio \
-    -drive if=virtio,media=disk,index=0,file=minixR330.build-ready-v1.qcow2.xz
+    -drive if=virtio,media=disk,index=0,file=minixR330.build-ready-v1.qcow2
 @end example
 
 User name is @var{miles}, password is @var{12345}.
@@ -1893,6 +1893,15 @@ Remove undeeded daemons (exim4, rpc in debian?).
 
 @item
 Remove unneeded files (perhaps @command{virt-sparsify} or @command{virt-syspre}).
+
+@item
+Add Previous stable OS versions: FreeBSD 9.3, Debian 6, Ubuntu 12 LTS
+
+@item
+Add more gnu/linuxes: OpenSUSE, Arch
+
+@item
+Add non-amd64 VMs (debian-armbe on QEMU?)
 
 @end itemize
 
