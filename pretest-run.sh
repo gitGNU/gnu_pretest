@@ -24,17 +24,19 @@ echo "HELP NOT ImPLEMENTED YET"
 exit 1
 }
 
-## parse parameterse
+## parse parameters
+vga_default_driver=cirrus  # no way to change it from command-line, yet.
 boot_from=cd
 show_help=
 ram_size=384
 ssh_port=2222
 snapshot=yes
+pid_file=no
+serial_file=no
 curses=no
-display=no
-nographic=yes
+vga=no
 daemonize=no
-while getopts zCDSm:p:h name
+while getopts m:p:SrCDhzP name
 do
         case $name in
         m)      echo "$OPTARG" | grep -q '^[0-9][0-9]*$' \
@@ -47,15 +49,18 @@ do
                 ;;
         S)      snapshot=no
                 ;;
+        r)      serial_file=yes
+                ;;
         C)      curses=yes
-                nographic=no
                 ;;
-        D)      display=yes
-                nographic=no
+        D)      vga=yes
                 ;;
-        h)      show_help=y
+        h)      show_help=yes
                 ;;
         z)      daemonize=yes
+                pid_file=yes
+                ;;
+        P)      pid_file=yes
                 ;;
         ?)      die "Try -h for help."
         esac
@@ -78,6 +83,7 @@ NAME=$(basename "$QCOW2_FILE" | tr -d -c '[:alnum:].-_')
 NAME=${NAME%.*}
 
 PIDFILE="$NAME.pid"
+SERIALFILE="$NAME.serial"
 
 ## Prepare KVM parameters
 SNAPSHOT_PARAM=
@@ -85,13 +91,28 @@ DAEMON_PARAM=
 DISPLAY_PARAM=
 PID_PARAM=
 SERIAL_PARAM=
-test "x$snapshot"  = xyes && SNAPSHOT_PARAM="-snapshot"
-test "x$daemonize" = xyes && DAEMON_PARAM="-daemonize"
-test "x$daemonize" = xyes && PID_PARAM="-pidfile '$PIDFILE'"
-test "x$nographic" = xyes && DISPLAY_PARAM="-nographic"
-test "x$curses"    = xyes && DISPLAY_PARAM="-curses"
-test "x$display"   = xyes && DISPLAY_PARAM="-vga cirrus"
-test "x$display"   = xyes && SERIAL_PARAM="-serial stdio"
+test "x$snapshot"    = xyes && SNAPSHOT_PARAM="-snapshot"
+test "x$daemonize"   = xyes && DAEMON_PARAM="-daemonize"
+test "x$pid_file"    = xyes && PID_PARAM="-pidfile '$PIDFILE'"
+test "x$serial_file" = xyes && SERIAL_PARAM="-serial 'file:$SERIALFILE'"
+
+# Figure out the display type.
+# NOTE:
+#  If PreTest VMs are configured to use the first serial as console.
+#  If the user asked for Graphi display, send the first serial port to NULL.
+#  (In the future, perhaps add "-serial stdio".)
+#  This is needed in case the user asked for a serial file as well,
+#  which should be connected to the SECOND serial port in the guest.
+if test "x$curses" = xyes ; then
+    DISPLAY_PARAM="-vga std -curses -serial null"
+elif test "x$vga" = xyes ; then
+    DISPLAY_PARAM="-vga $vga_default_driver -serial null"
+else
+    # Default: if display options specified, emulate '-no-graphics'
+
+    #TODO: why is '-vga std' needed ? '-vga none' fails to boot some VMs...
+    DISPLAY_PARAM="-nographic -serial mon:stdio"
+fi
 
 ## Ugly Hacks to accomodate some OSes
 DISK_IF=virtio
@@ -129,11 +150,8 @@ kvm -name "$NAME" \
     $DAEMON_PARAM \
     $DISPLAY_PARAM \
     $SERIAL_PARAM \
-    $KVM_PARAMS \
-    -vga std \
-    -serial mon:stdio \
-    -serial file:"$NAME.booted" \
-    -serial file:"$NAME.par"
+    $KVM_PARAMS
+
 
 ## vim: set shiftwidth=4:
 ## vim: set tabstop=4:
