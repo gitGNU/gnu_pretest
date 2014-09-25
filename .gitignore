@@ -1,0 +1,8 @@
+README.html
+os-versions.html
+os-versions.tsv
+
+images/*.qcow2.xz
+images/*.iso.xz
+images/*.qcow2
+images/*.iso
