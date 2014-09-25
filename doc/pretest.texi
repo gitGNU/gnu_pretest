@@ -229,7 +229,8 @@ see @ref{Build-Ready VM downloads} for list of available VM images.
 * NetBSD 6.1.4::                Installing NetBSD 6.1.4 VM
 * FreeBSD 10::                  Installing FreeBSD 10 VM
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
-* Debian 7.6::                  Installing Debian 7.6
+* Debian 7.6::                  Installing Debian 7.6 VM
+* CentOS 7.0::                  Installing CentOS 7.0 VM
 @end menu
 
 @c ***********************************************************
@@ -883,7 +884,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c Debian 7.6
 @c ***********************************************************
-@node Debian 7.6, Downloads, Minix R3.3.0, Build Recipes
+@node Debian 7.6, CentOS 7.0, Minix R3.3.0, Build Recipes
 @section Debian 7.6
 @cindex Debian 7.6, build recipe
 @cindex build recipe, Debian 7.6
@@ -998,6 +999,146 @@ Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
+@c OS Name and Version
+@c ***********************************************************
+@node CentOS 7.0, Downloads, Debian 7.6, Build Recipes
+@section CentOS 7.0
+@cindex CentOS 7.0, build recipe
+@cindex build recipe, CentOS 7.0
+
+Home Page: @url{http://www.centos.org/}
+
+Version Announcement: @url{http://lists.centos.org/pipermail/centos-announce/2014-July/020393.html}
+
+@cindex CentOS 7.0, download
+@unnumberedsubsec Download
+
+Downloads: @url{http://www.centos.org/download/}
+
+ISO @url{http://mirror.us.leaseweb.net/centos/7.0.1406/isos/x86_64/CentOS-7.0-1406-x86_64-NetInstall.iso}
+
+@cindex CentOS 7.0, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+CentOS 7 installation requires a graphic monitor, QEMU's @option{-curses} can
+not be used. Installation also requires a high-resolution monitor (QEMU's
+@option{-vga cirrus} is sufficient, but @option{-vga std} is not).
+
+CentOS 7 installation requires 512 MB of RAM.
+
+See the installation script (@file{build_scripts/build_centos7.sh}) for
+download and QMEU/KVM commands.
+
+@cindex CentOS 7.0, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+CentOS 7 Installer is graphical. Configure the VM by selecting the options
+in the following order:
+@itemize
+@item Setup network
+@itemize
+@item click @var{Network & Hostname}.
+@item then enable @var{eth0} by clicking on the "OFF/ON" button,
+@item Set @var{Hostname} to @var{centos7} (edit-box on bottom of the screen)
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item Setup Installation Source
+@itemize
+@item Enter @var{http://mirror.centos.org/centos/7/os/x86_64/}
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item Software Selection
+@itemize
+@item select @var{minimal install}, without any additional options (e.g. no "development toosl")
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item Installation Destination
+@itemize
+@item Select @var{vda} disk (should bbe highlighted in blue)
+@item Partition: select @var{automatically configure partitioning}
+@item Select @var{NO encryption}
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item click @var{begin installation} button (bottom right)
+
+@item Click @var{root password}
+Enter @var{12345} (password is weak, must click "done" twice to confirm).
+
+@item Click @var{user creation}
+Full name: @var{miles}, User name @var{miles},
+Select @var{make this user administrator},
+Enter password @var{12345}, (password is weak, must click "done" twice to confirm).
+
+@item Wait until installating is complete (progress bar on the bottom of the screen)
+
+@end itemize
+
+Once installation completes, click the @command{reboot} button (bottom-right
+corner) to reboot with the newly installed system.
+
+@cindex CentOS 7.0, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Install @command{sudo} and setup 'wheel' group to sudo without password:
+@example
+@end example
+
+Enable Console on serial port:
+@example
+sed -i -e '/GRUB_CMDLINE_LINUX=/s/"$/ modprobe.blacklist=cirrus"/' \
+       -e '/GRUB_CMDLINE_LINUX=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+       /etc/default/grub
+@end example
+
+Reduce bootloader wait time:
+@example
+sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' /etc/default/grub
+@end example
+
+Update GRUB bootloader configuration:
+@example
+grub2-mkconfig -o /boot/grub2/grub.cfg
+@end example
+
+Enable @command{sudo} without password for 'wheel' group members:
+@example
+sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{centos7.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex CentOS 7.0, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{centos7.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+yum -y update
+yum groupinstall -y "Development Tools"
+yum -y install wget gperf gettext-devel texinfo
+@end example
+
+Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
 @c Downloads
 @c ***********************************************************
 @node Downloads, Future Improvements, Build Recipes , Top
@@ -1037,6 +1178,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item Debian 7.6
 @url{http://files.housegordon.org/pretest/v0.1/debian76.clean-install.qcow2.xz}
 
+@item CentOS 7.0
+@url{http://files.housegordon.org/pretest/v0.1/centos7.clean-install.qcow2.xz}
+
 @end table
 
 
@@ -1068,6 +1212,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item Debian 7.6
 @url{http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz}
+
+@item CentOS 7.0
+@url{http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz}
 
 @end table
 
