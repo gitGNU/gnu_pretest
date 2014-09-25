@@ -231,6 +231,7 @@ see @ref{Build-Ready VM downloads} for list of available VM images.
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
 * Debian 7.6::                  Installing Debian 7.6 VM
 * CentOS 7.0::                  Installing CentOS 7.0 VM
+* CentOS 6.5::                  Installing CentOS 6.5 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
 * DilOS 1.3.7::                 Installing DilOS 1.3.7 VM
 @end menu
@@ -1003,7 +1004,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c OS Name and Version
 @c ***********************************************************
-@node CentOS 7.0, Ubuntu 14.04.1, Debian 7.6, Build Recipes
+@node CentOS 7.0, CentOS 6.5, Debian 7.6, Build Recipes
 @section CentOS 7.0
 @cindex CentOS 7.0, build recipe
 @cindex build recipe, CentOS 7.0
@@ -1139,6 +1140,132 @@ to terminate QEMU.
 
 Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
+@c CentOS 6.5
+@c ***********************************************************
+@node CentOS 6.5, Ubuntu 14.04.1, CentOS 7.0, Build Recipes
+@section CentOS 6.5
+@cindex CentOS 6.5, build recipe
+@cindex build recipe, CentOS 6.5
+
+Home Page: @url{http://www.centos.org}
+
+Version Announcement: @url{http://lists.centos.org/pipermail/centos-announce/2013-December/020032.html}
+
+@cindex CentOS 6.5, download
+@unnumberedsubsec Download
+
+Downloads for 6.5: @url{http://isoredirect.centos.org/centos/6/isos/x86_64/}
+
+ISO @url{http://centos.escapemg.com/6.5/isos/x86_64/CentOS-6.5-x86_64-netinstall.iso}
+
+@cindex CentOS 6.5, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+CentOS 6.5 installation requires a graphic monitor, QEMU's @option{-curses} can
+not be used.
+
+CentOS 6.5 installation requires 512 MB of RAM (installer will still complain
+about not enough memory for graphical installer, and switch to textual
+installer).
+
+See the installation script (@file{build_scripts/build_centos65.sh}) for
+download and QMEU/KVM commands.
+
+@cindex CentOS 6.5, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item installation source: select @var{URL}
+@item Configure TCP/IP: Enable IPv4: @var{yes};
+Dynamic IP Configuration (DHCP): @var{yes};
+Enable IPv6: @var{no}.
+@item URL Setup: @var{http://mirror.centos.org/centos/6.5/os/x86_64/}
+
+@item If prompted with "WARNING" "This device may need to be RE-INITIALIZE DISK",
+click @var{Re-Initialize all}.
+
+@item Root password: @var{123456} (NOTE: will change it later to 12345)
+@item Weak password warning: @var{use anyway}
+
+@item Partitioning type: @var{Replace Eixsting Linux System}
+@item (Wait for package installtion)
+
+@end itemize
+
+Once installation completes, run @command{reboot} to reboot with the
+newly installed system.
+
+@cindex CentOS 6.5, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{123456}).
+
+Change root password to 12345:
+@example
+printf "12345\n12345\n" | passwd root
+@end example
+
+Create user 'miles', add to 'wheel' group, set password to 12345:
+@example
+useradd -m -G wheel miles
+printf "12345\n12345\n" | passwd miles
+@end example
+
+Enable %wheel group to sudo without password
+@example
+sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+@end example
+
+Enable Console Login on serial port
+(see @url{http://www.cyberciti.biz/faq/centos-rhel-6-install-serial-console/}):
+@example
+sed -i -e '/hiddenmenu/aterminal serial console' \
+       -e '/hiddenmenu/aserial --unit=1 --speed=9600' \
+       -e '/splashimage/s/^/# /' \
+       -e '/kernel \//s/quiet//' \
+       -e '/kernel \//s/$/ console=tty0 console=ttyS0,9600n8/' \
+       /boot/grub/grub.conf
+@end example
+
+Enable root login on serial port
+@example
+echo "ttyS0" >>  /etc/securetty
+@end example
+NOTE: there's already @file{/etc/init/serial.conf} which auto-starts getty
+on serial IF it's the kernel's console.
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{centos65.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex CentOS 6.5, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{centos65.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+yum -y update
+yum groupinstall -y "Development Tools"
+yum -y install wget gperf texinfo
+@end example
+
+Run @command{halt} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
 
 
 @c ***********************************************************
@@ -1469,6 +1596,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.clean-install.qcow2.xz}
 
+@item CentOS 6.5
+@url{http://files.housegordon.org/pretest/v0.1/centos6.5.clean-install.qcow2.xz}
+
 @item Ubuntu 14.04.1
 @url{http://files.housegordon.org/pretest/v0.1/ubuntu14.clean-install.qcow2.xz}
 
@@ -1509,6 +1639,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz}
+
+@item CentOS 6.5
+@url{http://files.housegordon.org/pretest/v0.1/centos6.5.build-ready.qcow2.xz}
 
 @item Ubuntu 14.04.1
 @url{http://files.housegordon.org/pretest/v0.1/ubuntu14.build-ready.qcow2.xz}
