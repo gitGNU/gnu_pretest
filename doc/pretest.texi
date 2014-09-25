@@ -231,6 +231,7 @@ see @ref{Build-Ready VM downloads} for list of available VM images.
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
 * Debian 7.6::                  Installing Debian 7.6 VM
 * CentOS 7.0::                  Installing CentOS 7.0 VM
+* Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
 @end menu
 
 @c ***********************************************************
@@ -903,7 +904,7 @@ ISO: @url{http://cdimage.debian.org/debian-cd/7.6.0/amd64/iso-cd/debian-7.6.0-am
 @cindex Debian 7.6, QEMU/KVM notes
 @unnumberedsubsec QEMU/KVM notes
 
-Debian 7.6 installers requires a graphical monitor (doesn't work with QEMU's
+Debian 7.6 installer requires a graphical monitor (doesn't work with QEMU's
 @option{-curses}).
 
 See the installation script (@file{build_scripts/build_debian76.sh}) for
@@ -1001,7 +1002,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c OS Name and Version
 @c ***********************************************************
-@node CentOS 7.0, Downloads, Debian 7.6, Build Recipes
+@node CentOS 7.0, Ubuntu 14.04.1, Debian 7.6, Build Recipes
 @section CentOS 7.0
 @cindex CentOS 7.0, build recipe
 @cindex build recipe, CentOS 7.0
@@ -1138,6 +1139,159 @@ to terminate QEMU.
 Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
+
+@c ***********************************************************
+@c Ubuntu 14.04.1
+@c ***********************************************************
+@node Ubuntu 14.04.1, Downloads, CentOS 7.0, Build Recipes
+@section Ubuntu 14.04.1
+@cindex Ubuntu 14.04.1, build recipe
+@cindex build recipe, Ubuntu 14.04.1
+
+Home Page: @url{http://www.ubuntu.com/}
+
+Version Announcement: @url{http://fridge.ubuntu.com/2014/07/25/ubuntu-14-04-1-lts-released/}
+
+@cindex Ubuntu 14.04.1, download
+@unnumberedsubsec Download
+
+Downloads: @url{http://www.ubuntu.com/download/alternative-downloads}
+
+ISO @url{http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot/mini.iso}
+
+@cindex Ubuntu 14.04.1, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+Ubuntu 14.04.1 installer requires a graphical monitor (doesn't work with QEMU's
+@option{-curses}).
+
+See the installation script (@file{build_scripts/build_ubuntu14.sh}) for
+download and QMEU/KVM commands.
+
+@cindex Ubuntu 14.04.1, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item Hostname: @var{ubuntu14}
+@item Full name for new user: @var{miles}
+@item user name for your account: @var{miles}
+@item password for new user: @var{12345}
+@item Use Weak password: @var{yes}
+@item Encrypt home directory: @var{no}
+@item Partition method: @var{guided - use entire disk}
+@item Select disk to partition: @var{virtual disk1}
+@item Write changes to disk: Select @var{yes}
+@item (Wait for package installation)
+@item Manage upgrade: @var{no automatic upgrades}
+@item Choose Software to install: Select @var{OpenSSH Server}.
+@item (Wait for package installation)
+@item Install Grub Boot loader: @var{yes}
+@end itemize
+
+When installation is complete: choose @var{continue} to reboot with the
+newly installed system.
+
+@cindex Ubuntu 14.04.1, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+NOTE: logging in with @var{root} is disabled; must login with
+use @var{miles} and password @var{12345} (login with root is enabled below):
+
+Enable @command{sudo} without a password:
+@example
+sudo sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+@end example
+NOTE: Initially, this command is executed as user @var{miles}, and so requires
+@command{sudo} and will ask for a password.
+
+Enable login as root with password 12345 (see
+@url{http://askubuntu.com/questions/44418/how-to-enable-root-login}):
+@example
+printf "12345\n12345\n" | sudo passwd root
+sudo passwd -u root
+@end example
+
+Use only Free repositories (@code{main} and @code{universe}),
+without non-free repositories (@code{restricted} and @code{multiverse}):
+@example
+echo "deb http://us.archive.ubuntu.com/ubuntu/ trusty main
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main
+deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates main
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main
+deb http://us.archive.ubuntu.com/ubuntu/ trusty universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty universe
+deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe
+deb http://us.archive.ubuntu.com/ubuntu/ trusty-backports main universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-backports main universe
+deb http://security.ubuntu.com/ubuntu trusty-security main
+deb-src http://security.ubuntu.com/ubuntu trusty-security main
+deb http://security.ubuntu.com/ubuntu trusty-security universe
+deb-src http://security.ubuntu.com/ubuntu trusty-security universe" \
+  | sudo tee /etc/apt/sources.list
+@end example
+
+Enable booting with serial console:
+@example
+sudo sed -i -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ modprobe.blacklist=cirrus"/' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+         -e '/GRUB_TERMINAL=/s/=.*/=console/' \
+         /etc/default/grub
+@end example
+
+Reduce bootloader wait time:
+@example
+sudo sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/^#GRUB_HIDDEN_TIMEOUT/s/^#//' \
+         -e '/GRUB_HIDDEN_TIMEOUT=/s/=.*/=1/' \
+         /etc/default/grub
+@end example
+
+Update GRUB boot-loader configuration:
+@example
+sudo update-grub
+@end example
+
+Create @code{systemd} configuration file for login/getty on serial console
+(see @url{https://help.ubuntu.com/community/SerialConsoleHowto}):
+@example
+echo 'start on stopped rc or RUNLEVEL=[12345]
+stop on runlevel [!12345]
+respawn
+exec /sbin/getty -L 9600 ttyS0 vt102' \
+  | sudo tee /etc/init/ttyS0.conf
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{ubuntu14.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex Ubuntu 14.04.1, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{ubuntu14.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+apt-get install -y build-essential ca-certificates \
+    autopoint automake autoconf gettext \
+    git  gawk vim wget  rsync gperf texinfo pkg-config
+@end example
+
+Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
 @c ***********************************************************
 @c Downloads
 @c ***********************************************************
@@ -1181,6 +1335,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.clean-install.qcow2.xz}
 
+@item Ubuntu 14.04.1
+@url{http://files.housegordon.org/pretest/v0.1/ubuntu14.clean-install.qcow2.xz}
+
 @end table
 
 
@@ -1215,6 +1372,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz}
+
+@item Ubuntu 14.04.1
+@url{http://files.housegordon.org/pretest/v0.1/ubuntu14.build-ready.qcow2.xz}
 
 @end table
 
