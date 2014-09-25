@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.14.1
+autopoint-version: /usr/pkg/bin/autopoint (GNU gettext-tools) 0.18.3
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: no-version
+gmake-version: GNU Make 4.0
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 1.9.0
+wget-version: GNU Wget 1.9
+rsync-version: rsync version 3.1.0 protocol version 31
+gcc-version: missing
+cc-version: clang version 3.4 (branches/release_34)
+uname-s: Minix
+uname-r: 3.3.0
+uname-m: i386
+uname-p: i386
+uname-i: 
+uname-o: 
+uname-v: Minix 3.3.0 (GENERIC)

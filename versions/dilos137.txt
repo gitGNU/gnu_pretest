@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.14
+autopoint-version: /usr/bin/autopoint (GNU gettext-tools) 0.18.3
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: GNU Make 3.82
+gmake-version: GNU Make 3.82
+makeinfo-version: makeinfo (GNU texinfo) 4.7
+git-version: git version 1.9.4
+wget-version: GNU Wget 1.14 built on solaris2.11.
+rsync-version: rsync version 3.0.9 protocol version 30
+gcc-version: gcc (GCC) 4.8.3
+cc-version: missing
+uname-s: SunOS
+uname-r: 5.11
+uname-m: i86pc
+uname-p: i386
+uname-i: i86pc
+uname-o: 
+uname-v: 1.3.7
