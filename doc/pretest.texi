@@ -1842,7 +1842,18 @@ Available pre-build virtual machines are congiured as described in
 
 @section Scripts
 
+@itemize
+
+@item
 Check mimimum version of QEMU/KVM (missing @option{-q} on old @command{qemu-img}).
+
+@item
+Use @command{sshpass} to automate logins:
+@example
+sshpass -p "12345" ssh -p 2222 -o StrictHostKeyChecking=no miles@localhost
+@end example
+
+@end itemize
 
 @section Guest VMs
 
