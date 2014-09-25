@@ -93,6 +93,9 @@ if echo "$NAME" | grep -qi 'netbsd' ; then
     # TODO: only disable on kvm < 2.0.0 (or specific CPUs?)
     KVM_PARAMS="-no-kvm"
 fi
+if echo "$NAME" | grep -qi 'dilos' ; then
+    KVM_PARAMS="$KVM_PARAMS -machine pc-1.1"
+fi
 
 rm -f "$NAME.booted" "$NAME.par"
 
