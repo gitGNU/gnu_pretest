@@ -210,9 +210,88 @@ see @ref{Build-Ready VM downloads} for list of available VM images.
 @c Usage
 @c ***********************************************************
 @node    Usage, Build Recipes, VM Configuration, Top
-@comment node-name,     next,          previous, up
 @chapter Usage
 @cindex Usage
+
+@menu
+* Debian Compilers Pack Usage::     Testing multiple compilers
+@end menu
+
+@node Debian Compilers Pack Usage, Build Recipes, Usage, Usage
+@section Debian Compilers Pack Usage
+@cindex Cross Compilers, usage
+@cindex Compilers Pack
+
+The @ref{Debian Compilers Pack} virtual machine image is pre-configured with
+multile compilers and cross compilers:
+@itemize
+@item gcc (native)
+@item clang (native)
+@item tcc - Tiny C compiler (native)
+@item arm (gcc cross compiler)
+@item powerpc (gcc cross compiler)
+@item mips (gcc cross compiler)
+@item MinGW 32bit (gcc cross compiler)
+@item MinGW 64bit (gcc cross compiler)
+@end itemize
+
+Additionally, the virtual machine is configured with @code{binfmt} and QEMU's
+static emulation to run cross-compiled binaries.
+
+See @ref{Build-Ready VM downloads} for download instructions, and
+@ref{Debian Compilers Pack} for details about how this virtual machine was
+installed.
+
+When using this virtual machine, an @code{autotools}-based project can be
+compiled like so:
+@example
+wget http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
+tar -xf hello-2.9.tar.gz
+cd hello-2.9
+
+# Cross-Compile for ARM
+./configure --host=arm-linux-gnueabi
+
+# Cross-Compile for PowerPC
+./configure --host=powerpc-linux-gnu
+
+# Cross-Compile for MIPS
+./configure --host=mips-linux-gnu
+
+# Cross-Compile for Windows 32Bit
+./configure --host=i686-w64-mingw32
+
+# Cross-Compile for Windows 64-bit
+./configure --host=x86_64-w64-mingw32
+
+# Native Compile using CLANG (instead of the default GCC)
+./configure CC=clang
+
+# Native compile using TCC (TCC is C99-compliant compiler)
+./configure CC=tcc
+
+# The continue to build the project
+make
+@end example
+
+When compiling for ARM/PowerPC/MIPS, the resulting non-native binary
+can be executed on the host using QEMU+binfmt:
+@example
+$ ./configure --host=arm-linux-gnueabi
+<...>
+$ make
+<...>
+$ file ./src/hello
+./src/hello: ELF 32-bit LSB executable, ARM, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.18, BuildID[sha1]=0xcdb472c330662c870db31789e13de057f22c4f52, not stripped
+
+# The ARM binary can be executed:
+$ ./src/hello
+Hello, world!
+
+# And autotools tests can be used:
+$ make check
+<...>
+@end example
 
 @c **********************************************************o
 @c Build Recipces
@@ -230,6 +309,7 @@ see @ref{Build-Ready VM downloads} for list of available VM images.
 * FreeBSD 10::                  Installing FreeBSD 10 VM
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
 * Debian 7.6::                  Installing Debian 7.6 VM
+* Debian Compilers Pack::       Installing many compilers (and cross-compilers) VM
 * CentOS 7.0::                  Installing CentOS 7.0 VM
 * CentOS 6.5::                  Installing CentOS 6.5 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
@@ -887,7 +967,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c Debian 7.6
 @c ***********************************************************
-@node Debian 7.6, CentOS 7.0, Minix R3.3.0, Build Recipes
+@node Debian 7.6, Debian Compilers Pack, Minix R3.3.0, Build Recipes
 @section Debian 7.6
 @cindex Debian 7.6, build recipe
 @cindex build recipe, Debian 7.6
@@ -1001,10 +1081,108 @@ to terminate QEMU.
 Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
+
 @c ***********************************************************
-@c OS Name and Version
+@c Debian Compilers Pack
 @c ***********************************************************
-@node CentOS 7.0, CentOS 6.5, Debian 7.6, Build Recipes
+@node Debian Compilers Pack, CentOS 7.0,Debian 7.6, Build Recipes
+@section Debian Compilers Pack
+@cindex Debian Compilers Pack, build recipe
+@cindex build recipe, Debian Compilers Pack
+
+The @emph{Debian Compilers Pack} is a virtual machine image pre-configured
+with multiple compilers and cross-compilers.
+
+Home Page: @url{http://www.emdebian.org/}
+
+See @ref{Debian Compilers Pack Usage} for usage examples.
+
+@cindex Debian Compilers Pack, Setup build tools
+@unnumberedsubsec Setup build tools
+
+Start with the @ref{Debian 7.6} 'build-ready' image (@file{debian76.qcow2})
+and use the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Add emdebian sources:
+@example
+echo "deb http://ftp.us.debian.org/debian/ squeeze main
+deb http://www.emdebian.org/debian/ squeeze main" \
+   > /etc/apt/sources.list.d/emdebian.list
+@end example
+
+Install Emdebian's keyring and update packages
+@example
+sudo apt-get install emdebian-archive-keyring
+sudo apt-get update
+@end example
+
+Install Armel GCC cross-compiler
+@example
+apt-get -y install gcc-4.3-arm-linux-gnueabi \
+     libc6-armel-cross \
+     libc6-dev-armel-cross \
+     libc-dev-bin-armel-cross \
+     linux-libc-dev-armel-cross
+@end example
+
+Install PowerPC GCC cross-compiler
+@example
+apt-get -y install gcc-4.3-powerpc-linux-gnu g++-4.3-powerpc-linux-gnu \
+      libc-bin-powerpc-cross \
+      libc-dev-powerpc-cross \
+      libc-dev-bin-powerpc-cross \
+      linux-libc-dev-powerpc-cross
+@end example
+
+Install MIPS GCC cross-compiler
+@example
+apt-get -y install  g++-4.3-mips-linux-gnu gcc-4.3-mips-linux-gnu \
+       libc-bin-mips-cross \
+       libc-dev-mips-cross \
+       libc-dev-bin-mips-cross \
+       linux-libc-dev-mips-cross
+@end example
+
+Install MinGW 32/64 bit cross-compilers
+@example
+apt-get -y install binutils-mingw-w64-i686 binutils-mingw-w64-x86-64 \
+       gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 \
+       g++-mingw-w64-i686 g++-mingw-w64-x86-64 \
+       mingw-w64-i686-dev mingw-w64-x86-64-dev \
+       mingw-w64-tools
+@end example
+
+Install additional native compilers: @command{clang} and
+@command{tcc} (Tiny C Compiler):
+@example
+apt-get -y install tcc clang
+@end example
+
+Setup @code{binfmt} with QEMU's static emulation
+(This will allow running cross-compiled binaries on the host system):
+@example
+apt-get -y install qemu binfmt-support qemu-user-static
+ln -s /usr/arm-linux-gnueabi /etc/qemu-binfmt/arm
+ln -s /usr/mips-linux-gnu /etc/qemu-binfmt/mips
+ln -s /usr/powerpc-linux-gnu /etc/qemu-binfmt/ppc
+@end example
+
+Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'compilers-pack'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+
+@c ***********************************************************
+@c Cent OS 7.0
+@c ***********************************************************
+@node CentOS 7.0, CentOS 6.5, Debian Compilers Pack, Build Recipes
 @section CentOS 7.0
 @cindex CentOS 7.0, build recipe
 @cindex build recipe, CentOS 7.0
@@ -1636,6 +1814,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item Debian 7.6
 @url{http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz}
+
+@item Debian Compilers Pack
+@url{http://files.housegordon.org/pretest/v0.1/debian76.compilers-pack.qcow2.xz}
 
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz}
