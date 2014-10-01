@@ -86,7 +86,7 @@ While the virtual machine is running, type @kbd{CTRL-A, C} to switch
 to QEMU Monitor mode (@url{http://en.wikibooks.org/wiki/QEMU/Monitor}).
 Type @kbd{CTRL-A, c} to return to the virtual machine's console.
 
-A helper script (@file{pretest_run.sh}) provides more KVM/QEMU options.
+A helper script (@file{pretest-run.sh}) provides more KVM/QEMU options.
 
 @c ***********************************************************
 @c Getting Started
@@ -136,9 +136,9 @@ kvm -nographic -m 384 \
     -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
 @end example
 
-Or use the supplied @file{pretest_run.sh} for more options:
+Or use the supplied @file{pretest-run.sh} for more options:
 @example
-pretest_run.sh XXXX.qcow2
+pretest-run.sh XXXX.qcow2
 @end example
 
 see @ref{Clean-Install VM downloads} for list of available VM images.
@@ -199,9 +199,9 @@ kvm -nographic -m 384 \
     -drive if=virtio,media=disk,index=0,file=XXXX.qcow2
 @end example
 
-Or use the supplied @file{pretest_run.sh} for more options:
+Or use the supplied @file{pretest-run.sh} for more options:
 @example
-pretest_run.sh XXXX.qcow2
+pretest-run.sh XXXX.qcow2
 @end example
 
 see @ref{Build-Ready VM downloads} for list of available VM images.
@@ -354,7 +354,7 @@ After the installation from the ISO file is complete, the system should be
 rebooted (still running under the same QEMU/KVM process).
 The build scripts are configured to boot from the installed drive.
 This section lists commands to be run at this stage, to prepare the image
-to be run with the @command{pretest_run.sh} scripts with similar settings
+to be run with the @command{pretest-run.sh} scripts with similar settings
 (e.g. same password for user @var{root} and non-root user @var{miles},
 @command{sudo} without password for user @var{miles},
 boot using serial console, etc.).
@@ -366,7 +366,7 @@ available for download, see @xref{Downloads}.
 @item Setup build tools ('build-ready')
 This section lists commands required to install build tools (e.g.
 @command{autoconf}, @command{git}, @command{make}, etc.).
-The VMs are started using @command{pretest_run.sh}, and after installation is
+The VMs are started using @command{pretest-run.sh}, and after installation is
 complete, the QCOW2 files are tagged as 'build-ready'. Such pre-build images
 are available for download, see @xref{Downloads}.
 
@@ -407,7 +407,7 @@ Download and initial QEMU invocation commands are available in the
 @unnumberedsubsec QEMU/KVM notes
 GNU Hurd can not use @option{virtio} drivers for disk or networking.
 The installation script (@file{build_scripts/build_hurd-20140529.sh}) and the
-run script (@file{pretest_run.sh}) use @sc{IDE} for disk emulation,
+run script (@file{pretest-run.sh}) use @sc{IDE} for disk emulation,
 and @sc{rtl8139} for network emulation.
 
 See @url{http://www.gnu.org/software/hurd/hurd/running/qemu.html}
@@ -554,7 +554,7 @@ download, see @xref{Downloads}.
 @cindex OpenBSD 5.5, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{openbsd55.qcow2} with the @command{pretest_run.sh} script.
+Start @file{openbsd55.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -715,7 +715,7 @@ download, see @xref{Downloads}.
 @cindex NetBSD 6.1.4, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{netbsd614.qcow2} with the @command{pretest_run.sh} script.
+Start @file{netbsd614.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -806,7 +806,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex FreeBSD 10, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{freebsd10.qcow2} with the @command{pretest_run.sh} script.
+Start @file{freebsd10.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -918,7 +918,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex MINIX R3.3.0, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{minixR330.qcow2} with the @command{pretest_run.sh} script.
+Start @file{minixR330.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (no password).
 
@@ -1063,7 +1063,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex Debian 7.6, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{debian76.qcow2} with the @command{pretest_run.sh} script.
+Start @file{debian76.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -1104,7 +1104,7 @@ See @ref{Debian Compilers Pack Usage} for usage examples.
 @unnumberedsubsec Setup build tools
 
 Start with the @ref{Debian 7.6} 'build-ready' image (@file{debian76.qcow2})
-and use the @command{pretest_run.sh} script.
+and use the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -1302,7 +1302,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex CentOS 7.0, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{centos7.qcow2} with the @command{pretest_run.sh} script.
+Start @file{centos7.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -1427,7 +1427,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex CentOS 6.5, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{centos65.qcow2} with the @command{pretest_run.sh} script.
+Start @file{centos65.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -1581,7 +1581,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex Ubuntu 14.04.1, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{ubuntu14.qcow2} with the @command{pretest_run.sh} script.
+Start @file{ubuntu14.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -1709,7 +1709,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex DilOS 1.3.7, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{dilos137.qcow2} with the @command{pretest_run.sh} script.
+Start @file{dilos137.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
