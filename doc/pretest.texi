@@ -847,6 +847,9 @@ First boot must use "-hda" and "-cdrom", can't use "virtio" during installation.
 After installation, re-configure as virto, see
 @url{http://wiki.minix3.org/UsersGuide/RunningOnQemu}
 
+MINIX seems to require a VGA adapter (using @option{-nographic -nodefaults}
+prevents successful booting).
+
 See the installation script (@file{build_scripts/build_minixR330.sh}) for
 download and QMEU/KVM commands.
 
@@ -1632,6 +1635,9 @@ DilOS installer requires 1024MB of RAM.
 
 DilOS requires using QEMU's @option{-machine pc-1.1} (without it, booting hangs
 forever).
+
+DilOS seems to require a VGA adapter (using @option{-nographic -nodefaults}
+prevents successful booting).
 
 See the installation script (@file{build_scripts/build_dilso137.sh}) for
 download and QMEU/KVM commands.
