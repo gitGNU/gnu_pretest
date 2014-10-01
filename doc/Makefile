@@ -1,3 +1,9 @@
+# Copyright 2014 (C) Assaf Gordon (assafgordon@gmail.com)
+#
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.
+#
 SRC=pretest.texi
 
 PDF=$(SRC:.texi=*.pdf)
