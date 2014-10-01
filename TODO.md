@@ -28,6 +28,10 @@
 
 ## Guest VMs Improvements
 
+* DilOS: add 'libiconv-dev', 'libtoolize'
+
+* Minix: add symlink from 'clang++' to 'cxx'
+
 * CloudInit/KickStart automation - passing commands to guest
 
 * Automated shell-script execution upon boot completion.  
