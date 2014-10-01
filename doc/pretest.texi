@@ -69,15 +69,15 @@ testing. Future versions will add automated testing facilities.
 Download one of the images in the @ref{Downloads} section, and decompress
 the image
 @example
-wget http://files.housegordon.org/pretest/v0.1/minixR330.build-ready-v1.qcow2.xz
-unxz minixR330.build-ready-v1.qcow2.xz
+wget http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz
+unxz debian76.build-ready.qcow2.xz
 @end example
 
 Run the image:
 @example:
 kvm -nographic -m 384 \
     -net user -net nic,model=virtio \
-    -drive if=virtio,media=disk,index=0,file=minixR330.build-ready-v1.qcow2
+    -drive if=virtio,media=disk,index=0,file=debian76.build-ready.qcow2
 @end example
 
 User name is @var{miles}, password is @var{12345}.
@@ -85,8 +85,10 @@ User name is @var{miles}, password is @var{12345}.
 While the virtual machine is running, type @kbd{CTRL-A, C} to switch
 to QEMU Monitor mode (@url{http://en.wikibooks.org/wiki/QEMU/Monitor}).
 Type @kbd{CTRL-A, c} to return to the virtual machine's console.
+For details about KVM parameters, see @ref{Simple KVM usage}.
 
-A helper script (@file{pretest-run.sh}) provides more KVM/QEMU options.
+A helper script (@file{pretest-run.sh}) provides more KVM/QEMU options, see
+@ref{Pretest-run script}.
 
 @c ***********************************************************
 @c Getting Started
@@ -239,8 +241,171 @@ or as a basis for such servers.
 @cindex Usage
 
 @menu
+* Simple KVM usage::                Using images directly with KVM
+* Pretest-run script::              Using images with pretest-run.sh script
+* Sending data from Guest to Host:: Using serial port to export data
+* LibVirt usage::                   Using images with libVirt
 * Debian Compilers Pack Usage::     Testing multiple compilers
 @end menu
+
+@node Simple KVM usage, Pretest-run script, Usage, Usage
+@section Simple KVM Usage
+@cindex Simple KVM Usage
+
+All images are pre-configured to be used with QEMU/KVM with the default parameters
+and with @emph{virtio} drivers (except GNU Hurd which requires @emph{IDE} drivers).
+
+A typical usage is:
+@example
+kvm -nographic -m 384 \
+    -net user -net nic,model=virtio \
+    -drive if=virtio,media=disk,index=0,file=debian76.build-ready.qcow2
+@end example
+
+All pre-configured VMs support serial console (QEMU's @option{-serial mon:stdio}).
+
+All pre-configured VMs support graphic monitors (QEMU's @option{-vga cirrus} or
+related option).
+
+@emph{NOTE}: Some VMs have special requirement, see each VM's build instructions,
+or the @file{pretest-run.sh} script for OS-specific hacks.
+
+@node Pretest-run script, Sending data from Guest to Host, Simple KVM usage, Usage
+@section Pretest-run script
+@cindex pretest-run script
+@cindex pretest-run.sh
+
+The included script (@file{pretest-run.sh}) provides a common, simple
+interface for starting all pre-built images with the most common settings.
+
+A typical usage is:
+
+@example
+# Download a pre-built image
+wget http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz
+unxz debian76.build-ready.qcow2.xz
+
+# Start it, with serial console
+pretest-run.sh debian76.build-ready.qcow2
+@end example
+
+The @file{pretest-run.sh} script will use the appropriate KVM/QEMU parameters
+for each VM/OS type.
+
+By default the @file{pretest-run.sh} uses serial console, no graphic card,
+user-mode networking with DHCP and virtio drivers, and forwards the guest
+VM's port 22 to the host's 2222 TCP port.
+
+Additionally, the @file{pretest-run.sh} accepts the following options:
+
+@table @option
+@item -h
+Show help screen
+
+@item -m @var{N}
+Use N MBs of ram (default is 384MB)
+
+@item -p @var{N}
+Forward guest VM's port 22 (SSH) to host port N (default 2222).
+
+To connect to the guest, use the following on the host:
+@example
+ssh -p $ssh_port miles@@localhost
+@end example
+
+@item -S
+Disable QEMU's @option{-snapshot} mode, write changes to QCOW2 image file.
+(default: use @option{-snapshot})
+
+NOTE: Even with @option{-snapshot} mode on, changes can be written to the VM
+disk image using the QEMU Monitor (press @kbd{CTRL-A,c}, thent type
+@command{commit all}).
+
+@item -r
+Connect the guest VM's 2nd serial port to a file on the host.
+
+To send data from guest VM to host, run (inside the guest VM):
+@example
+echo hello > /dev/ttyS1 (on GNU/Linux)
+echo hello > /dev/com1  (on Hurd)
+echo hello > /dev/ttyu1 (on FreeBSD)
+echo hello > /dev/tty01 (on Dilos, MINIX, OpenBSD, NetBSD)
+@end example
+
+The file will be named @file{FILE.serial} (based on input QCOW2 filename).
+
+@item -C
+Use CURSES VGA text interface (QEMU's @option{-curses} option).
+
+Default is no VGA adapter, only serial consoele.
+
+@item -D
+Use VGA Display mode (QEMU's @option{-vga cirrus}).
+
+Default is no VGA adapter, only serial consoele.
+
+@item -z
+Fork QMEU process in the background (QEMU's @option{-daemonize}).
+
+Default is to stay in the foreground. Implies @option{-P}.
+
+@item -P
+Write PID file (QEMU's @option{-pidfile}).
+
+The file will be named @file{FILE.pid} (based on input QCOW2 filename).
+@end table
+
+@node Sending data from Guest to Host, LibVirt usage, Pretest-run script, Usage
+@section Sending data from Guest to Host
+@cindex Sending data from Guest to Host
+@cindex Serial file
+
+Using a serial file, exporting data from the guest VMs to the host is easy.
+
+Start a guest VM with the @option{-r} option of @command{pretest-run.sh}, like so:
+
+@example
+pretest-run.sh -r minixR330.qcow2
+@end example
+
+The guest VM's @emph{2nd} serial port will be connected to a file named
+@file{minixR330.serial} on the host (the first serial port is connected to the
+console by default).
+
+Inside the guest VM, use @command{uuencode} (or @command{base64}, or other
+similar commands) to convert a binary file to text, then send it to the
+serial port:
+
+@example
+# On GNU/Linux VMs:
+uuencode -m /path/to/file REMOTENAME > /dev/ttyS1
+
+# On MINIX, NetBSD, OpenBSD, etc VMs:
+cat FILE | uuencode -m /path/to/file REMOTENAME > /dev/tty01
+@end example
+
+It is also recommended to use a checksum program (e.g. @command{sum}) to verify
+the integrity of a binary file after the transfer.
+
+On the host, decode the file like so:
+
+@example
+cat minixR330.serial | tr -d '\r' | uudecode
+@end example
+
+and a new file @file{REMOTENAME} will be created on the host. Compare the
+@command{sum} of the generated file to the guest's sum to verify integrity.
+
+@emph{NOTE:} The @file{FILE.serial} is truncated every invocation of the
+@command{pretest-run.sh} script.
+
+@node LibVirt usage, Debian Compilers Pack Usage, Pretest-run script, Usage
+@section LibVirt usage
+@cindex libvirt
+
+LibVirt (@url{http://libvirt.org/}) support is planned (e.g. providing a
+libVirt-compatible XML configuration files for each VM image), but is not
+yet available. Patches are welcomed.
 
 @node Debian Compilers Pack Usage, Build Recipes, Usage, Usage
 @section Debian Compilers Pack Usage
@@ -252,7 +417,7 @@ multile compilers and cross compilers:
 @itemize
 @item gcc (native)
 @item clang (native)
-@item tcc - Tiny C compiler (native)
+@item tcc - Tiny C compiler (a C99-compatible compiler, native)
 @item arm (gcc cross compiler)
 @item powerpc (gcc cross compiler)
 @item mips (gcc cross compiler)
