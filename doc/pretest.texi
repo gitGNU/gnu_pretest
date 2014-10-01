@@ -21,6 +21,8 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org).
 @page
 @vskip 0pt plus 1filll
 Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
+
+License: CC-BY-SA 4.0 (@url{http://creativecommons.org/licenses/by-sa/4.0/}).
 @end titlepage
 
 @node    Top,       Introduction, (dir),    (dir)
