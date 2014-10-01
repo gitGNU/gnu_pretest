@@ -111,6 +111,7 @@ enable compilation of GNU software (or other @command{autotool}-based pacakges).
 @menu
 * Clean-Install VMs::        Minimally configurated VMs
 * Build-Ready VMs::          GNU-autotools configured VMs
+* Security Considerations::  Security Considerations
 @end menu
 
 @node    Clean-Install VMs, Build-Ready VMs, VM Configuration, VM Configuration
@@ -205,6 +206,30 @@ pretest-run.sh XXXX.qcow2
 @end example
 
 see @ref{Build-Ready VM downloads} for list of available VM images.
+
+@node    Security Considerations, Usage, Build-Ready VMs, VM Configuration
+@section Security Considerations
+@cindex  Security Considerations
+
+The pre-built VM images are configured with very little security in mind.
+
+@itemize
+
+@item The root password is known, weak and fixed (it is always `12345`).
+
+@item The non-root user 'miies' has knonw, weak password `12345` and can run
+@command{sudo} commands without requiring a password.
+
+@item The images boot using a known random-seed state (which is to say: not
+random at all)
+
+@item The images are @emph{not} regularly updated with security updates, and
+certainly contained out-dated software with known vulnerabilities.
+
+@end itemize
+
+These pre-built images must not be used for any production or public servers,
+or as a basis for such servers.
 
 @c ***********************************************************
 @c Usage
