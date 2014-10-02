@@ -511,6 +511,7 @@ $ make check
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
 * Debian 7.6::                  Installing Debian 7.6 VM
 * Debian Compilers Pack::       Installing many compilers (and cross-compilers) VM
+* gNewSense 3.1::               Installing gNewSense 3.1 VM
 * CentOS 7.0::                  Installing CentOS 7.0 VM
 * CentOS 6.5::                  Installing CentOS 6.5 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
@@ -1382,11 +1383,132 @@ to terminate QEMU.
 Save the disk image as 'compilers-pack'.
 A pre-build image is available for download, see @xref{Downloads}.
 
+@c ***********************************************************
+@c gNewSense 3.1
+@c ***********************************************************
+@node gNewSense 3.1, CentOS 7.0, Debian Compilers Pack, Build Recipes
+@section gNewSense 3.1
+@cindex gNewSense 3.1, build recipe
+@cindex build recipe, gNewSense 3.1
+
+gNewSense is a Free/Libre Operating System, based on GNU/Linux Debian.
+
+gNewSense 3.1 is based on Debian GNU/Linux 6.
+
+Home Page: @url{http://www.gnewsense.org/}
+
+Version Announcement: @url{https://savannah.nongnu.org/forum/forum.php?forum_id=7880}
+
+@cindex gNewSense 3.1, download
+@unnumberedsubsec Download
+
+ISO @url{http://archive.gnewsense.org/gnewsense-three/gnewsense/dists/parkes/main/installer-amd64/current/images/netboot/mini.iso}
+
+@cindex gNewSense 3.1, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+gNewSense 3.1 installer requires a graphical monitor (doesn't work with QEMU's
+@option{-curses}).
+
+See the installation script (@file{build_scripts/build_gnewsense31.sh}) for
+download and QMEU/KVM commands.
+
+@cindex gNewSense 3.1, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item hostname: @var{gnewsense31}
+@item domain name: @var{(empty)}
+@item root password: @var{12345}
+@item Full name for new user: @var{miles}
+@item user name for your account: @var{miles}
+@item password for new user: @var{12345}
+@item Partition method: @var{guided - use entire disk}
+@item Select disk to partition: @var{virtual disk1}
+@item Partition scheme: @var{All files on one partition}
+@item Select @var{Finision paritition and write changes to disk}
+@item Write changes to disk: Select @var{yes}
+@item Choose Software to install: Select @var{SSH Server} and
+@var{Standard System Utilities}
+@item Install Grub Boot loader: @var{yes}
+@end itemize
+
+When installation is complete: choose @var{reboot} to reboot with the
+newly installed system.
+
+@cindex gNewSense 3.1, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Install @command{sudo} and setup 'sudo' group to sudo without password:
+@example
+apt-get -y install sudo
+adduser miles sudo
+sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+@end example
+
+Enable Console Login on serial port:
+@example
+sed -i -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ modprobe.blacklist=cirrus"/' \
+       -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+       -e '/GRUB_TERMINAL=/s/=.*/=console/' \
+       /etc/default/grub
+@end example
+
+Reduce bootloader wait time:
+@example
+sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' /etc/default/grub
+@end example
+
+Update GRUB boot-loader:
+@example
+update-grub
+@end example
+
+Enable serial console login/getty:
+@example
+sed -i -e '/^#T0/s/^#//' /etc/inittab
+@end example
+NOTE: default gNewSense installation already contains a commented-out setting,
+just need to uncomment it.
+
+Stop the VM with @command{shutdown -h now},
+tag the QCOW2 file @file{gnewsense31.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex gNewSense 3.1, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{gnewsense31.qcow2} with the @command{pretest-run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+apt-get -y update && apt-get -y upgrade
+apt-get install -y build-essential ca-certificates \
+    autopoint automake autoconf gettext \
+    git gawk vim wget rsync gperf pkg-config
+@end example
+
+Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
 
 @c ***********************************************************
 @c Cent OS 7.0
 @c ***********************************************************
-@node CentOS 7.0, CentOS 6.5, Debian Compilers Pack, Build Recipes
+@node CentOS 7.0, CentOS 6.5, gNewSense 3.1, Build Recipes
 @section CentOS 7.0
 @cindex CentOS 7.0, build recipe
 @cindex build recipe, CentOS 7.0
@@ -1978,6 +2100,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item Debian 7.6
 @url{http://files.housegordon.org/pretest/v0.1/debian76.clean-install.qcow2.xz}
 
+@item gNewSense 3.1
+@url{http://files.housegordon.org/pretest/v0.1/gnewsense31.clean-install.qcow2.xz}
+
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.clean-install.qcow2.xz}
 
@@ -2024,6 +2149,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item Debian Compilers Pack
 @url{http://files.housegordon.org/pretest/v0.1/debian76.compilers-pack.qcow2.xz}
+
+@item gNewSense 3.1
+@url{http://files.housegordon.org/pretest/v0.1/gnewsense31.build-ready.qcow2.xz}
 
 @item CentOS 7.0
 @url{http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz}
