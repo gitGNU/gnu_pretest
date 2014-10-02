@@ -73,7 +73,9 @@ Read the manual for detailed setup information and usage examples.
 ## License
 
 * Shell/Perl scripts: [GPLv3+](http://www.gnu.org/licenses/gpl.html)
-* Cookbook Texinfo document: [CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
+* Cookbook Texinfo document: Dual License:
+  [CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/), and
+  [GFDL 1.3+](http://www.gnu.org/copyleft/fdl.html)
 * Operation System Virtual Machine Images:  
     Each operating system use a mixture of Free-Software license.  
     Where an operating system offers non-free software options,

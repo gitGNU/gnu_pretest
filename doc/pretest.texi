@@ -22,7 +22,16 @@ Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org).
 @vskip 0pt plus 1filll
 Copyright @copyright{} 2014 Assaf Gordon (agn@@gnu.org)
 
-License: CC-BY-SA 4.0 (@url{http://creativecommons.org/licenses/by-sa/4.0/}).
+Content on this manual is licensed under a
+Creative Commons Attribution-Share-Alike 4.0 License
+(@url{http://creativecommons.org/licenses/by-sa/4.0/}),
+
+or, at your choice,
+
+under the GNU Free Documentation License 1.3,
+with no invariant sections, with no front-cover texts,
+and with no back-cover texts.
+A copy of the license is included in the file @file{COPYING.DOC}.
 @end titlepage
 
 @node    Top,       Introduction, (dir),    (dir)
