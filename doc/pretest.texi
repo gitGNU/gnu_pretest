@@ -508,6 +508,7 @@ $ make check
 * OpenBSD 5.5::                 Installing OpenBSD 5.5 VM
 * NetBSD 6.1.4::                Installing NetBSD 6.1.4 VM
 * FreeBSD 10::                  Installing FreeBSD 10 VM
+* FreeBSD 9.3::                 Installing FreeBSD 9.3 VM
 * Minix R3.3.0::                Installing Minix R3.3.0 VM
 * Debian 7.6::                  Installing Debian 7.6 VM
 * Debian Compilers Pack::       Installing many compilers (and cross-compilers) VM
@@ -1028,9 +1029,102 @@ Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
+@c FreeBSD 9.3
+@c ***********************************************************
+@node FreeBSD 9.3, Minix R3.3.0, FreeBSD 10, Build Recipes
+@section FreeBSD 9.3
+@cindex FreeBSD 9.3, build recipe
+@cindex build recipe, FreeBSD 9.3
+
+Homepage: @url{https://www.freebsd.org/}
+
+Version announcement: @url{https://www.freebsd.org/releases/9.3R/announce.html}
+
+@cindex FreeBSD 9.3, download
+@unnumberedsubsec Download
+
+ISO @url{ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/amd64/ISO-IMAGES/9.3/FreeBSD-9.3-RELEASE-amd64-bootonly.iso}
+
+@cindex FreeBSD 9.3, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+FreeBSD 9.3 works well with the default QEMU/KVM settings.
+
+See the installation script (@file{build_scripts/build_freebsd93.sh}) for
+download and QMEU/KVM commands.
+
+@cindex FreeBSD 9.3, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item Network config: Use @var{vtnet0}, DHCP: @var{yes}, IPv6: @var{no}.
+@item Partitioning: @var{guided}
+@item Parition: @var{Entire disk}
+@item Partition Editor: Use disk @var{vtbd0}, select @var{finish} then @var{commit}
+@item root password: @var{12345}
+@item system configuration: select @var{sshd}, @var{dumpdev}
+@item Create non-root user: @var{miles}
+@item invite user into other groups: @var{wheel}
+@item non-root password: @var{12345}
+@item Select @var{Apply configuration and Exit Installer}
+@end itemize
+
+Select @var{reboot} to reboot with the newly installed system.
+
+@cindex FreeBSD 9.3, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Install @command{sudo} and setup 'wheel' group to sudo without password:
+@example
+pkg_add -r sudo
+sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
+@end example
+
+Enable Console Login on serial port
+(see @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}):
+@example
+echo 'consolcomconsole,vidconsole"' >> /boot/loader.conf
+@end example
+(NOTE: No need to modify @file{/etc/ttys} -
+@file{ttyu0} will be atuomatically on if console is serial.)
+
+Reduce bootloader wait time:
+@example
+echo 'autoboot_delay="1"' >> /boot/loader.conf
+@end example
+
+Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{freebsd93.qcow2}
+ as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex FreeBSD 9.3, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{freebsd93.qcow2} with the @command{pretest-run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+echo autoconf automake git wget rsync | xargs -n1  pkg_add -r
+@end example
+
+Run @command{/sbin/halt} to stop the machine, press @kbd{CTRL-A,c} to switch
+to QEMU's monitor, run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+
+@c ***********************************************************
 @c Minix R3.3.0
 @c ***********************************************************
-@node Minix R3.3.0, Debian 7.6, FreeBSD 10, Build Recipes
+@node Minix R3.3.0, Debian 7.6, FreeBSD 9.3, Build Recipes
 @section Minix R3.3.0
 @cindex Minix R3.3.0, build recipe
 @cindex build recipe, Minix R3.3.0
@@ -2332,6 +2426,9 @@ Available pre-build virtual machines are congiured as described in
 @item FreeBSD 10
 @url{http://files.housegordon.org/pretest/v0.1/freebsd10.clearn-install.qcow2.xz}
 
+@item FreeBSD 9.3
+@url{http://files.housegordon.org/pretest/v0.1/freebsd93.clean-install.qcow2.xz}
+
 @item MINIX R3.3.0
 @url{http://files.housegordon.org/pretest/v0.1/minixR330.clean-install.qcow2.xz}
 
@@ -2390,6 +2487,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item FreeBSD 10
 @url{http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz}
+
+@item FreeBSD 9.3
+@url{http://files.housegordon.org/pretest/v0.1/freebsd93.build-ready.qcow2.xz}
 
 @item Debian 7.6
 @url{http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz}
