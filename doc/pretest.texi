@@ -515,6 +515,7 @@ $ make check
 * CentOS 7.0::                  Installing CentOS 7.0 VM
 * CentOS 6.5::                  Installing CentOS 6.5 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
+* Trisquel 6.0.1::              Installing Trisquel 6.0.1 VM
 * DilOS 1.3.7::                 Installing DilOS 1.3.7 VM
 @end menu
 
@@ -1775,7 +1776,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c Ubuntu 14.04.1
 @c ***********************************************************
-@node Ubuntu 14.04.1, DilOS 1.3.7, CentOS 7.0, Build Recipes
+@node Ubuntu 14.04.1, Trisquel 6.0.1, CentOS 7.0, Build Recipes
 @section Ubuntu 14.04.1
 @cindex Ubuntu 14.04.1, build recipe
 @cindex build recipe, Ubuntu 14.04.1
@@ -1926,9 +1927,148 @@ A pre-build image is available for download, see @xref{Downloads}.
 
 
 @c ***********************************************************
+@c Trisquel 6.0.1
+@c ***********************************************************
+@node Trisquel 6.0.1, DilOS 1.3.7, Ubuntu 14.04.1, Build Recipes
+@section Trisquel 6.0.1
+@cindex Trisquel 6.0.1, build recipe
+@cindex build recipe, Trisquel 6.0.1
+
+Trisquel is a Free/Libre Operating System, based on Ubuntu GNU/Linux.
+
+Trisquel 6.0.1 is based on Ubuntu 12.04 LTS.
+
+Home Page: @url{http://trisquel.info/}
+
+Version Announcement: @url{http://trisquel.info/en/trisquel-gnulinux-601-lts-upgrade-release}
+
+@cindex Trisquel 6.0.1, download
+@unnumberedsubsec Download
+
+Downloads: @url{http://trisquel.info/en/download}
+
+NetInstall ISO @url{http://mirror.fsf.org/trisquel-images/trisquel-netinst_6.0.1_amd64.iso}
+
+@cindex Trisquel 6.0.1, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+Trisquel 6.0.1 installer requires a graphical monitor (doesn't work with QEMU's
+@option{-curses}).
+
+See the installation script (@file{build_scripts/build_trisquel601.sh}) for
+download and QMEU/KVM commands.
+
+@cindex Trisquel 6.0.1, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item language: @var{english}
+@item Hostname: @var{trisquel601}
+@item mirror: @var{USA}
+@item Full name for new user: @var{miles}
+@item user name for your account: @var{miles}
+@item password for new user: @var{12345}
+@item Use Weak password: @var{yes}
+@item Encrypt home directory: @var{no}
+@item Partition method: @var{guided - use entire disk}
+@item Select disk to partition: @var{virtual disk 1}
+@item Write changes to disk: Select @var{yes}
+@item (Wait for package installation)
+@item Kernel to install: @var{linux-generic}
+@item Manage upgrade: @var{no automatic upgrades}
+@item Choose Software to install: Select @var{OpenSSH Server},
+@var{Trisquel console}, @var{Trisquel mini}
+@item (Wait for package installation)
+@item Install Grub Boot loader: @var{yes}
+@end itemize
+
+When installation is complete: choose @var{reboot} to reboot with the
+newly installed system.
+
+@cindex Trisquel 6.0.1, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+NOTE: logging in with @var{root} is disabled; must login with
+use @var{miles} and password @var{12345} (login with root is enabled below):
+
+Enable @command{sudo} without a password:
+@example
+sudo sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+@end example
+NOTE: Initially, this command is executed as user @var{miles}, and so requires
+@command{sudo} and will ask for a password.
+
+Enable login as root with password 12345:
+@example
+printf "12345\n12345\n" | sudo passwd root
+sudo passwd -u root
+@end example
+
+Enable booting with serial console:
+@example
+sudo sed -i -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ modprobe.blacklist=cirrus"/' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+         -e '/GRUB_TERMINAL=/s/=.*/=console/' \
+         /etc/default/grub
+@end example
+
+Reduce bootloader wait time:
+@example
+sudo sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/^#GRUB_HIDDEN_TIMEOUT/s/^#//' \
+         -e '/GRUB_HIDDEN_TIMEOUT=/s/=.*/=1/' \
+         /etc/default/grub
+@end example
+
+Update GRUB boot-loader configuration:
+@example
+sudo update-grub
+@end example
+
+Create @code{systemd} configuration file for login/getty on serial console
+(see @url{https://help.ubuntu.com/community/SerialConsoleHowto}):
+@example
+echo 'start on stopped rc or RUNLEVEL=[12345]
+stop on runlevel [!12345]
+respawn
+exec /sbin/getty -L 9600 ttyS0 vt102' \
+  | sudo tee /etc/init/ttyS0.conf
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{trisquel601.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex Trisquel 6.0.1, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{trisquel 6.0.1.qcow2} with the @command{pretest-run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+apt-get install -y build-essential ca-certificates \
+    autopoint automake autoconf gettext \
+    git  gawk vim wget rsync gperf texinfo pkg-config
+@end example
+
+Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
 @c DilOS 1.3.7
 @c ***********************************************************
-@node DilOS 1.3.7, Downloads, Ubuntu 14.04.1, Build Recipes
+@node DilOS 1.3.7, Downloads, Trisquel 6.0.1, Build Recipes
 @section DilOS 1.3.7
 @cindex DilOS 1.3.7, build recipe
 @cindex build recipe, DilOS 1.3.7
@@ -2112,6 +2252,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item Ubuntu 14.04.1
 @url{http://files.housegordon.org/pretest/v0.1/ubuntu14.clean-install.qcow2.xz}
 
+@item Trisquel 6.0.1
+@url{http://files.housegordon.org/pretest/v0.1/trisquel601.clean-install.qcow2.xz}
+
 @item DilOS 1.3.7
 @url{http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz}
 
@@ -2161,6 +2304,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item Ubuntu 14.04.1
 @url{http://files.housegordon.org/pretest/v0.1/ubuntu14.build-ready.qcow2.xz}
+
+@item Trisquel 6.0.1
+@url{http://files.housegordon.org/pretest/v0.1/trisquel601.build-ready.qcow2.xz}
 
 @item DilOS 1.3.7
 @url{http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz}
