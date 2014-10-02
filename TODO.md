@@ -26,13 +26,25 @@
     - `pretest run IMAGE script.sh` - run IMAGE, make it run `script.sh` after booting
     - `pretest build TEMPLATE`      - build image from template (similar to current 'build' scripts)
 
+* Consider "Travis-CI" like YAML-based build script generator (to specify
+  requirements and prerequisites, and other settings?)
+
 ## Guest VMs Improvements
 
-* DilOS: add 'libiconv-dev', 'libtoolize'
+* DilOS (and others): add 'libiconv-dev', 'libtoolize'
 
 * Minix: add symlink from 'clang++' to 'cxx'
 
 * CloudInit/KickStart automation - passing commands to guest
+
+* libcurses for emacs:
+    * Debian-like: add 'libncurses-dev'
+    * CentOS-like: add 'ncurses-devel.x86_64'
+    * OpenSUSE: add 'ncurses-devel'
+
+* Fix Terminal settings (no vt100?) to work better on xterm?
+
+* MINIX: fix WGET
 
 * Automated shell-script execution upon boot completion.  
   Possibly, wrapping the shell script in an ISO file (`getisoimage`),
