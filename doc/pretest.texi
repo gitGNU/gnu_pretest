@@ -516,6 +516,7 @@ $ make check
 * CentOS 6.5::                  Installing CentOS 6.5 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
 * Trisquel 6.0.1::              Installing Trisquel 6.0.1 VM
+* OpenSUSE 13.1::               Installing OpenSUSE 13.1 VM
 * DilOS 1.3.7::                 Installing DilOS 1.3.7 VM
 @end menu
 
@@ -2066,9 +2067,109 @@ Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
+@c OpenSUSE 13.1
+@c ***********************************************************
+@node OpenSUSE 13.1, DilOS 1.3.7, Trisquel 6.0.1, Build Recipes
+@section OpenSUSE 13.1
+@cindex OpenSUSE 13.1, build recipe
+@cindex build recipe, OpenSUSE 13.1
+
+Home Page: @url{http://www.opensuse.org}
+
+Version Announcement: @url{https://news.opensuse.org/2013/11/19/opensuse-13-1-ready-for-action/}
+
+@cindex OpenSUSE 13.1, download
+@unnumberedsubsec Download
+
+ISO @url{http://mirror.metrocast.net/opensuse/distribution/13.1/iso/openSUSE-13.1-NET-x86_64.iso}
+
+@cindex OpenSUSE 13.1, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+See the installation script (@file{build_scripts/build_opensuse131.sh}) for
+download and QMEU/KVM commands.
+
+@cindex OpenSUSE 13.1, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, use the default option for most choices.
+Note the following:
+
+@itemize
+@item Select Mode: @var{New Installation}
+@item Desktop Selection: @var{Other -> Minimal Server Selection (text mode)}
+@item Suggested Partitioning: @var{(accept the defaults)}, no LVM,
+no encryption, no BTRFS.
+@item Create new user: username @var{miles}, password @var{12345}. no auto-login.
+@end itemize
+
+Once installation completes, run @command{reboot} to reboot with the
+newly installed system.
+
+@cindex OpenSUSE 13.1, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Add user @var{miles} to the 'sudo' group, enable @command{sudo} without password:
+@example
+usermod -g wheel miles
+sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+@end example
+
+Open Port 22 (SSH) in the firewall (see @url{https://en.opensuse.org/SuSEfirewall2}),
+and enable SSH server on start-up:
+@example
+sed -i '/^FW_SERVICES_EXT_TCP=/s/""/"ssh"/'  /etc/sysconfig/SuSEfirewall2
+systemctl enable sshd.service
+@end example
+
+Enable Console on serial port, reduce boot-loader timeout to 1 second:
+@example
+sed -i -e '/^GRUB_CMDLINE_LINUX_DEFAULT=/ @{ s/splash=silent/splash=0/ ; s/quiet// ; s/"$/ text nomodeset console=tty0 console=ttyS0,9600n8"/ @}' \
+         -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/GRUB_BACKGROUND=/s/^/#/' \
+         -e '/GRUB_THEME=/s/^/#/' \
+         -e '/GRUB_TERMINAL=/s/=.*/=console/' \
+         /etc/default/grub
+@end example
+
+Update GRUB boot-loader configuration:
+@example
+grub2-mkconfig -o /boot/grub2/grub.cfg
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{opensuse131.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex OpenSUSE 13.1, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{opensuse131.qcow2} with the @command{pretest_run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+zypper update
+zypper install -y gcc gcc-c++
+zypper install -y -y git automake autoconf bison xz rsync
+zypper install -y makeinfo texinfo gperf make
+@end example
+
+Run @command{/sbin/halt} to stop the machine,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
 @c DilOS 1.3.7
 @c ***********************************************************
-@node DilOS 1.3.7, Downloads, Trisquel 6.0.1, Build Recipes
+@node DilOS 1.3.7, Downloads, OpenSUSE 13.1, Build Recipes
 @section DilOS 1.3.7
 @cindex DilOS 1.3.7, build recipe
 @cindex build recipe, DilOS 1.3.7
@@ -2255,6 +2356,9 @@ GNU Hurd/Debian does not have a 'clean-install' image.
 @item Trisquel 6.0.1
 @url{http://files.housegordon.org/pretest/v0.1/trisquel601.clean-install.qcow2.xz}
 
+@item OpenSUSE 13.1
+@url{http://files.housegordon.org/pretest/v0.1/opensuse131.clean-install.qcow2.xz}
+
 @item DilOS 1.3.7
 @url{http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz}
 
@@ -2307,6 +2411,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item Trisquel 6.0.1
 @url{http://files.housegordon.org/pretest/v0.1/trisquel601.build-ready.qcow2.xz}
+
+@item OpenSUSE 13.1
+@url{http://files.housegordon.org/pretest/v0.1/opensuse131.build-ready.qcow2.xz}
 
 @item DilOS 1.3.7
 @url{http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz}
