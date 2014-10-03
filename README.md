@@ -3,6 +3,8 @@
 PreTest's goal is to provide pre-built virtual-machine images of Free-Software
 POSIX-compliant operating systems, ready for testing *autotools*-based programs.
 
+Learn more at <http://www.nongnu.org/pretest/>
+
 Typical usage:
 
     # Download a VM image
@@ -16,59 +18,87 @@ Typical usage:
         -drive if=virtio,media=disk,index=0,file=freebsd10.build-ready-v1.qcow2
 
     # For more KVM options, use the supplied helper script
-    ./run_scripts/pretest_run.sh freebsd10.build-ready.v1.qcow2
+    ./pretest-run.sh freebsd10.build-ready.v1.qcow2
 
 All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
 
+## Current and Future plans
+
+The current version of PreTest provides pre-configured VMs, which facilitate
+manual testing on multiple operating systems.
+
+Future versions will provide scripts to automated (or semi-automate) testing
+of a given tarball on multiple operating systems.
+
+If you're interested in helping or improving PreTest, please see the `TODO.md`
+file in the git repository (<http://git.savannah.gnu.org/cgit/pretest.git>),
+and/or write to <pretest-users@nongnu.org>.
+
 ## Setup Details
 
-Read the manual for detailed setup information and usage examples.
+* All VMs use QEMU/KVM and assume amd64 host
 
-'clean-install' images are snapshots of post-installation state.  
-'build-ready' images are snapshots of post-build-tools installation state.
+* A helper script `pretest-run.sh` provide an easy way to start each VM,
+  using the most common QEMU/KVM settings.
 
-## Available VM images
+* **clean-install** images are snapshots of post-installation state.
+    * User 'miles' with password '12345', can `sudo` without password.
+    * User 'root' with password '12345' (or no password on MINIX,Hurd)
+    * SSH server runs on port 22, `pretest-run.sh` script redirects it to
+      to host's port 2222 (or another port with `-p`)
+    * VMs are configured to use serial console, compatible with QEMU's
+      `-nographic` and `-serial mon:stdio` options.
 
-* CentOS 6.5:
-[clean-install](http://files.housegordon.org/pretest/v0.1/centos6.5.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/centos6.5.build-ready.qcow2.xz)
+* **build-ready** images are snapshots of post-build-tools installation state.
+    * Have C/C++ compilers (gcc or clang)
+    * autoconf,automake,make
+    * git,wget,rsync
+    * pre-configured to compile autotools-based projects, such as:
 
-* CentOS 7.0
-[clean-install](http://files.housegordon.org/pretest/v0.1/centos7.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/centos7.build-ready.qcow2.xz)
+        ```
+        wget http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
+        tar xzf hello-2.9.tar.gz
+        cd hello-2.9
+        ./configure
+        make
+        make check
+        ```
 
-* Debian 7.6:
-[clean-install](http://files.housegordon.org/pretest/v0.1/debian76.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/debian76.build-ready.qcow2.xz),
-[cross-compilers-pack](http://files.housegordon.org/pretest/v0.1/debian76.compilers-pack.qcow2.xz)
+* **Compilers-pack** image is Debian-based installation pre-configured with
+  cross-compilers for ARM,MIPS,PowerPC and binfmt/qemu-static setup.
 
-* DilOS 1.3.7.18:
-[clean-install](http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz)
+See detailed version information at <http://www.nongnu.org/pretest/versions/>
 
-* FreeBSD 10:
-[clean-install](http://files.housegordon.org/pretest/v0.1/freebsd10.clearn-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz)
+Read the manual for detailed setup information and usage examples:
+<http://www.nongnu.org/pretest/manual/>
 
-* GNU-Hurd 0.5/Debian:
-[build-ready](http://files.housegordon.org/pretest/v0.1/hurd.build-ready.qcow2.xz)
+## Available Pre-Configured VM images
 
+* CentOS 7.0, 6.5
+* Debian 7.6
+* gNewSense 3.1 (based on Debian 6)
+* OpenSUSE 13.1
+* Ubuntu 14.04.1
+* Trisquel 6.0.1 (based on Ubuntu 12.04 LTS)
+* DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
+* FreeBSD 10, 9.3
+* NetBSD 6.1.4
+* OpenBSD 5.5
+* GNU-Hurd 0.5/Debian
+* MINIX R3.3.0
 
-* MINIX R3.3.0:
-[clean-install](http://files.housegordon.org/pretest/v0.1/minixR330.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/minixR330.build-ready-v1.qcow2.xz)
+See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 
-* NetBSD 6.1.4:
-[clean-install](http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz)
+## Contact
 
-* OpenBSD 5.5:
-[clean-install](http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz),
-[build-ready](http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz)
+For bug-reports, suggestions, comments and patches, please send emails to
+<pretest-users@nongnu.org>
 
-* Ubuntu 14.04.1:
-[clean-install](http://files.housegordon.org/pretest/v0.1/ubuntu14.clean-install.qcow2.xz)
-[build-ready](http://files.housegordon.org/pretest/v0.1/ubuntu14.build-ready.qcow2.xz)
+To subscribe to the mailing list, visit:
+<https://lists.nongnu.org/mailman/listinfo/pretest-users>
+
+To view/search past discussions, visit:
+<http://lists.nongnu.org/archive/html/pretest-users>
 
 ## License
 
@@ -77,7 +107,7 @@ Read the manual for detailed setup information and usage examples.
   [CC-BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/), and
   [GFDL 1.3+](http://www.gnu.org/copyleft/fdl.html)
 * Operation System Virtual Machine Images:  
-    Each operating system use a mixture of Free-Software license.  
+    Each operating system use a mixture of Free-Software licenses.  
     Where an operating system offers non-free software options,
     those were removed. See the license for the relevant OSes:
 
@@ -90,6 +120,9 @@ Read the manual for detailed setup information and usage examples.
     * OpenBSD: <http://www.openbsd.org/policy.html>
     * FreeBSD: <https://www.freebsd.org/copyright/freebsd-license.html>
     * NetBSD: <http://www.netbsd.org/about/redistribution.html>
+    * OpenSUSE: <https://en.opensuse.org/openSUSE:License>
+    * Trisquel: <http://trisquel.info/en/under-what-license-trisquel-distributed>
+    * gNewSense: <http://www.gnewsense.org/Licenses>
 
     If you spot a non-free software in those pre-build images, please send
-    a bug report.
+    a bug report to <pretest-users@nongnu.org>
