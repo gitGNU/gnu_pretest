@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.14
+autopoint-version: /usr/local/bin/autopoint (GNU gettext-tools) 0.18.3
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: no-version
+gmake-version: missing
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 1.8.5.2
+wget-version: GNU Wget 1.14 built on freebsd9.1.
+rsync-version: rsync  version 3.1.0  protocol version 31
+gcc-version: gcc (GCC) 4.2.1 20070831 patched [FreeBSD]
+cc-version: cc (GCC) 4.2.1 20070831 patched [FreeBSD]
+uname-s: FreeBSD
+uname-r: 9.3-RELEASE
+uname-m: amd64
+uname-p: amd64
+uname-i: GENERIC
+uname-o: FreeBSD
+uname-v: FreeBSD 9.3-RELEASE #0 r268512: Thu Jul 10 23:44:39 UTC 2014     root@snap.freebsd.org:/usr/obj/usr/src/sys/GENERIC 
