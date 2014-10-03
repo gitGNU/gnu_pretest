@@ -160,9 +160,9 @@ do
         case $name in
         b)      git_branch="-b '$OPTARG'"
                 ;;
-        c)      configure_params="$configure_params '$OPTARG'"
+        c)      configure_params="$configure_params $OPTARG"
                 ;;
-        m)      make_params="$make_params '$OPTARG'"
+        m)      make_params="$make_params $OPTARG"
                 ;;
         e)      echo "$OPT_ARG" | grep -E -q '^[A-Za-z0-9]=' ||
                    die "error: '-e $OPTARG' doesn't look like a " \
@@ -206,6 +206,10 @@ DIR=$(mktemp -d -t "${BASENAME}.XXXXXX") \
     || die "failed to create temporary directory"
 cd "$DIR" || exit 1
 
+BOOTSTRAP_LOG="$DIR/$BASENAME.bootstrap.log"
+CONFIGURE_LOG="$DIR/$BASENAME.configure.log"
+MAKE_LOG="$DIR/$BASENAME.make.log"
+MAKE_CHECK_LOG="$DIR/$BASENAME.make_check.log"
 
 ##
 ## Validate source (git, remote file, local file)

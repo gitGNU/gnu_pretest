@@ -59,15 +59,64 @@ test "x$TRANSPOSE" = "xyes" \
   && TRANSCMD="datamash transpose" \
   || TRANSCMD="cat"
 
+OUTPUT="$DIR/os-versions.html"
+
+echo "<html>
+<head>
+<title>PreTest - VM Versions</title>
+<style>
+table.osversions {
+  white-space: nowrap;
+  font-family: \"Courier New\", Courier, monospace;
+  border-collapse: separate;
+  border-spacing: 2.0ex 0.0ex;
+}
+table.osversions tr:nth-child(2n) {
+  background: #F0F0F0;
+}
+table.osversions th {
+  text-align: left;
+}
+</style>
+</head>
+<body>
+<h1>PreTest - VM versions</h1>
+
+<p>
+PreTest's goal is to provide pre-built virtual-machine images of Free-Software
+POSIX-compliant operating systems, ready for testing <b>autotools</b>-based programs.
+</p>
+
+<p>
+Learn more at the PreTest Homepage: <a href=\"http://www.nongnu.org/pretest/\">http://www.nongnu.org/pretest/</a>
+</p>
+
+<br/>
+<br/>
+<br/>
+<h2>Versions of installed programs on each VM:</h2>
+" > "$OUTPUT"
 
 cat "$DIR/progs.tsv" \
   | $TRANSCMD \
-  | ./misc_scripts/htmlize.pl --skip-footer > "$DIR/os-versions.html"
+  | ./misc_scripts/htmlize.pl --skip-header --skip-footer >> "$OUTPUT"
+
+
+echo "
+<br/>
+<br/>
+<br/>
+<h2>System Information (uname) on each VM:</h2>" >> "$OUTPUT"
+
 
 cat "$DIR/uname.tsv" \
   | $TRANSCMD \
-  | ./misc_scripts/htmlize.pl --skip-header >> "$DIR/os-versions.html"
+  | ./misc_scripts/htmlize.pl --skip-header --skip-footer >> "$OUTPUT"
 
+echo "
+</body>
+</html>
+" >> "$OUTPUT"
 
 cp "$DIR/os-versions.html" "$DIR/os-versions.tsv" .
 rm -rf "$DIR"
