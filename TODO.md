@@ -7,6 +7,7 @@
 * run script:
     * Check mimimum version of `qemu-img` (use `-q` if supported).
     * Don't use `-no-kvm` for NetBSD on qemu>2.0.0
+    * Add option for no-network (or atleast no SSH redirection)
 
 * auto-logins: Find a way to use `sshpass` with all VMs.
 
@@ -14,10 +15,10 @@
 
 * Use different SSH redirection ports for each VM.
 
-* Use datamash's `build-aux` scripts for automated testing:  
-   `check-remote-make.sh`,  
-   `check-remote-make-all.sh`  
-   `check-remote-make-extra.sh`
+* Use 'misc_scripts/auto-build-check.sh' for automated tested on each VM.
+    * Save results of each step to a file (configure/make/make-check)
+    * Upload files to a public server
+    * Accept build/project ID
 
 * convert project to 'autotools', with interface such as:  
     - `pretest list`                - listing available images
