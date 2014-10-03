@@ -68,6 +68,12 @@ similar tools installed.
 This version of @emph{pretest} provides images for quick and easy manual
 testing. Future versions will add automated testing facilities.
 
+For latest up-to-date information, visit PreTest website at:
+@url{http://www.nongnu.org/pretest/}.
+
+For suggetions, comments, questions, but reports and patches, send an email
+to @url{pretest-users@@nongnu.org}
+
 @c ***********************************************************
 @c Quick Start
 @c ***********************************************************
