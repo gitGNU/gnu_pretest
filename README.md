@@ -15,12 +15,14 @@ Typical usage:
     kvm -nographic -m 384 \
         -snapshot \
         -net user -net nic,model=virtio \
-        -drive if=virtio,media=disk,index=0,file=freebsd10.build-ready-v1.qcow2
+        -drive if=virtio,media=disk,index=0,file=freebsd10.build-ready.qcow2
 
     # For more KVM options, use the supplied helper script
-    ./pretest-run.sh freebsd10.build-ready.v1.qcow2
+    ./pretest-run.sh freebsd10.build-ready.qcow2
 
 All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
+
+For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/pretest.git/tree/pretest-run.sh) script.
 
 ## Current and Future plans
 
