@@ -521,6 +521,7 @@ $ make check
 * gNewSense 3.1::               Installing gNewSense 3.1 VM
 * CentOS 7.0::                  Installing CentOS 7.0 VM
 * CentOS 6.5::                  Installing CentOS 6.5 VM
+* Fedora 20::                   Installing Fedora 20 VM
 * Ubuntu 14.04.1::              Installing Ubuntu 14.04.1 VM
 * Trisquel 6.0.1::              Installing Trisquel 6.0.1 VM
 * OpenSUSE 13.1::               Installing OpenSUSE 13.1 VM
@@ -1872,12 +1873,152 @@ to terminate QEMU.
 Save the disk image as 'build-ready'.
 A pre-build image is available for download, see @xref{Downloads}.
 
+@c ***********************************************************
+@c Fedora 20
+@c ***********************************************************
+@node Fedora 20, Ubuntu 14.04.1, CentOS 6.5, Build Recipes
+@section Fedora 20
+@cindex Fedora 20, build recipe
+@cindex build recipe, Fedora 20
 
+Home Page: @url{http://fedoraproject.org/}
+
+Version Announcement: @url{http://docs.fedoraproject.org/en-US/Fedora/20/html/Release_Notes/index.html}
+
+@cindex Fedora 20, download
+@unnumberedsubsec Download
+
+NOTE: for the creation of the Fedora VM, the DVD image was used (not the
+'net-install'). With the 'net-install' version I was not able to complete
+the installation under QEMU (network issues?).
+
+Downloads: @url{http://fedoraproject.org/en/get-fedora-all}
+
+ISO @url{http://download.fedoraproject.org/pub/fedora/linux/releases/20/Fedora/x86_64/iso/Fedora-20-x86_64-DVD.iso}
+
+@cindex Fedora 20, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+
+Fedora 20 installation requires a graphic monitor, QEMU's @option{-curses} can
+not be used. Installation also requires a high-resolution monitor (QEMU's
+@option{-vga cirrus} is sufficient, but @option{-vga std} is not).
+
+Fedora 20 installation requires 512 MB of RAM.
+
+See the installation script (@file{build_scripts/build_fedora20.sh}) for
+download and QMEU/KVM commands.
+
+@cindex Fedora 20, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+Fedora 20 Installer is graphical. Configure the VM by selecting the options
+in the following order:
+@itemize
+@item Setup network
+@itemize
+@item click @var{Network & Hostname}.
+@item then enable @var{eth0} by clicking on the "OFF/ON" button,
+@item Set @var{Hostname} to @var{fedora20} (edit-box on bottom of the screen)
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item Software Selection
+@itemize
+@item select @var{minimal install}, with @var{Guest Agents} component.
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item Installation Destination
+@itemize
+@item Select @var{vda} disk (should be highlighted in blue)
+@item After confirming, select the following options in the pop-up dialog:
+@item Partition: select @var{automatically configure partitioning}
+@item Select @var{NO encryption}
+@item click @var{done} (blue botton on top-left corner)
+@end itemize
+
+@item click @var{begin installation} button (bottom right)
+
+@item Click @var{root password}
+Enter @var{12345} (password is weak, must click "done" twice to confirm).
+
+@item Click @var{user creation}
+Full name: @var{miles}, User name @var{miles},
+Select @var{make this user administrator},
+Enter password @var{12345}, (password is weak, must click "done" twice to confirm).
+
+@item Wait until installating is complete (progress bar on the bottom of the screen)
+
+@end itemize
+
+Once installation completes, click the @command{reboot} button (bottom-right
+corner) to reboot with the newly installed system.
+
+@cindex Fedora 20, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Enable Console on serial port:
+@example
+sed -i -e '/GRUB_CMDLINE_LINUX=/s/"$/ modprobe.blacklist=cirrus"/' \
+       -e '/GRUB_CMDLINE_LINUX=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+       /etc/default/grub
+@end example
+
+Reduce bootloader wait time:
+@example
+sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' /etc/default/grub
+@end example
+
+Update GRUB bootloader configuration:
+@example
+grub2-mkconfig -o /boot/grub2/grub.cfg
+@end example
+
+Enable @command{sudo} without password for 'wheel' group members:
+@example
+sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+@end example
+
+Stop the VM with @command{/sbin/halt},
+tag the QCOW2 file @file{fedora20.qcow2} as 'clean-install'.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@cindex Fedora 20, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{fedora20.qcow2} with the @command{pretest-run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+yum -y update
+yum groupinstall -y "Development Tools"
+yum -y install wget gperf gettext-devel texinfo automake autoconf
+@end example
+
+Use disk-based @file{/tmp} (instead of memory-based @code{tmpfs}) -
+For build-automation we use VMs with very little memory.
+(see @url{http://fedoraproject.org/wiki/Features/tmp-on-tmpfs}.)
+@example
+systemctl mask tmp.mount
+@end example
+
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
+terminating QMEU,
+press @kbd{CTRL-A,c} to switch to QEMU's monitor,
+run @command{commit all} to save changes, then @command{quit}
+to terminate QEMU.
+
+Save the disk image as 'build-ready'.
+A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
 @c Ubuntu 14.04.1
 @c ***********************************************************
-@node Ubuntu 14.04.1, Trisquel 6.0.1, CentOS 7.0, Build Recipes
+@node Ubuntu 14.04.1, Trisquel 6.0.1, Fedora 20, Build Recipes
 @section Ubuntu 14.04.1
 @cindex Ubuntu 14.04.1, build recipe
 @cindex build recipe, Ubuntu 14.04.1

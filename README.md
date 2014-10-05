@@ -77,6 +77,7 @@ Read the manual for detailed setup information and usage examples:
 ## Available Pre-Configured VM images
 
 * CentOS 7.0, 6.5
+* Fedora 20
 * Debian 7.6
 * gNewSense 3.1 (based on Debian 6)
 * OpenSUSE 13.1
@@ -116,6 +117,7 @@ To view/search past discussions, visit:
     * Debian: <https://www.debian.org/legal/licenses/> (Only *main* repository used)
     * Ubuntu: <http://www.ubuntu.com/about/about-ubuntu/licensing> (only *main* and *universe* repositories used)
     * CentOS: GPL + others (link?)
+    * Fedora: <https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing>
     * Hurd: GPL + others (link?)
     * MINIX: <http://www.minix3.org/other/license.html>
     * DilOS: <http://www.dilos.org/license>
