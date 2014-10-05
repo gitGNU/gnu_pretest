@@ -9,21 +9,11 @@ clean:
 
 .PHONY: website
 website: web/index.html \
-	 web/downloads/index.html \
 	 web/versions/index.html \
 	 web/manual/index.html
 
 web/index.html: README.md
 	mkdir -p web/
-	pandoc -f markdown -t html5 --standalone \
-	       --include-in-header=$(CSS).prefix \
-	       --include-in-header=$(CSS) \
-	       --include-in-header=$(CSS).suffix \
-	       --output "$@" \
-		"$<"
-
-web/downloads/index.html: downloads.md
-	mkdir -p web/downloads
 	pandoc -f markdown -t html5 --standalone \
 	       --include-in-header=$(CSS).prefix \
 	       --include-in-header=$(CSS) \
