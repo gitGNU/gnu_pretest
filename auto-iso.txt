@@ -1,0 +1,99 @@
+BSDs:
+device: /dev/cd0 (requires specific option '-t cd9660' to mount)
+
+$ cat /etc/rc.d/pretest-guest-init
+=================================
+#!/bin/sh
+#
+# $FreeBSD: release/10.0.0/etc/rc.d/local 179931 2008-06-22 16:23:39Z mtm $
+#
+
+# PROVIDE: guestinit
+# REQUIRE: LOGIN
+
+. /etc/rc.subr
+
+name="guestinit"
+start_cmd="pretest_guest_init_start"
+stop_cmd="pretest_guest_init_stop"
+
+pretest_guest_init_start()
+{
+        /home/miles/pretest-guest-init.sh
+}
+
+pretest_guest_init_stop()
+{
+}
+
+load_rc_config $name
+run_rc_command "$1"
+=================================
+
+
+#### Dilos
+
+## rc.init
+http://www.science.uva.nl/pub/solaris/solaris2/Q3.22.html
+
+===========================
+#!/sbin/sh
+# /etc/init.d/rc.local - to be linked into /etc/rc3.d as
+# S99rc.local -- a place to hang local startup stuff.
+# started after everything else when going multi-user.
+
+# Ian Darwin, Toronto, November, 1992
+# As with all system changes, use at own risk!
+
+case "$1" in
+'start')
+	    echo "Starting local services...\c"
+
+	    if [ -f /export/home/miles/pretest-guest-init.sh ]; then
+		    /export/home/miles/pretest-guest-init.sh
+	    fi
+	    echo ""
+	    ;;
+'stop')
+	    echo "$0: Not stopping any services."
+	    ;;
+*)
+	    echo "Usage: $0 { start | stop }"
+	    ;;
+esac
+===========================
+
+chmod a+x /etc/init.d/rc.local
+cd /etc/rc3.d/
+ln -s ../init.d/rc.local S99rc.local
+
+## mount cd
+http://unix.stackexchange.com/questions/78791/how-to-mount-the-cd-rom-on-solaris-10
+
+
+#### Debian, CentOS 6.5
+Add "/home/miles/pretest-guest-init.sh" to NON-LAST line of '/etc/rc.local'
+
+### Fedora20,CentOS7 + systemD - ARGGGGG
+save into '/usr/lib/systemd/system/pretest-guest-init.service':
+===
+[Unit]
+Description=Pretest Guest Init
+After=rc-local.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/miles/pretest-guest-init.sh
+ExecStop=
+
+[Install]
+WantedBy=multi-user.target
+===
+#RUN: 'systemctl enable pretest-guest-init.service'
+
+#### GNU Hurd
+https://www.debian.org/ports/hurd/hurd-install
+## only mounts UPPERCASE filenames?
+settrans /mnt /hurd/iso9660fs /dev/hd2
+
