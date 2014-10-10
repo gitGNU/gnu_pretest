@@ -38,6 +38,8 @@
   to grub's default kernel command line - to enable curses (perhaps even
   doing so manually during installation?)
 
+* All VMs: verify 'help2man'
+
 * DilOS (and others): add 'libiconv-dev', 'libtoolize'
 
 * Minix: add symlink from 'clang++' to 'cxx'
