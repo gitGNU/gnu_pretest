@@ -31,6 +31,11 @@ run_rc_command "$1"
 =================================
 
 
+
+
+
+
+
 #### Dilos
 
 ## rc.init
@@ -71,8 +76,17 @@ ln -s ../init.d/rc.local S99rc.local
 http://unix.stackexchange.com/questions/78791/how-to-mount-the-cd-rom-on-solaris-10
 
 
+
+
+
+
 #### Debian, CentOS 6.5
 Add "/home/miles/pretest-guest-init.sh" to NON-LAST line of '/etc/rc.local'
+
+
+
+
+
 
 ### Fedora20,CentOS7 + systemD - ARGGGGG
 save into '/usr/lib/systemd/system/pretest-guest-init.service':
@@ -92,8 +106,31 @@ WantedBy=multi-user.target
 ===
 #RUN: 'systemctl enable pretest-guest-init.service'
 
+
+
+
 #### GNU Hurd
 https://www.debian.org/ports/hurd/hurd-install
 ## only mounts UPPERCASE filenames?
 settrans /mnt /hurd/iso9660fs /dev/hd2
+## Enable 'authoried-keys' login (password-less ssh)
+sed -i '/^#AuthorizedKeysFile/s/^#//' /etc/ssh/sshd_config
+
+
+
+
+
+## MINIX 3.3.3
+ "-cdrom" is connected to "/dev/c1d2".
+ Can be checked with "part /dev/cd1d2"
+
+See
+https://groups.google.com/forum/#!searchin/Minix3/cdrom/minix3/Sz90JJ1aoK8/GdiSiyYdZaYJ
+
+## Startup on minix:
+ (    /etc/rc => /usr/etc/rc => /usr/etc/rc.local )
+
+echo "/home/miles/pretest-guest-init.sh" >> /usr/etc/rc.local
+
+BUT: This is happens BEFORE networking and SSHD
 
