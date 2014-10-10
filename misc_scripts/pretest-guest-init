@@ -35,6 +35,12 @@ die()
     exit 1
 }
 
+bailout()
+{
+    echo "$BASE: aborting: $@" >&2
+    exit 0
+}
+
 log()
 {
     echo "$BASE: $@" >&2
@@ -47,11 +53,11 @@ log()
 mount_cdrom()
 {
     test -e "$1" \
-        || die "Expected CD device ($1) not found"
+        || bailout "Expected CD device ($1) not found"
     test -d "$2" \
-        || die "CD Mount direcotry ($2) not found"
+        || bailout "CD Mount direcotry ($2) not found"
     mount $3 "$1" "$2" \
-        || log "Mounting CDROM ($1) failed. aborting."
+        || bailout "Mounting CDROM ($1) failed. aborting."
 }
 
 # Parameters:
@@ -60,11 +66,11 @@ mount_cdrom()
 mount_hurd_cdrom()
 {
     test -e "$1" \
-        || die "Expected CD device ($1) not found"
+        || bailout "Expected CD device ($1) not found"
     test -d "$2" \
-        || die "CD Mount direcotry ($2) not found"
+        || bailout "CD Mount direcotry ($2) not found"
     settrans "$2" /hurd/iso9660fs "$1" \
-        || log "Mounting CDROM ($1) with settrans failed. aborting."
+        || bailout "Mounting CDROM ($1) with settrans failed. aborting."
 }
 
 # Parameters
@@ -86,10 +92,10 @@ copy_minix_cdrom()
 
     # Check CDROM device accessibility
     minix_isodir_exists "$MINIXCDDEV" "/" \
-        || die "failed to access CDROM at device $MINIXCDDEV"
+        || bailout "failed to access CDROM at device $MINIXCDDEV"
 
     minix_isodir_exists "$MINIXCDDEV" "/pretest/" \
-	    || die "Pretest-Init dir (/pretest/) not found on $MINIXCDDEV. aborting."
+	    || bailout "Pretest-Init dir (/pretest/) not found on $MINIXCDDEV. aborting."
 
     __dir=$(mktemp -d -t pretest) || die "failed to create temporary directory"
     mkdir "$__dir/pretest/" || die "mkdir '$__dir/pretest/' failed"
