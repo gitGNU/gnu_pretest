@@ -29,6 +29,7 @@ serial_file=no
 curses=no
 vga=no
 daemonize=no
+cdrom_image=
 
 die() { BASE=$(basename "$0") ; echo "$BASE: error: $@" >&2 ; exit 1 ; }
 
@@ -52,6 +53,8 @@ Options:
 
 -S      Disable QEMU's -snapshot mode, write changes to QCOW2 image file.
         (default: use -snapshot)
+
+-i FILE   Add FILE as '-cdrom' device.
 
 -r      Connect the guest VM's 2nd serial port to a file on the host.
         To send data from guest VM to host, run (inside the guest VM):
@@ -78,7 +81,7 @@ exit 1
 }
 
 ## parse parameters
-while getopts m:p:SrCDhzP name
+while getopts m:p:SrCDhzPi: name
 do
         case $name in
         m)      echo "$OPTARG" | grep -q '^[0-9][0-9]*$' \
@@ -103,6 +106,8 @@ do
                 pid_file=yes
                 ;;
         P)      pid_file=yes
+                ;;
+        i)      cdrom_image="$OPTARG"
                 ;;
         ?)      die "Try -h for help."
         esac
@@ -140,6 +145,7 @@ DAEMON_PARAM=
 DISPLAY_PARAM=
 PID_PARAM=
 SERIAL_PARAM=
+CDROM_PARAM=
 test "x$snapshot"    = xyes && SNAPSHOT_PARAM="-snapshot"
 test "x$daemonize"   = xyes && DAEMON_PARAM="-daemonize"
 if test "x$pid_file"    = xyes ; then
@@ -149,6 +155,11 @@ fi
 if test "x$serial_file" = xyes ; then
     SERIAL_PARAM="-serial file:$SERIALFILE"
     rm -f "$SERIALFILE"
+fi
+if test -n "$cdrom_image" ;  then
+    test -e "$cdrom_image" \
+        || die "cdrom ISO image file ($cdrom_image) not found"
+    CDROM_PARAM="-cdrom $cdrom_image"
 fi
 
 # Figure out the display type.
@@ -214,6 +225,7 @@ kvm -name "$NAME" \
     $SNAPSHOT_PARAM \
     $DAEMON_PARAM \
     $DISPLAY_PARAM \
+    $CDROM_PARAM \
     $SERIAL_PARAM \
     $KVM_PARAMS
 
