@@ -5,6 +5,10 @@
 # as upper-case. Set to non-empty to convert all PATHs to upper-case.
 upper_case=
 
+# Hack for Minix
+# 'su -K' is needed to avoid password request/kerberos ticket request
+su_params=
+
 BASE=$(basename "$0")
 
 die()
@@ -59,7 +63,7 @@ copy_minix_cdrom()
     # https://groups.google.com/d/msg/Minix3/Sz90JJ1aoK8/8YzEONyBMYkJ
     # The device is tightly coupled to PreTest's configuration of
     # virtio disk and IDE "-cdrom" drive.
-    MINIXCDDEV=/dev/c1d2
+    MINIXCDDEV="$1"
     service -c up /service/at_wini -dev "$MINIXCDDEV" -label at_wini
 
     # Check CDROM device accessibility
@@ -85,6 +89,10 @@ copy_minix_cdrom()
         done
     done
 
+    # Ensure all users can access the files
+    chmod -R a+rX "$__dir" \
+        || die "failed to set permissions on '$__dir'"
+
     # Copying done, set new fake 'mount dir'
     # TODO: delete it after script is done (with a trap?)
     MOUNTDIR=$__dir
@@ -101,7 +109,7 @@ copy_minix_cdrom()
 # 1. auto-detect device on DilOS, GNU Hurd.
 # 2. Future MINIX might be able to mount CDROMs, need to check version as well.
 # 3. Do all known 'linux' systems auto-enable '/dev/cdrom' ?
-mount_system_cdrom()
+system_setup()
 {
     UNAME=$(uname -s) || die "failed to get uname-s"
     MOUNTDIR=/mnt/
@@ -113,7 +121,8 @@ mount_system_cdrom()
         GNU)            mount_hurd_cdrom "/dev/hd2" "$MOUNTDIR"
                         upper_case=yes
                         ;;
-        Minix)          copy_minix_cdrom
+        Minix)          copy_minix_cdrom "/dev/c1d2"
+                        su_params="-K"
                         ;;
         *)          die "don't know which CDDEV to use for system '$UNAME'" ;;
     esac
@@ -144,7 +153,7 @@ verify_pretest_directory()
 ##
 ## Script start
 ##
-mount_system_cdrom
+system_setup
 
 set_directory_names
 
@@ -198,7 +207,7 @@ if test -d "$SCRIPTSDIR" ; then
 	for i in $(find "$SCRIPTSDIR" -type f | sort) ;
 	do
 		log "Running script '$i'..."
-		su "miles" -c "$i"
+		su $su_params "miles" -c "sh $i"
 	done
 	log "Running scripts - done"
 else

@@ -128,7 +128,7 @@ See
 https://groups.google.com/forum/#!searchin/Minix3/cdrom/minix3/Sz90JJ1aoK8/GdiSiyYdZaYJ
 
 ## Startup on minix:
- (    /etc/rc => /usr/etc/rc => /usr/etc/rc.local )
+ (    etc/rc => /usr/etc/rc => /usr/etc/rc.local )
 
 echo "/home/miles/pretest-guest-init.sh" >> /usr/etc/rc.local
 
