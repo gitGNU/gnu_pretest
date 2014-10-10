@@ -1377,8 +1377,18 @@ Install development packages:
 apt-get -y update && apt-get -y upgrade
 apt-get install -y build-essential ca-certificates \
     autopoint automake autoconf gettext \
-    git gawk vim wget rsync gperf pkg-config
+    git gawk vim wget rsync gperf pkg-config help2man \
+    libtool libncurses-dev
 @end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
 
 Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
 terminating QMEU,
