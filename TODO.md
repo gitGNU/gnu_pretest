@@ -32,6 +32,12 @@
 
 ## Guest VMs Improvements
 
+* Enable quiet/silent boot throught grub?
+
+* In linuxes: add 'modprobe.blacklist=bochs_drm' and 'modprobe.blacklist=cirrus'
+  to grub's default kernel command line - to enable curses (perhaps even
+  doing so manually during installation?)
+
 * DilOS (and others): add 'libiconv-dev', 'libtoolize'
 
 * Minix: add symlink from 'clang++' to 'cxx'
@@ -82,8 +88,12 @@
 
 * More OSes: Haiku, Plan9 ?
 
+* Hostnames: fix 'centos65', and 'hurd'
+
 ## Manual/Texinfo improvements
 
 * Mention Root passwod exception: minix,hurd (no password)
 
 * Mention no sudo on minix
+
+* Mention `scp -o Port=2222  FILE  miles@localhost:` method to copy files.
