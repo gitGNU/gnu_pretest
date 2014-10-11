@@ -18,11 +18,6 @@
 # along with PreTest If not, see <http://www.gnu.org/licenses/>.
 
 
-# Hack for GNU-Hurd:
-# mounted CDROM filesystems (using /hurd/iso9660fs) are always listed
-# as upper-case. Set to non-empty to convert all PATHs to upper-case.
-upper_case=
-
 # Hack for Minix
 # 'su -K' is needed to avoid password request/kerberos ticket request
 su_params=
@@ -65,12 +60,48 @@ mount_cdrom()
 #   $2 = mount directory
 mount_hurd_cdrom()
 {
+    # mounted CDROM filesystems (using /hurd/iso9660fs) are always listed
+    # as upper-case, with ";1" suffix.
+    # Copy the files to a different directory, make them lower-case,
+    # and remove the suffix
+
     test -e "$1" \
         || bailout "Expected CD device ($1) not found"
     test -d "$2" \
         || bailout "CD Mount direcotry ($2) not found"
-    settrans "$2" /hurd/iso9660fs "$1" \
-        || bailout "Mounting CDROM ($1) with settrans failed. aborting."
+    # Ugly Hack:
+    #   Hurd sometimes auto-mounts CDROM to '/mnt' -
+    #   so don't exit if re-mounting fails.
+    settrans "$2" /hurd/iso9660fs "$1"
+    #    || bailout "Mounting CDROM ($1) with settrans failed. aborting."
+    test -d "$2/PRETEST" \
+        || bailout "PRETEST directory not found on mounted CDROM"
+
+    # Copy the files, lower-case them, remove suffix
+    __dir=$(mktemp -d -t pretest.XXXXXXX) \
+        || die "failed to create temporary directory"
+    for i in $(find "$2" -type f) ;
+    do
+        # Make path lowercase
+        DIR=$(dirname "$i" | tr 'A-Z' 'a-z')
+        # Remove CDROM mount directory prefix
+        DIR=${DIR#$2}
+        # Make basename lowercase, remove suffix
+        FILE=$(basename "$i" | tr 'A-Z' 'a-z' | sed 's/;[0-9]*$//')
+
+        mkdir -p "$__dir/$DIR" \
+            || die "failed to create directory '$__dir/$DIR'"
+        cp "$i" "$__dir/$DIR/$FILE" \
+            || die "failed to copy '$i'"
+    done
+
+    # Ensure all users can access the files
+    chmod -R a+rX "$__dir" \
+        || die "failed to set permissions on '$__dir'"
+
+    # Copying done, set new fake 'mount dir'
+    # TODO: delete it after script is done (with a trap?)
+    MOUNTDIR=$__dir
 }
 
 # Parameters
@@ -143,7 +174,6 @@ system_setup()
         SunOS)          mount_cdrom "/dev/dsk/c0t0d0s0" "$MOUNTDIR" "-r -F hsfs" ;;
         Linux)          mount_cdrom "/dev/cdrom" "$MOUNTDIR" ;; #at least on debian?
         GNU)            mount_hurd_cdrom "/dev/hd2" "$MOUNTDIR"
-                        upper_case=yes
                         ;;
         Minix)          copy_minix_cdrom "/dev/c1d2"
                         su_params="-K"
@@ -154,23 +184,16 @@ system_setup()
 
 set_directory_names()
 {
-    if test "x$upper_case" = "xyes" ; then
-        INITDIR="$MOUNTDIR/PRETEST"
-        KEYSDIR="$INITDIR/KEYS"
-        RSCRIPTSDIR="$INITDIR/RSCRIPTS"
-        SCRIPTSDIR="$INITDIR/SCRIPTS"
-    else
-        INITDIR="$MOUNTDIR/pretest"
-        KEYSDIR="$INITDIR/keys"
-        RSCRIPTSDIR="$INITDIR/rscripts"
-        SCRIPTSDIR="$INITDIR/scripts"
-    fi
+    INITDIR="$MOUNTDIR/pretest"
+    KEYSDIR="$INITDIR/keys"
+    RSCRIPTSDIR="$INITDIR/rscripts"
+    SCRIPTSDIR="$INITDIR/scripts"
 }
 
 verify_pretest_directory()
 {
     test -d "$INITDIR" \
-	    || die "Pretest-Init dir ($INITDIR) doesn't exist. aborting."
+	    || bailout "Pretest-Init dir ($INITDIR) doesn't exist."
 }
 
 
