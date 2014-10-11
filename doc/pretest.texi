@@ -1618,7 +1618,7 @@ in @file{/usr/local/bin}.
 
 @unnumberedsubsec PreTest Image Preparation
 
-Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
 terminating QMEU,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
@@ -2243,10 +2243,20 @@ Install development packages:
 @example
 apt-get install -y build-essential ca-certificates \
     autopoint automake autoconf gettext \
-    git  gawk vim wget  rsync gperf texinfo pkg-config
+    git gawk vim wget rsync gperf texinfo pkg-config help2man \
+    libtool libncurses-dev nano
 @end example
 
-Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
+
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
 terminating QMEU,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
