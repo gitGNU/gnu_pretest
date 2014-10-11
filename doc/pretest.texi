@@ -2044,7 +2044,8 @@ Install development packages:
 @example
 yum -y update
 yum groupinstall -y "Development Tools"
-yum -y install wget gperf gettext-devel texinfo automake autoconf
+yum -y install wget gperf gettext-devel texinfo automake autoconf \
+               nano help2man ncurses-devel libtool
 @end example
 
 Use disk-based @file{/tmp} (instead of memory-based @code{tmpfs}) -
@@ -2053,6 +2054,35 @@ For build-automation we use VMs with very little memory.
 @example
 systemctl mask tmp.mount
 @end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @command{Systemd} configuration
+file @file{/usr/lib/systemd/system/pretest-guest-init.service}:
+@example
+# PreTest Guest Init Script
+# See http://www.nongnu.org/pretest/
+[Unit]
+Description=Pretest Guest Init
+After=rc-local.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/pretest-guest-init
+ExecStop=
+
+[Install]
+WantedBy=multi-user.target
+@end example
+
+Then running @command{systemctl enable pretest-guest-init.service} to enable
+this service at boot time.
+
+@unnumberedsubsec PreTest Image Preparation
 
 Run @command{shutdown -H now} to stop the virtual machine @emph{without}
 terminating QMEU,
