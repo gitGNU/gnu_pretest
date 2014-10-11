@@ -2915,7 +2915,7 @@ Available pre-build virtual machines are congiured as described in
 @url{http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz}
 
 @item FreeBSD 10
-@url{http://files.housegordon.org/pretest/v0.1/freebsd10.clearn-install.qcow2.xz}
+@url{http://files.housegordon.org/pretest/v0.1/freebsd10.clean-install.qcow2.xz}
 
 @item FreeBSD 9.3
 @url{http://files.housegordon.org/pretest/v0.1/freebsd93.clean-install.qcow2.xz}
@@ -2971,10 +2971,10 @@ Available pre-build virtual machines are congiured as described in
 @url{http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz}
 
 @item GNU Hurd/Debian
-@url{http://files.housegordon.org/pretest/v0.1/hurd.build-ready.qcow2.xz}
+@url{http://files.housegordon.org/pretest/v0.1/hurd05.build-ready.qcow2.xz}
 
 @item MINIX R3.3.0
-@url{http://files.housegordon.org/pretest/v0.1/minixR330.build-ready-v1.qcow2.xz}
+@url{http://files.housegordon.org/pretest/v0.1/minixR330.build-ready.qcow2.xz}
 
 @item FreeBSD 10
 @url{http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz}
