@@ -2385,7 +2385,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @cindex Trisquel 6.0.1, Setup build tools
 @unnumberedsubsec Setup build tools ('build-ready')
 
-Start @file{trisquel 6.0.1.qcow2} with the @command{pretest-run.sh} script.
+Start @file{trisquel601.qcow2} with the @command{pretest-run.sh} script.
 
 Once booted, login with @var{root} (password: @var{12345}).
 
@@ -2393,10 +2393,20 @@ Install development packages:
 @example
 apt-get install -y build-essential ca-certificates \
     autopoint automake autoconf gettext \
-    git  gawk vim wget rsync gperf texinfo pkg-config
+    git gawk vim wget rsync gperf texinfo pkg-config \
+    help2man libtool libncurses-dev nano
 @end example
 
-Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
+
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
 terminating QMEU,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
