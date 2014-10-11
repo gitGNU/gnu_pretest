@@ -658,10 +658,26 @@ echo 'GRUB_CMDLINE_GNUMACH="console=com0"' >> /etc/default/grub
 update-grub
 @end example
 
-Stop GNU-Hurd VM:
+Install additional software:
 @example
-/sbin/halt
+apt-get install help2man libtool
 @end example
+
+Enable password-less SSH login:
+@example
+sed -i '/^#AuthorizedKeysFile/s/^#//' /etc/ssh/sshd_config
+@end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
+
+Stop GNU-Hurd VM with @command{shutdown -H -h now}.
 
 Note: since the downloaded image is already installed, there is no
 `clean-install` version of of GNU Hurd VM.
