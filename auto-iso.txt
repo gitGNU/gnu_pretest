@@ -47,15 +47,12 @@ http://www.science.uva.nl/pub/solaris/solaris2/Q3.22.html
 # S99rc.local -- a place to hang local startup stuff.
 # started after everything else when going multi-user.
 
-# Ian Darwin, Toronto, November, 1992
-# As with all system changes, use at own risk!
-
 case "$1" in
 'start')
 	    echo "Starting local services...\c"
 
-	    if [ -f /export/home/miles/pretest-guest-init.sh ]; then
-		    /export/home/miles/pretest-guest-init.sh
+	    if [ -f /usr/bin/pretest-guest-init ]; then
+		    /usr/bin/pretest-guest-init
 	    fi
 	    echo ""
 	    ;;
