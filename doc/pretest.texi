@@ -775,7 +775,7 @@ Install development packages:
 echo 'PKG_PATH="ftp://mirrors.nycbug.org/pub/OpenBSD/5.5/packages/$(machine -a)/"' >> .profile
 echo 'export PKG_PATH' >> .profile
 
-echo autoconf-2.69p1 automake-1.14.1 gperf wget \
+echo autoconf-2.69p1 automake-1.14.1 gperf wget nano help2man libtool \
      xz rsync-3.1.0 git bison | xargs -n1 pkg_add -v
 @end example
 
@@ -788,6 +788,14 @@ echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
 Without these settings, running @command{autoconf} will terminate with an
 error message complaining about having to select a specific version.
 
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
 
 Stop the VM with @command{/sbin/halt},
 Enter QEMU's monitor mode (type @kbd{CTRL-A, c}),
