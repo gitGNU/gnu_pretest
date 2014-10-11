@@ -2801,16 +2801,57 @@ apt-get -y upgrade
 apt-get -y install developer-build-gnu-make developer-versioning-mercurial \
                    git gcc-48 text-gnu-grep developer-gnu-binutils \
                    developer-build-autoconf developer-build-automake \
-                   developer-build-pkg-config rsync \
+                   developer-build-pkg-config rsync libncurses-dev \
                    system-library-math-dev system-library-platform-dev \
-                   developer-gperf
+                   developer-gperf nano help2man libtool libiconv-dev
 # Special handling for gnu-gettext: if the first installation fails,
 # Fix it with '-f'
 apt-get -y install text-gnu-gettext
 apt-get -f install
 @end example
 
-Run @command{/sbin/halt} to stop the machine,
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/bin}.
+
+A start-up init script @file{/etc/init.d/rc.local} is added, with:
+@example
+#!/sbin/sh
+# /etc/init.d/rc.local - to be linked into /etc/rc3.d as
+# S99rc.local -- a place to hang local startup stuff.
+# started after everything else when going multi-user.
+
+case "$1" in
+'start')
+	    echo "Starting local services...\c"
+
+	    if [ -f /usr/bin/pretest-guest-init ]; then
+		    /usr/bin/pretest-guest-init
+	    fi
+	    echo ""
+	    ;;
+'stop')
+	    echo "$0: Not stopping any services."
+	    ;;
+*)
+	    echo "Usage: $0 { start | stop }"
+	    ;;
+esac
+@end example
+
+And is made to run at start-up, with:
+@example
+chmod a+x /etc/init.d/rc.local
+cd /etc/rc3.d/
+ln -s ../init.d/rc.local S99rc.local
+@end example
+
+(See @url{http://www.science.uva.nl/pub/solaris/solaris2/Q3.22.html})
+
+@unnumberedsubsec PreTest Image Preparation
+
+Run @command{halt} to stop the machine,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
 to terminate QEMU.
