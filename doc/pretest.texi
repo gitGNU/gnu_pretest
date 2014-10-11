@@ -943,8 +943,51 @@ Install development packages:
 @example
 echo git-base binutils bison perl autoconf \
      automake wget rsync pkg-config bash gperf \
-     gettext gmake bmake gtexinfo | xargs -n1 pkgin -y install
+     gettext gmake bmake gtexinfo help2man nano libtool \
+     | xargs -n1 pkgin -y install
 @end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/bin}.
+
+A start-up init script @file{/etc/rc.d/pretest-guest-init} is added, with:
+@example
+#!/bin/sh
+#
+# PreTest startup script
+# http://www.nongnu.org/pretest/
+#
+
+# PROVIDE: guestinit
+# REQUIRE: LOGIN
+
+. /etc/rc.subr
+
+name="guestinit"
+start_cmd="pretest_guest_init_start"
+stop_cmd="pretest_guest_init_stop"
+
+pretest_guest_init_start()
+{
+        /usr/bin/pretest-guest-init
+}
+
+pretest_guest_init_stop()
+{
+}
+
+load_rc_config $name
+run_rc_command "$1"
+@end example
+
+And is made executable:
+@example
+chmod a+x /etc/rc.d/pretest-guest-init
+@end example
+
+@unnumberedsubsec PreTest Image Preparation
 
 Stop the VM with @command{/sbin/halt},
 Enter QEMU's monitor mode (type @kbd{CTRL-A, c}),
