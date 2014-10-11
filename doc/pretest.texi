@@ -1025,8 +1025,51 @@ Once booted, login with @var{root} (password: @var{12345}).
 Install development packages:
 @example
 echo pkgconf gperf autoconf automake git bison wget rsync \
+     help2man nano libtool \
      | xargs -n1 env ASSUME_ALWAYS_YES=YES pkg install
 @end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+A start-up init script @file{/etc/rc.d/pretest-guest-init} is added, with:
+@example
+#!/bin/sh
+#
+# PreTest startup script
+# http://www.nongnu.org/pretest/
+#
+
+# PROVIDE: guestinit
+# REQUIRE: LOGIN
+
+. /etc/rc.subr
+
+name="guestinit"
+start_cmd="pretest_guest_init_start"
+stop_cmd="pretest_guest_init_stop"
+
+pretest_guest_init_start()
+{
+        /usr/local/bin/pretest-guest-init
+}
+
+pretest_guest_init_stop()
+{
+}
+
+load_rc_config $name
+run_rc_command "$1"
+@end example
+
+And is made executable:
+@example
+chmod a+x /etc/rc.d/pretest-guest-init
+@end example
+
+@unnumberedsubsec PreTest Image Preparation
 
 Run @command{/sbin/halt} to stop the machine, press @kbd{CTRL-A,c} to switch
 to QEMU's monitor, run @command{commit all} to save changes, then @command{quit}
@@ -1390,7 +1433,7 @@ in @file{/usr/local/bin}.
 
 @unnumberedsubsec PreTest Image Preparation
 
-Run @command{shutdown -H -h now} to stop the virtual machine @emph{without}
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
 terminating QMEU,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
