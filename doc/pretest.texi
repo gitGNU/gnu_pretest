@@ -2474,10 +2474,41 @@ Install development packages:
 zypper update
 zypper install -y gcc gcc-c++
 zypper install -y -y git automake autoconf bison xz rsync
-zypper install -y makeinfo texinfo gperf make
+zypper install -y makeinfo texinfo gperf make nano help2man \
+                  libtool ncurses-devel gettext-tools gettext-runtime
 @end example
 
-Run @command{/sbin/halt} to stop the machine,
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @command{Systemd} configuration
+file @file{/usr/lib/systemd/system/pretest-guest-init.service}:
+@example
+# PreTest Guest Init Script
+# See http://www.nongnu.org/pretest/
+[Unit]
+Description=Pretest Guest Init
+After=rc-local.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/pretest-guest-init
+ExecStop=
+
+[Install]
+WantedBy=multi-user.target
+@end example
+
+Then running @command{systemctl enable pretest-guest-init.service} to enable
+this service at boot time.
+
+@unnumberedsubsec PreTest Image Preparation
+
+Run @command{shutdown -H now} to stop the virtual machine @emph{without}
+terminating QMEU,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
 run @command{commit all} to save changes, then @command{quit}
 to terminate QEMU.
