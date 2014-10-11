@@ -1386,13 +1386,15 @@ Install development-related packages
 pkgin -y update
 echo vim openssh git-base binutils clang bison perl \
      autoconf automake wget rsync pkg-config bash \
-     gperf gettext gmake bmake | xargs -n1 pkgin -y install
+     gperf gettext gmake bmake help2man nano libtool-info libtoo-base \
+     | xargs -n1 pkgin -y install
 @end example
 
 Minix uses @command{clang} but does not have @command{cc} by default,
 add a soft link (for easier @command{./configure} usage):
 @example
 ln -s $(which clang) /usr/bin/cc
+ln -s $(which clang++) /usr/bin/cxx
 @end example
 
 Replace defective @command{wget} with a working older version:
@@ -1414,6 +1416,15 @@ make install
 cd ..
 rm -r ./wget-1.9*
 @end example
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/usr/local/etc/rc}.
+
+@unnumberedsubsec PreTest Image Preparation
 
 Run @command{/sbin/halt} to stop the machine,
 press @kbd{CTRL-A,c} to switch to QEMU's monitor,
