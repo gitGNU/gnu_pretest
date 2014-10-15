@@ -174,7 +174,7 @@ the following items (in addition to all '@ref{Clean-Install VMs}' settings):
 @item @command{make}, and optionally @command{gmake} (if @command{make} is not GNU make)
 @item autotools programs (@command{automake}, @command{autoconf}, @command{authoreconf})
 @item texinfo (@command{makeinfo})
-@item @command{pkg-config}, @command{gperf}
+@item @command{pkg-config}, @command{gperf}, @command{libtool}, @command{help2man}
 @item @command{git}, @command{rync}, @command{wget}, @command{xz}
 
 @item @emph{NOTE}: The version of the above programs vary widely between OSes.
@@ -209,6 +209,20 @@ cd datamash
 @end example
 NOTE: Building from git (using gnuli's @file{bootstrap}) usually requires
 a recent version of autotools programs which are not always available.
+
+@item All OSes have the @file{pretest-auto-build-check} script, allowing quick
+build check:
+@example
+pretest-auto-build-check http://ftp.gnu.org/gnu/hello/hello-2.8.tar.gz
+pretest-auto-build-check git://git.savannah.gnu.org/hello.git
+@end example
+
+Which will download the tarball (or clone the GIT repository), then run
+@command{bootstrap} (if needed), @command{configure}, @command{make},
+@command{make check}.
+
+@item All OSes have the @file{pretest-guest-init} script configured to run
+on boot time, enabling automatic ssh-key configuration and script execution.
 
 @end itemize
 
