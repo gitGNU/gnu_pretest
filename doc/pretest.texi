@@ -649,6 +649,15 @@ The VMs are started using @command{pretest-run.sh}, and after installation is
 complete, the QCOW2 files are tagged as 'build-ready'. Such pre-build images
 are available for download, see @xref{Downloads}.
 
+@item Pretest-Scripts
+This section lists where the two @emph{pretest} scripts
+(@file{pretest-guest-init} and @file{pretest-auto-build-check}) are installed,
+and how the @file{pretest-guest-init} script is configured to run at boot time.
+
+@item Pretest Image Preparation
+This section lists how the VM image files (the downloadable @file{*.qcow2.xz}
+files) were packaged.
+
 @end table
 
 
