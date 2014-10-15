@@ -986,13 +986,13 @@ start_cmd="pretest_guest_init_start"
 stop_cmd="pretest_guest_init_stop"
 
 pretest_guest_init_start()
-{
+@{
         /usr/bin/pretest-guest-init
-}
+@}
 
 pretest_guest_init_stop()
-{
-}
+@{
+@}
 
 load_rc_config $name
 run_rc_command "$1"
@@ -1119,13 +1119,13 @@ start_cmd="pretest_guest_init_start"
 stop_cmd="pretest_guest_init_stop"
 
 pretest_guest_init_start()
-{
+@{
         /usr/local/bin/pretest-guest-init
-}
+@}
 
 pretest_guest_init_stop()
-{
-}
+@{
+@}
 
 load_rc_config $name
 run_rc_command "$1"
@@ -1254,13 +1254,13 @@ start_cmd="pretest_guest_init_start"
 stop_cmd="pretest_guest_init_stop"
 
 pretest_guest_init_start()
-{
+@{
         /usr/local/bin/pretest-guest-init
-}
+@}
 
 pretest_guest_init_stop()
-{
-}
+@{
+@}
 
 load_rc_config $name
 run_rc_command "$1"
@@ -2862,7 +2862,7 @@ case "$1" in
 	    echo "$0: Not stopping any services."
 	    ;;
 *)
-	    echo "Usage: $0 { start | stop }"
+	    echo "Usage: $0 @{ start | stop @}"
 	    ;;
 esac
 @end example
