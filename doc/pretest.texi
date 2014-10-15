@@ -891,7 +891,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c Net BSD 6.1.4
 @c ***********************************************************
-@node NetBSD 6.1.4, Minix R3.3.0, OpenBSD 5.5, Build Recipes
+@node NetBSD 6.1.4, FreeBSD 10, OpenBSD 5.5, Build Recipes
 @section NetBSD 6.1.4
 @cindex NetBSD 6.1.4, build recipe
 @cindex build recipe, NetBSD 6.1.4
@@ -1083,7 +1083,7 @@ A pre-build image is available for download, see @xref{Downloads}.
 @c ***********************************************************
 @c FreeBSD 10
 @c ***********************************************************
-@node FreeBSD 10, Minix R3.3.0, NetBSD 6.1.4, Build Recipes
+@node FreeBSD 10, FreeBSD 9.3, NetBSD 6.1.4, Build Recipes
 @section FreeBSD 10
 @cindex FreeBSD 10, build recipe
 @cindex build recipe, FreeBSD 10
