@@ -1,7 +1,7 @@
 pre {
 	background: #F0F0F0;
-	margin-left: 1em;
-	margin-right: 1em;
 	padding: 0.5em;
 }
-
+code {
+	background: #F0F0F0;
+}

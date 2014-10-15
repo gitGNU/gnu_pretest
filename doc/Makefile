@@ -15,10 +15,14 @@ all: $(HTML) $(PDF) $(INFO)
 %.pdf: %.texi
 	makeinfo --pdf $<
 
+
 %.html: %.texi
 	texi2any --set-customization-variable WORDS_IN_PAGE=0 \
 	         --html --no-split \
+		 --css-include=pretest.css \
 	         -- $<
+
+*.html: pretest.css
 
 %.info: %.texi
 	makeinfo $<
