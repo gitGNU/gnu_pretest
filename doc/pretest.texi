@@ -274,6 +274,7 @@ or as a basis for such servers.
 @menu
 * Simple KVM usage::                Using images directly with KVM
 * Pretest-run script::              Using images with pretest-run.sh script
+* Pretest-auto-build-check script:: Automating download/build/check procedure
 * Sending data from Guest to Host:: Using serial port to export data
 * LibVirt usage::                   Using images with libVirt
 * Debian Compilers Pack Usage::     Testing multiple compilers
@@ -301,7 +302,7 @@ related option).
 @emph{NOTE}: Some VMs have special requirement, see each VM's build instructions,
 or the @file{pretest-run.sh} script for OS-specific hacks.
 
-@node Pretest-run script, Sending data from Guest to Host, Simple KVM usage, Usage
+@node Pretest-run script, Pretest-auto-build-check script, Simple KVM usage, Usage
 @section Pretest-run script
 @cindex pretest-run script
 @cindex pretest-run.sh
@@ -386,7 +387,59 @@ Write PID file (QEMU's @option{-pidfile}).
 The file will be named @file{FILE.pid} (based on input QCOW2 filename).
 @end table
 
-@node Sending data from Guest to Host, LibVirt usage, Pretest-run script, Usage
+@node Pretest-auto-build-check script, Sending data from Guest to Host, Pretest-run script, Usage
+@section Pretest-auto-build-check
+@cindex Pretest-auto-build-check
+@cindex automating download/build/check procedure
+
+All @emph{Build-Ready} VMs contain the @file{pretest-auto-build-check} script.
+This script can be used to simplify the download/build/check procedure when
+testing a new pre-release tarball.
+
+Typical Usage:
+@example
+pretest-auto-build-check SOURCE
+@end example
+Where @var{SOURCE} is a URL of a tarball, or a URL of a git repository.
+
+Examples:
+@example
+pretest-auto-build-check http://ftp.gnu.org/gnu/hello/hello-2.8.tar.gz
+pretest-auto-build-check git://git.savannah.gnu.org/hello.git
+@end example
+
+Additionally, the @file{pretest-auto-build-check.sh} accepts the following options:
+
+@table @option
+@item -h
+Show help screen
+
+@item -c @var{PARAM}
+Add @var{PARAM} as a parameter to the @command{configure} step.
+
+@item -m @var{PARAM}
+Add @var{PARAM} as a parameter to the @command{make} step.
+
+@item -e @var{NAME}=@var{VALUE}
+Add @code{NAME=VALUE} as an environment variable to all commands.
+
+@item -b @var{BRANCH}
+When cloning a @command{git} repository, check out branch @var{BRANCH} instead
+of the default @var{master} branch.
+@end table
+
+The script does the following:
+@enumerate
+@item Creates a temporary directory under @file{/tmp}
+@item Downloads the tarball, decompress it (@command{gzip},@command{bzip2},@command{xz} are supported). Or,
+@item Clones the GIT repository, checking out branch @var{master} (or another branch, with @option{-b}).
+@item If checking out a GIT repository, runs @command{./bootstrap}
+@item runs @command{./configure}
+@item runs @command{make}
+@item runs @command{make check}
+@end enumerate
+
+@node Sending data from Guest to Host, LibVirt usage, Pretest-auto-build-check script, Usage
 @section Sending data from Guest to Host
 @cindex Sending data from Guest to Host
 @cindex Serial file
