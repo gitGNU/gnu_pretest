@@ -275,6 +275,7 @@ or as a basis for such servers.
 * Simple KVM usage::                Using images directly with KVM
 * Pretest-run script::              Using images with pretest-run.sh script
 * Pretest-auto-build-check script:: Automating download/build/check procedure
+* Pretest-guest-init script::       Boot-time automation
 * Sending data from Guest to Host:: Using serial port to export data
 * LibVirt usage::                   Using images with libVirt
 * Debian Compilers Pack Usage::     Testing multiple compilers
@@ -366,6 +367,9 @@ echo hello > /dev/tty01 (on Dilos, MINIX, OpenBSD, NetBSD)
 
 The file will be named @file{FILE.serial} (based on input QCOW2 filename).
 
+@item -i @var{FILE.ISO}
+Mount @var{FILE.ISO} as an IDE CDROM drive. To be used with @file{pretest-guest-init}.
+
 @item -C
 Use CURSES VGA text interface (QEMU's @option{-curses} option).
 
@@ -387,7 +391,7 @@ Write PID file (QEMU's @option{-pidfile}).
 The file will be named @file{FILE.pid} (based on input QCOW2 filename).
 @end table
 
-@node Pretest-auto-build-check script, Sending data from Guest to Host, Pretest-run script, Usage
+@node Pretest-auto-build-check script, Pretest-guest-init script, Pretest-run script, Usage
 @section Pretest-auto-build-check
 @cindex Pretest-auto-build-check
 @cindex automating download/build/check procedure
@@ -439,7 +443,58 @@ The script does the following:
 @item runs @command{make check}
 @end enumerate
 
-@node Sending data from Guest to Host, LibVirt usage, Pretest-auto-build-check script, Usage
+@node Pretest-guest-init script, Sending data from Guest to Host, Pretest-auto-build-check script, Usage
+@section Pretest-guest-init script - Portable boot-time automation
+@cindex Pretest-guest-init script
+@cindex Portable Boot-time automation 
+
+All @emph{Build-Ready} VMs contain the @file{pretest-guest-init} script,
+pre-configured to run the script on start-up (as late as possible in the boot
+sequence, just before enabling login).
+
+The @file{pretest-guest-init} script is a feature-limited, portable initialization
+script, conceptually similar to @emph{CloudInit} (@url{https://launchpad.net/cloud-init}).
+
+When each VM boots, the @file{pretest-guest-init} script does the following:
+@enumerate
+
+@item Check for an available CDROM device (e.g. @file{/dev/cdrom} on linux).
+
+@item If a CDROM image is connected to the VM, mounts it.
+
+@item Verifies the CDROM image contains @file{/pretest/} directory (otherwise- aborts).
+
+@item Copies SSH public-keys from @file{/pretest/keys} directory to the
+@file{authorized_keys} file of user @var{miles} - this enables password-less login
+once the VM boots.
+
+@item Executes shell script from @file{/pretest/rscripts/} directory as user @var{root}.
+
+@item Executes shell scripts from @file{/pretest/scripts/} directory as user @var{miles}.
+
+@item For few specific VMs (@var{Hurd}, @var{MINIX}) where CDROM mounting requires
+special commands, additional code ensures the files from the CDROM are available
+as if they were mounted 'normally'.
+
+@end enumerate
+
+To connect a CDROM manually, run:
+@example:
+kvm -nographic -m 384 \
+    -net user -net nic,model=virtio \
+    -drive if=virtio,media=disk,index=0,file=debian76.build-ready.qcow2 \
+    -cdrom FILE.ISO
+@end example
+
+A simpler method is to use the @option{-i} option of @file{pretest-run} script:
+@example
+pretest-run.sh -i FILE.ISO debian76.build-ready.qcow2
+@end example
+
+@emph{TODO}:
+Explain how to create a compatible ISO image with @command{genisoimage}.
+
+@node Sending data from Guest to Host, LibVirt usage, Pretest-guest-init script, Usage
 @section Sending data from Guest to Host
 @cindex Sending data from Guest to Host
 @cindex Serial file
