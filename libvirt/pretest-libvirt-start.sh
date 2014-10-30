@@ -65,7 +65,7 @@ fi
 ## Get the domain's IP address
 ##
 if [ "x$retries" = "xyes" ]; then
-    attempts=10
+    attempts=20
     while true ; do
         domipaddr=$("$VIRT_ADDR_SCRIPT" -- "$domname" 2>/dev/null)
         test -n "$domipaddr" && break
