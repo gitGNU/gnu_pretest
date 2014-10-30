@@ -20,7 +20,9 @@
 RAM=384
 DISKTYPE=virtio
 NETTYPE=virtio
+GRAPHICS=none
 CONNECT_URL=qemu:///system
+OS_VARIANT=generic
 
 die()
 {
@@ -50,6 +52,25 @@ test -e "$QCOW2_FILE" \
 
 domname=pretest-$NAME
 
+##
+## Few Hacks for specific VMs
+##
+
+# Hack for GNU-Hurd: can't handle virtio
+if echo "$NAME" | grep -qi 'hurd' ; then
+    DISKTYPE=ide
+    NETTYPE=rtl8139
+    OS_VARIANT="msdos"
+fi
+if echo "$NAME" | grep -qi 'dilos' ; then
+    GRAPHICS="vnc"
+    RAM=768
+    OS_VARIANT="opensolaris"
+fi
+if echo "$NAME" | grep -qi 'minix' ; then
+    RAM=768
+fi
+
 
 tmp=$(mktemp -t pretest.XXXXXXX.xml) || die "failed to create tmp file"
 
@@ -62,7 +83,7 @@ virt-install --connect "$CONNECT_URL" \
     --os-variant=generic \
     --boot hd,cdrom \
     --disk "path=$QCOW2_FILE,device=disk,format=qcow2,bus=$DISKTYPE,perms=rw" \
-    --graphics none \
+    --graphics "$GRAPHICS" \
     --print-xml \
     --network "network=default,model=$NETTYPE" \
     --serial pty \
