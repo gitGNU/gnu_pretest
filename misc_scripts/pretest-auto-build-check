@@ -164,7 +164,7 @@ do
                 ;;
         m)      make_params="$make_params $OPTARG"
                 ;;
-        e)      echo "$OPT_ARG" | grep -E -q '^[A-Za-z0-9]=' ||
+        e)      echo "$OPTARG" | grep -E -q '^[A-Za-z0-9]+=' ||
                    die "error: '-e $OPTARG' doesn't look like a " \
                            "valid environment variable"
                 env_params="$env_PARAMS $OPTARG"
