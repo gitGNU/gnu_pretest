@@ -34,6 +34,13 @@
 
 * Enable quiet/silent boot throught grub?
 
+* Add libz-dev
+
+* Add custom 'pretest-guest-shutdown' to each VM, instead of guessing the
+  shutdown command in `pretest-run.sh`.
+
+* Remove 'requiretty' from /etc/sudoers on Fedora/CentOS7
+
 * In linuxes: add 'modprobe.blacklist=bochs_drm' and 'modprobe.blacklist=cirrus'
   to grub's default kernel command line - to enable curses (perhaps even
   doing so manually during installation?)
