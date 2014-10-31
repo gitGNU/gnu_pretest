@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+=pod
+virt-addr: returns the IP address of a VM Domain under LibVirt
+
+Original script from Richard WM Jones:
+   http://rwmj.wordpress.com/tag/virt-addr/
+
+Modified by Assaf Gordon (assafgordon@gmail.com)
+
+License: Public Domain (See: http://rwmj.wordpress.com/about/)
+=cut
+
+use warnings;
+use strict;
+use XML::XPath;
+use XML::XPath::XMLParser;
+use Sys::Virt;
+use Getopt::Long;
+use File::Basename qw/basename/;
+
+my $debug;
+my $return_all;
+
+sub usage;
+
+my $rc = GetOptions("help|h" => \&usage,
+                    "debug" => \$debug,
+                    "all|a" => \$return_all)
+    or die "invalid command-line option. See --help for more information\n";
+
+my $domain = shift
+    or die "missing DOMAIN name. See --help for more information\n";
+
+# Open libvirt connection and get the domain.
+my $conn = Sys::Virt->new (readonly => 1);
+my $dom = $conn->get_domain_by_name ($domain);
+
+# Get the libvirt XML for the domain.
+my $xml = $dom->get_xml_description ();
+
+# Parse out the MAC addresses using an XPath expression.
+my $xp = XML::XPath->new (xml => $xml);
+my $nodes = $xp->find ("//devices/interface[\@type='network']/mac/\@address");
+# TODO: Detect network-less configuration were $nodes is empty?
+
+# Convert MAC addresses to a hash
+my %dom_mac_addrs = map { lc($_->getData) => 1} $nodes->get_nodelist;
+print STDERR "Mac-Addresses (from XML): ",
+             join(',', keys %dom_mac_addrs),"\n" if $debug;
+
+# Look up the MAC addresses in the output of 'arp -an'.
+my @arp_lines = split /\n/, `arp -an`;
+die "error: failed to run 'arp -an'\n" unless ($?>>8)==0;
+print STDERR "ARP Table: \n", map{"  $_\n"} @arp_lines if $debug;
+
+my $count=0;
+
+foreach (@arp_lines) {
+    if (/\((.*?)\) at (.*?) /) {
+        my $this_addr = lc $2;
+        if (exists $dom_mac_addrs{$this_addr}) {
+            print "$1\n";
+            ++$count;
+            last unless $return_all;
+        }
+    }
+}
+
+die "error: no IP address found for domain '$domain'\n" if $count==0;
+
+
+sub usage()
+{
+	my $base = basename($0);
+	print<<EOF;
+$base: libvirt helper tool - Returns IP address of a running domain.
+
+Usage:
+   $base [OPTIONS] DOMAIN
+
+Options:
+  -a, --all       print all IP addresses found.
+                  by default action: print only the first one found.
+      --debug     print debugging information to STDERR
+  -h, --help      this help screen.
+
+Original script from Richard WM Jones:
+   http://rwmj.wordpress.com/tag/virt-addr/
+Modified by Assaf Gordon (assafgordon\@gmail.com)
+License: Public Domain (See: http://rwmj.wordpress.com/about/)
+
+EOF
+	exit 0;
+}
