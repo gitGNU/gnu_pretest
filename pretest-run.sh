@@ -177,9 +177,14 @@ else
     # Default: if no display options specified, use only serial console
     DISPLAY_PARAM="-nographic"
 
-    # If not forking into background, connect the serial port to the console
-    test "x$daemonize"  != xyes \
-        && DISPLAY_PARAM="$DISPLAY_PARAM -serial mon:stdio"
+    # If not forking into background, connect the serial port to the current
+    # terminal. If forking, connect to the a different file.
+    # This will ensure that the first serial is connected to something,
+    # So if the user add '-r' (for a serial device), it will be second serial
+    # port inside the VM.
+    test "x$daemonize"  = xyes \
+        && DISPLAY_PARAM="$DISPLAY_PARAM -serial file:$NAME.console" \
+        || DISPLAY_PARAM="$DISPLAY_PARAM -serial mon:stdio"
 fi
 
 ## Ugly Hacks to accomodate some OSes
