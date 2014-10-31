@@ -51,6 +51,7 @@ my $dry_run;
 my $boot_order = "cd"; # currently hard-coded
 my $boot_connection_attempts = 120 ; # 120 attemps =~ 4 minutes
 my $graceful_shutdown_attempts = 30 ; # 30 attempts =~ 30 seconds
+my @ssh_command; # optional command to run when connecting to SSH
 
 ## Internal/QEMU parameters
 my $disk_if="virtio";
@@ -120,11 +121,15 @@ Copyright (C) 2014 Assaf Gordon (agn at gnu dot org)
 License: GPLv3+
 
 Usage:
-$base [OPTIONS] FILE.QCOW2
+$base [OPTIONS] FILE.QCOW2 [COMMAND]
 
 FILE.QCOW2 - The Guest VM QCOW2 disk image file.
              By default, the Guest is started in snapshot mode,
              and connected to with SSH.
+
+COMMAND - When running in --ssh mode (the default), COMMAND will
+          be executed inside the guest VM, and it's exit code will
+          be returned to the host.
 
 Options:
  -h, --help           this help screen
@@ -184,6 +189,24 @@ Then, start the guest VM, and automatically connect to it with SSH:
 When exiting the SSH session (with 'exit' or CTRL-D), the guest VM will be
 immediately terminated (with no data-loss or corruption because the default is
 using -snapshot mode).
+
+To automatically download, build and check a auto-tools package:
+
+   $base freebsd10.qcow2 \
+          pretest-auto-build-check \
+           http://ftp.gnu.org/gnu/hello/hello-2.8.tar.gz && echo ok
+
+'pretest-auto-build-check' is a script which exists inside all Pretest VMs.
+It will download the specified package, build it and run 'make check'.
+When the check is completed, SSH will exit, the guest VM will be terminated,
+and the exit code (from the build) will be returned to the host.
+
+STDIN will be connected to SSH session, enablig the pipe a shell command or
+script to the guest VM:
+
+   echo 'uname -a' | $base freebsd10.qcow2
+
+Will start the Guest VM, run 'uname -a' on it, and terminate the guest.
 
 PreTest website:           http://pretest.nongnu.org
 Download pre-build VMs:    http://www.nongnu.org/pretest/downloads/
@@ -259,6 +282,11 @@ sub parse_commandline ## no critic (ProhibitExcessComplexity)
 		if $ram_size<5;
 	die "error: invalid SSH port ($ssh_port), must be >1024\n"
 		if defined $ssh_port && $ssh_port<=1024;
+
+	# Any extra parameters are commands to be passed to the SSH connection
+	@ssh_command = @ARGV;
+	die "error: custom SSH commands can not be used with @ops\n"
+		unless $connect_ssh;
 
 	return;
 }
@@ -499,7 +527,9 @@ sub connect_ssh
 			   "-o", "CheckHostIP=no",
 			   "-o", "UserKnownHostsFile=/dev/null",
 			   "-p", $ssh_port,
-			   "$ssh_user\@$ssh_addr" ) ;
+			   "$ssh_user\@$ssh_addr",
+			   "--",
+			   @ssh_command) ;
 
 	my $exit_code = xsystem("ssh", @ssh_params);
 
