@@ -1,0 +1,18 @@
+KVM: requires "ide" disk, -machine pc-1.1
+Setup: normal
+Keyboard: default [47]
+language: default [7]
+
+disk: select ATA
+FDisk Partitions: Use whole disk
+Computer Name: openindiana
+
+Network: automatic
+root password: 12345
+non-root user: miles (password 12345)
+
+
+
+Virtio Driver:
+http://openindiana.org/pipermail/openindiana-discuss/2011-October/005903.html
+

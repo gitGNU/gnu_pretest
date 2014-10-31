@@ -1,0 +1,186 @@
+Debian76: /dev/nbd0p1
+gNewSense: /dev/nbd0p1
+trisquel: /dev/nbd0p1
+ubuntu14: /dev/nbd0p1
+OpenSUSE: /dev/nbd0p2 (linux partition)
+
+CentOS 6.5: Linux LVM
+
+   sudo qemu-nbd -r -c /dev/nbd0 images/debian76.qcow2
+   mount /dev/nbd0p1 /mnt/image
+
+CentOS 7: Linux LVM
+===
+$ sudo fdisk -l /dev/nbd0
+Disk /dev/nbd0: 5368 MB, 5368709120 bytes
+255 heads, 63 sectors/track, 652 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000cdd65
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p1   *        2048     1026047      512000   83  Linux
+/dev/nbd0p2         1026048    10485759     4729856   8e  Linux LVM
+===
+$ sudo vgchange -ay
+  2 logical volume(s) in volume group "centos_centos7" now active
+$ ls -l /dev/centos_centos7/
+total 0
+lrwxrwxrwx 1 root root 7 Oct 11 17:12 root -> ../dm-1
+lrwxrwxrwx 1 root root 7 Oct 11 17:12 swap -> ../dm-0
+
+$ sudo mount -o ro /dev/centos_centos7/root /tmp/foo
+===
+
+
+##
+## FReeBSD10,9.3,  (uses GPT, so fdisk is no good,, use parted instead)
+##
+$ printf "print\nquit\n" | sudo parted /dev/nbd0
+Warning: Error fsyncing/closing /dev/nbd0: Input/output error
+GNU Parted 2.3
+Using /dev/nbd0
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) print
+Model: Unknown (unknown)
+Disk /dev/nbd0: 5369MB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  82.9kB  65.5kB
+ 2      82.9kB  5099MB  5099MB  freebsd-ufs
+ 3      5099MB  5368MB  268MB
+
+(parted) quit
+Warning: Error fsyncing/closing /dev/nbd0: Input/output error
+===
+
+sudo mount -o ro -o ufstype=ufs2 /dev/nbd0p2 /tmp/foo/
+
+##
+## OpenBSD 5.5
+##
+$ sudo fdisk -l /dev/nbd0
+
+Disk /dev/nbd0: 5368 MB, 5368709120 bytes
+255 heads, 63 sectors/track, 652 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p4   *          64    10474379     5237158   a6  OpenBSD
+============
+sudo mount -o ro -o ufstype=44bsd /dev/nbd0p4 /tmp/foo/
+
+##
+## NetBSD 6.1.4
+##
+$ sudo fdisk -l /dev/nbd0
+
+Disk /dev/nbd0: 5368 MB, 5368709120 bytes
+181 heads, 40 sectors/track, 1448 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p1   *          63    10485759     5242848+  a9  NetBSD
+=====
+sudo mount -o ro -o ufstype=ufs2 /dev/nbd0p1 /tmp/foo/
+
+##
+## Minix R3.3.0
+##
+$ sudo fdisk -l /dev/nbd0
+
+Disk /dev/nbd0: 5368 MB, 5368709120 bytes
+256 heads, 63 sectors/track, 650 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p1   *          63    10483199     5241568+  81  Minix / old Linux
+====
+
+## Problem:
+## MINIX uses internal 'sub-parition' schemes unknown to linux.
+## To solve:
+##  run MINIX, find offsets within image with 'part'
+## Then use 'losetup' to mount directlry fromoffset of the image, see:
+https://groups.google.com/d/msg/Minix3/uNgF67JzkDE/icFleCphvlsJ
+
+##
+## DilOS
+##
+=====
+$ sudo fdisk -l /dev/nbd0
+
+Disk /dev/nbd0: 5368 MB, 5368709120 bytes
+181 heads, 40 sectors/track, 1448 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p1   *        4096    10485759     5240832   bf  Solaris
+====
+Fdisk/Linux only sees ony partition, but dmesg shows:
+===
+[81583.137373] block nbd0: queue cleared
+[81599.563023]  nbd0: p1
+[81599.563023]  p1: <solaris: [s0] p5 [s2] p6 [s3] p7 [s8] p8 >
+===
+Seems complicated, might need ZFS/Fuse:
+http://serverfault.com/questions/266303/how-to-transfer-data-from-linux-to-solaris-openindiana
+https://packages.debian.org/squeeze/zfs-fuse
+
+##
+## GNU Hurd
+##
+====
+$ sudo fdisk -l /dev/nbd0
+
+Disk /dev/nbd0: 3146 MB, 3146776576 bytes
+255 heads, 63 sectors/track, 382 cylinders, total 6146048 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x0007b37c
+
+     Device Boot      Start         End      Blocks   Id  System
+/dev/nbd0p1            2048     5787647     2892800   83  Linux
+/dev/nbd0p2         5789694     6143999      177153    5  Extended
+/dev/nbd0p5         5789696     6143999      177152   82  Linux swap / Solaris
+====
+ sudo mount -o ro /dev/nbd0p1 /tmp/foo/
+
+##
+## General QEMU-NBD
+##
+
+
+http://en.wikibooks.org/wiki/QEMU/Images#Mounting_an_image_on_the_host
+
+$ vgscan
+  Reading all physical volumes.  This may take a while...
+  Found volume group "ub1110server-qemu" using metadata type lvm2
+$ vgchange -ay
+   2 logical volume(s) in volume group "ub1110server-qemu" now active
+$ mount /dev/ub1110server-qemu/<LogicalVolumeName> /mnt/image
+Replace <LogicalVolumeName> with the name of the logical volume present in the
+volume group. Finally, after the usage its important to unmount the image and
+reverse other steps (depending on how the image was mounted):
+
+$ umount /mnt/image
+$ qemu-nbd -d /dev/nbd0
+$ vgchange -an VolGroupName
+$ killall qemu-nbd
+

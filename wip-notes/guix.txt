@@ -1,0 +1,84 @@
+Booting:
+Use '-hda' for USB image and '-boot menu=on',
+and '-drive FILE,if=virtio' for disk iamge.
+
+press F12 to enter boot menu, then click "2" to boot from USB drive.
+
+USB Image is /dev/sda1
+DISK is      /dev/vda  ( unpartitioned at first )
+
+=== After boot, prepare for isntallation
+http://www.gnu.org/software/guix/manual/html_node/System-Installation.html
+
+# dhclient eth0
+
+# fdisk /dev/vda
+  n (new partition)
+  p (primary partition)
+  (use defaults for all values)
+  a (activate parition)
+  1 (parition number)
+  w (write changes)
+
+## Label must be 'gnu-disk-image'...
+# mkfs.ext4 -L gnu-disk-image /dev/vda1
+
+# mount /dev/vda1 /mnt
+
+# deco start cow-store /mnt
+
+=== 6.1.4 Proceeding with the installation
+
+# mkdir /mnt/etc
+# cat /dev/ttyS0 > /mnt/etc/config.scm
+===
+(use-modules (gnu))
+
+(operating-system
+  (host-name "guix07")
+  (timezone "Europe/Paris")
+  (locale "en_US.UTF-8")
+
+  ;; Assuming /dev/sdX is the target hard disk, and "root" is
+  ;; the label of the target root file system.
+  (bootloader (grub-configuration (device "/dev/vda")))
+  (file-systems (cons (file-system
+                        (device "/dev/vda1")
+                        (mount-point "/")
+                        (type "ext4"))
+                      %base-file-systems))
+
+  ;; Load Virtio-Blk driver
+  (initrd (lambda (file-systems . rest)
+              (apply base-initrd file-systems
+                     #:extra-modules '("virtio.ko" "virtio_ring.ko"
+                                       "virtio_pci.ko" "virtio_blk.ko"
+                                       "virtio_net.ko")
+                     rest)))
+
+  ;; This is where user accounts are specified.  The "root"
+  ;; account is implicit, and is initially created with the
+  ;; empty password.
+  (users (list (user-account
+                (name "miles")
+                (comment "Bob's sister")
+                (group "users")
+
+                ;; Adding the account to the "wheel" group
+                ;; makes it a sudoer.
+                (supplementary-groups '("wheel"))
+                (home-directory "/home/miles")))))
+===
+# guix system init /mnt/etc/fconfig.scm /mnt
+
+=============
+After boot (from /dev/vda1):
+
+sed -i -e '/^set timeout=/s/=.*/=1/' \
+       -e '/^  linux/s/$/ console=tty0 console=ttyS0/' \
+       -e '/^  linux/s/$/ modprobe.blacklist=bochs_drm/' \
+       -e '/^  linux/s/$/ modprobe.blacklist=cirrus/' \
+       /boot/grub/grub.cfg
+
+
+
