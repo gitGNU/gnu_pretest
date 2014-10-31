@@ -19,6 +19,7 @@
     * Save results of each step to a file (configure/make/make-check)
     * Upload files to a public server
     * Accept build/project ID
+    * add SUBDIRS=. to 'make check' to avoid checking gnulib
 
 * convert project to 'autotools', with interface such as:  
     - `pretest list`                - listing available images
