@@ -1,14 +1,16 @@
 #!/usr/bin/env perl
+
+## no critic (ErrorHandling::RequireCarping)
+## no critic (RegularExpressions::RequireExtendedFormatting)
+## no critic (ControlStructures::ProhibitPostfixControls)
+
 use strict;
 use warnings;
+use Socket;
 use Data::Dumper;
 use Getopt::Long;
 use File::Basename;
 use File::Temp qw/tempfile/;
-my $have_net_emptyport = eval {
-		require Net::EmptyPort;
-		1;
-	};
 
 ## User/Command-line parameters
 my $qcow2_filename;
@@ -16,6 +18,7 @@ my $vm_name;
 my $daemonize;
 my $connect_console;
 my $connect_ssh;
+my $connect_ssh_copy_id;
 my $serial_file;
 my $ram_size=384;
 my $snapshot_mode=1;
@@ -28,6 +31,7 @@ my $verbose;
 my $dry_run;
 my $boot_order = "cd"; # currently hard-coded
 my $boot_connection_attempts = 120 ; # 120 attemps =~ 4 minutes
+my $graceful_shutdown_attempts = 30 ; # 30 attempts =~ 30 seconds
 
 ## Internal/QEMU parameters
 my $disk_if="virtio";
@@ -35,7 +39,6 @@ my $net_if ="virtio";
 my $graphics_if="none";
 my @extra_qemu_params;
 my $ssh_user = "miles";
-my $ssh_connected;
 my $qemu_pid;
 
 sub parse_commandline;
@@ -46,20 +49,22 @@ sub setup_ssh;
 sub connect_ssh;
 sub usage;
 sub get_qemu_pid;
-sub die_with_debug_info;
+sub die_with_qemu_running;
+sub xsystem;
+sub try_ssh_connect;
+sub kill_qemu;
+sub gracefull_kill_qemu;
 
 ##
 ## Program Start
 ##
 parse_commandline;
 setup_vm_hacks;
-setup_ssh if $connect_ssh;
+setup_ssh if $connect_ssh || $connect_ssh_copy_id;
 my @qemu_params = setup_qemu_parameters;
 
-print "QEMU Parameters:\n", Dumper(\@qemu_params),"\n" if $debug;
-
 if ($dry_run) {
-	print join (" ", "qemu-system-x86_64",
+	print join (' ', 'qemu-system-x86_64',
 			 map { "'$_'" } @qemu_params ), "\n";
 	exit 0;
 }
@@ -69,26 +74,19 @@ if ($dry_run) {
 #   until the user kills the machine.
 # If connecting using SSH (thus, qmeu will daemonize),
 #   this will return immediately, then we'll try SSH connection
-system "qemu-system-x86_64", @qemu_params;
+my $qemu_exit_code = xsystem('qemu-system-x86_64', @qemu_params);
 
 if ($connect_ssh) {
-	$qemu_pid = get_qemu_pid();
-
 	my $exit_code = connect_ssh();
-
-	if ($ssh_connected)
-	{
-		# Done with SSH - kill the Guest VM
-		my $pid = get_qemu_pid();
-		my $count = kill 'SIGKILL', $pid;
-		die "error: failed to kill QEMU process PID $pid\n" if $count == 0;
-
-		# Pass the exit code from SSH back to the user.
-		exit $exit_code;
-	} else {
-		die_with_debug_info;
-	}
+	kill_qemu();
+	exit $exit_code;
 }
+if ($connect_ssh_copy_id) {
+	connect_ssh_copy_id();
+	gracefull_kill_qemu();
+}
+
+exit 0;
 
 ##
 ## Program End
@@ -98,13 +96,14 @@ sub usage
 {
 }
 
-sub parse_commandline
+sub parse_commandline ## no critic (ProhibitExcessComplexity)
 {
 	my $rc = GetOptions(
 			"help|h"      => \&usage,
 			"daemonize|d" => \$daemonize,
 			"console"     => \$connect_console,
-			"ssh"	      => \$connect_ssh,
+			"ssh"         => \$connect_ssh,
+			"pubkey"      => \$connect_ssh_copy_id,
 			"no-snapshot|S" => sub { $snapshot_mode = 0 ; },
 			"serial-file|r:s"  => \$serial_file,
 			"pid-file:s"  => \$pid_file,
@@ -150,17 +149,20 @@ sub parse_commandline
 		if defined $console_file and length($console_file)==0;
 
 	# Prevent mutually exclusive options, with informative error messages.
-	die "error: --console and --deaminize are mutually exclusive\n"
-		if $connect_console && $daemonize;
-	die "error: --console and --ssh are mutually exclusive\n"
-		if $connect_console && $connect_ssh;
-	die "error: --ssh and --daeminize are mutually exclusive\n"
-		if $connect_ssh && $daemonize;
+	my @ops;
+	push @ops, "--console" if $connect_console;
+	push @ops, "--ssh" if $connect_ssh;
+	push @ops, "--deaminize" if $daemonize;
+	push @ops, "--pubkey" if $connect_ssh_copy_id;
+	die "error: @ops are mutually exclusive options\n" if scalar(@ops)>1;
+	$connect_ssh = 1 if scalar(@ops)==0; # default operation: ssh connection
 
 	die "error: invalid/too-small RAM size ($ram_size)\n"
-		unless $ram_size>=5;
+		if $ram_size<5;
 	die "error: invalid SSH port ($ssh_port), must be >1024\n"
 		if defined $ssh_port && $ssh_port<=1024;
+
+	return;
 }
 
 sub setup_vm_hacks
@@ -184,6 +186,8 @@ sub setup_vm_hacks
 		# DilOS runs too much stuff to be usable with only 384
 		$ram_size = 768;
 	}
+
+	return;
 }
 
 sub setup_ssh
@@ -206,7 +210,13 @@ sub setup_ssh
 		$ssh_addr = "127.0.0.1";
 	}
 
+	## If adding an SSH pubkey, don't run with 'snapshot' - changes should
+	## be saved back to the disk image.
+	$snapshot_mode = undef if ($connect_ssh_copy_id);
+
 	$daemonize = 1;
+
+	return;
 }
 
 sub setup_qemu_parameters
@@ -269,33 +279,31 @@ sub setup_qemu_parameters
 
 sub find_available_tcp_port
 {
-	if ($have_net_emptyport) {
-		return empty_port(1025);
-	} else {
-		## This terrible hack was only tested on linux
-		my $text = `netstat -lnt`;
-		die "error: failed to run 'netstat -lnt'"
-			unless ($?>>8)==0;
-		my @lines = split /\n/, $text;
-		print "netstat returned: \n", Dumper(\@lines),"\n" if $debug;
-		# Keep TCP (discard tcp6)
-		@lines = grep { /^tcp / } @lines;
-		print "tcp lines: \n", Dumper(\@lines),"\n" if $debug;
-		# Grab the 4th column - the local addresses
-		my @local = map { my @t = split /\s+/, $_; $t[3] ; } @lines;
-		print "local addresses: \n", Dumper(\@local),"\n" if $debug;
-		# Extract the numeric ports
-		my @ports = map { /^(\d+)\.(\d+)\.(\d+)\.(\d+):(\d+)$/ and $5 or undef ; } @local;
-		print "used ports: \n", Dumper(\@ports),"\n" if $debug;
+	## This terrible hack was only tested on linux
+	my $text = `netstat -lnt`; ## no critic (InputOutput::ProhibitBacktickOperators)
+	die "error: failed to run 'netstat -lnt'"
+		unless ($?>>8)==0;
+	my @lines = split /\n/, $text;
+	print "netstat returned: \n", Dumper(\@lines),"\n" if $debug;
+	# Keep TCP (discard tcp6)
+	@lines = grep { /^tcp / } @lines;
+	print "tcp lines: \n", Dumper(\@lines),"\n" if $debug;
+	# Grab the 4th column - the local addresses
+	my @local = map { $_->[3] }
+			map { [ split /\s+/, $_ ] }
+			@lines;
+	print "local addresses: \n", Dumper(\@local),"\n" if $debug;
+	# Extract the numeric ports
+	my @ports = map { /^(\d+)\.(\d+)\.(\d+)\.(\d+):(\d+)$/ and $5 or undef ; } @local;
+	print "used ports: \n", Dumper(\@ports),"\n" if $debug;
 
-		my %ports = map { $_ => 1 } @ports;
-		foreach my $i ( 1025 .. 65500 ) {
-			return $i unless exists $ports{$i};
-		}
-
-		# Highly unlikely...
-		die "error: can't find available TCP port using netstat.";
+	my %ports = map { $_ => 1 } @ports;
+	foreach my $i ( 1025 .. 65500 ) {
+		return $i unless exists $ports{$i};
 	}
+
+	# Highly unlikely...
+	die "error: can't find available TCP port using netstat.";
 }
 
 sub get_qemu_pid
@@ -328,11 +336,10 @@ sub get_qemu_pid
 	return $t;
 }
 
-sub try_tcp_connect
+sub try_ssh_connect
 {
-	my ($host, $port) = @_;
+	my ($host, $port) = @_; 
 
-	use Socket;
 	my $iaddr   = inet_aton($host)
 		or die "invalid host address '$host'";
 	my $paddr   = sockaddr_in($port, $iaddr);
@@ -362,12 +369,9 @@ sub try_tcp_connect
 	return $ok;
 }
 
-sub connect_ssh
+sub wait_for_ssh_connection
 {
-	if ($debug) {
-		warn "QEMU Guest PID: $qemu_pid\n";
-		warn "Guest Console Log: $console_file\n";
-	}
+	$qemu_pid = get_qemu_pid();
 
 	## Test TCP connection to guest's port 22
 	my $attempts = $boot_connection_attempts;
@@ -376,20 +380,21 @@ sub connect_ssh
 
 		die "error: QEMU process (PID $qemu_pid) not found - perhaps crashed?\n"
 			unless kill 0, $qemu_pid;
-		try_tcp_connect($ssh_addr,$ssh_port) and last;
+		try_ssh_connect($ssh_addr,$ssh_port) and last;
 
 		--$attempts;
-		die_with_debug_info if $attempts==0;
+		die_with_qemu_running ("failed to connect with SSH to guest VM")
+			 if $attempts==0;
 		sleep 1;
 	}
 
+	return;
+}
 
-	## From here on we assume SSH can be connected,
-	## and once SSH is done, QEMU should be terminated.
-	$ssh_connected = 1;
+sub connect_ssh
+{
+	wait_for_ssh_connection();
 
-
-	##
 	## Run SSH
 	## (This is too OpenSSH specific...)
 	my @ssh_params = ( "-o", "StrictHostKeyChecking=no",
@@ -398,15 +403,7 @@ sub connect_ssh
 			   "-p", $ssh_port,
 			   "$ssh_user\@$ssh_addr" ) ;
 
-	print "SSH Parameters:\n", Dumper(\@ssh_params),"\n" if $debug;
-
-	my $rc = system "ssh", @ssh_params;
-	my $exit_code = ($rc>>8);
-	die "failed to execute SSH: $!\n" if $rc == -1;
-	if ($rc & 127) {
-		die "SSH child died with signal %d, %s coredump\n",
-		       ($? & 127),  ($? & 128) ? 'with' : 'without';
-	}
+	my $exit_code = xsystem("ssh", @ssh_params);
 
 	## The exitcode of SSH will be the exitcode of the last command
 	## executed inside the guest-VM - not necessarily zero.
@@ -414,11 +411,64 @@ sub connect_ssh
 	return $exit_code;
 }
 
-
-sub die_with_debug_info
+sub connect_ssh_copy_id
 {
+	wait_for_ssh_connection();
+
+	## Run ssh-copy-id
+	## (This is too OpenSSH specific...)
+	my @ssh_params = ( "-o", "StrictHostKeyChecking=no",
+			   "-o", "CheckHostIP=no",
+			   "-o", "UserKnownHostsFile=/dev/null",
+			   "-p", $ssh_port,
+			   "$ssh_user\@$ssh_addr" ) ;
+
+	my $exit_code = xsystem("ssh-copy-id", @ssh_params);
+
+	die_with_qemu_running ("failed to copy SSH public key")
+		unless $exit_code == 0 ;
+
+	## Ugly Hack for shutdown command.
+	## TODO: Use QEMU Monitor?
+	# start with GNU/Linux default
+	my $shutdown_cmd = "sudo /sbin/shutdown -h -P now";
+
+	$shutdown_cmd = "sudo /sbin/shutdown -p now"
+		if $vm_name =~ /freebsd/i;
+
+	$shutdown_cmd = "sudo /sbin/shutdown -h -p now"
+		if $vm_name =~ /(open|net)bsd/i;
+
+	$shutdown_cmd = "su root -c '/sbin/shutdown -h -p now'" # MINIX, no sudo
+		if $vm_name =~ /minix/i;
+
+	## DilOS (Illumos-based)
+	$shutdown_cmd = "sudo /usr/sbin/shutdown -y now"
+		if $vm_name =~ /dilos/i;
+
+	## Shutdown the machine
+	@ssh_params = ( "-o", "StrictHostKeyChecking=no",
+			"-o", "CheckHostIP=no",
+			"-o", "UserKnownHostsFile=/dev/null",
+			"-o", "BatchMode=yes",
+			"-p", $ssh_port,
+			"-t",
+			"$ssh_user\@$ssh_addr",
+			"sh", "-c", "\"$shutdown_cmd\"");
+
+	$exit_code = xsystem("ssh", @ssh_params);
+
+	return;
+}
+
+
+sub die_with_qemu_running ## no critic (Subroutines::RequireArgUnpacking)
+{
+	my $info = join(" ",@_);
+
 	print STDERR<<"EOF";
-error: failed to connect with SSH to QEMU Guest.
+Error: $info
+
 Check QEMU process PID $qemu_pid.
 Test SSH Connection with:
     nc $ssh_addr $ssh_port < /dev/null
@@ -431,3 +481,53 @@ It is possible the Guest VM is simply booting too slow.
 EOF
 	exit 1;
 }
+
+sub xsystem
+{
+	my ($program, @params) = @_;
+
+	print STDERR "Starting '$program'\n" if $verbose;
+
+	print STDERR "Running Command:\n",
+		"  $program \\\n",
+		join("\\\n", map{ "    '$_' " } @params),
+		"\n\n" if $debug;
+
+	my $rc = system $program, @params;
+	my $exit_code = ($rc>>8);
+	my $signal = ($rc & 127);
+
+	die "error: failed to execute '$program': $!\n" if $rc == -1;
+	die "error: '$program' died with signal $signal\n" if $signal;
+
+	return $exit_code;
+}
+
+sub kill_qemu
+{
+	# Done with SSH - kill the Guest VM
+	my $pid = get_qemu_pid();
+	my $count = kill 'SIGKILL', $pid;
+	die_with_qemu_running("failed to kil QEMU process") if $count == 0;
+	return;
+}
+
+sub gracefull_kill_qemu
+{
+	# Done with SSH - Wait for QEMU to terminate (since the guest VM
+	# was shutdown).
+	my $pid = get_qemu_pid();
+
+	my $attempts = $graceful_shutdown_attempts;
+	while (1) {
+		print STDERR "Waiting for Guest VM to shutdown...\n" if $debug;
+		my $cnt = kill 0, $pid;
+		last if $cnt==0;
+		--$attempts;
+		die_with_qemu_running("QEMU did not shutdown properly (after SSH pubkey copy)")
+			if $attempts==0;
+		sleep 1;
+	}
+	return;
+}
+
