@@ -1,5 +1,22 @@
 #!/usr/bin/env perl
 
+# Copyright (C) 2014 Assaf Gordon (assafgordon@gmail.com)
+#
+# This file is part of PreTest
+#
+# PreTest is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PreTest is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PreTest If not, see <http://www.gnu.org/licenses/>.
+
 ## no critic (ErrorHandling::RequireCarping)
 ## no critic (RegularExpressions::RequireExtendedFormatting)
 ## no critic (ControlStructures::ProhibitPostfixControls)
@@ -11,6 +28,8 @@ use Data::Dumper;
 use Getopt::Long;
 use File::Basename;
 use File::Temp qw/tempfile/;
+
+my $VERSION = "0.1.1";
 
 ## User/Command-line parameters
 my $qcow2_filename;
@@ -94,6 +113,85 @@ exit 0;
 
 sub usage
 {
+	my $base = basename($0);
+	print<<"EOF";
+PreTest Run Script version $VERSION
+Copyright (C) 2014 Assaf Gordon (agn at gnu dot org)
+License: GPLv3+
+
+Usage:
+$base [OPTIONS] FILE.QCOW2
+
+FILE.QCOW2 - The Guest VM QCOW2 disk image file.
+             By default, the Guest is started in snapshot mode,
+             and connected to with SSH.
+
+Options:
+ -h, --help           this help screen
+ -d, --daemonize      start the guest VM in the background, then return
+     --console        connect the guest VM's serial console to the current
+                      terminal. QEMU Monitor will be attached as well,
+                      accessible with CTRL-A,C .
+     --ssh            connect to the guest VM using SSH. SSH will be started
+                      on the current terminal. This is the default mode.
+     --pubkey         start the guest VM and use 'ssh-copy-id' to copy the
+                      user's public SSH key to guest VM. You will be prompted
+                      for a password (which is '12345'). When done, the Guest
+                      VM will be shutdown automatically.
+ -S, --no-snapshot    do not use QEMU's -snapshot mode, write changes back to
+                      the guest VM disk image file.
+ -r FILE, --serial-file FILE
+                      connect the guest VM's 2nd serial port to FILE.
+                      To send data from guest VM to host, run (in the guest VM):
+                         echo hello > /dev/ttyS1 (on GNU/Linux)
+                         echo hello > /dev/com1  (on Hurd)
+                         echo hello > /dev/ttyu1 (on FreeBSD)
+                         echo hello > /dev/tty01 (on Dilos,MINIX,OpenBSD,NetBSD)
+     --pid-file FILE
+                      write QEMU's process ID to FILE.  useful with --daemonize.
+     --console-file FILE
+                      connect the Guest VM's first serial/console output to
+                      FILE.  useful with --daemonize.
+ -p N, --ssh-port N   forward the Guest VM's port 22 to host port N.
+                      useful with --daemonize.
+                      when using --ssh, an available port number will be found
+                      automatically, and there's no need to use --ssh-port.
+     --name X         use name X (instead of detecting name from QCOW2 file)
+                      the name is used for specific QEMU options (e.g. if the
+                      name contains 'minix', the appropriate minix options will
+                      be passed to QEMU).
+     --ram N          amount of RAM to allocate to the guest VM.
+                      default is $ram_size for most VMs.
+     --debug          show debugging information, such as command-line parameters.
+     --verbose        show progress information.
+     --dry-run        don't run QEMU, instead - print the command-line.
+     --vm-image FILE
+                      run the Guest VM inside FILE (a QCOW2 file).
+                      if not specified, the first non-option parameters is assumed
+                      to be the QCOW2 filename.
+
+Typical usage:
+
+With a new Guest VM, run once with --pubkey to add your SSH key
+(you will be prompted for a password, which is '12345' for all pretest VMs):
+
+   $base --pubkey freebsd10.qcow2
+
+Then, start the guest VM, and automatically connect to it with SSH:
+
+   $base freebsd10.qcow2
+
+When exiting the SSH session (with 'exit' or CTRL-D), the guest VM will be
+immediately terminated (with no data-loss or corruption because the default is
+using -snapshot mode).
+
+PreTest website:           http://pretest.nongnu.org
+Download pre-build VMs:    http://www.nongnu.org/pretest/downloads/
+Questions and bug-reports: pretest-users\@nongnu.org
+search archives:           http://lists.nongnu.org/archive/html/pretest-users
+
+EOF
+	exit 0;
 }
 
 sub parse_commandline ## no critic (ProhibitExcessComplexity)
