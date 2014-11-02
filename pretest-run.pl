@@ -286,7 +286,7 @@ sub parse_commandline ## no critic (ProhibitExcessComplexity)
 	# Any extra parameters are commands to be passed to the SSH connection
 	@ssh_command = @ARGV;
 	die "error: custom SSH commands can not be used with @ops\n"
-		unless $connect_ssh;
+		if scalar(@ssh_command)>0 && !$connect_ssh;
 
 	return;
 }
