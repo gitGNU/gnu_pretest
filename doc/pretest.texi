@@ -634,6 +634,7 @@ $ make check
 * Build Recipe Introduction::   Information relevant to all build recipes
 * GNU Hurd::                    Preparing GNU Hurd VM
 * OpenBSD 5.5::                 Installing OpenBSD 5.5 VM
+* OpenBSD 5.6::                 Installing OpenBSD 5.6 VM
 * NetBSD 6.1.4::                Installing NetBSD 6.1.4 VM
 * FreeBSD 10::                  Installing FreeBSD 10 VM
 * FreeBSD 9.3::                 Installing FreeBSD 9.3 VM
@@ -820,7 +821,7 @@ download, see @xref{Downloads}.
 @c ***********************************************************
 @c Open BSD 5.5
 @c ***********************************************************
-@node OpenBSD 5.5, NetBSD 6.1.4, GNU Hurd, Build Recipes
+@node OpenBSD 5.5, OpenBSD 5.6, GNU Hurd, Build Recipes
 @section OpenBSD 5.5
 @cindex OpenBSD 5.5, build recipe
 @cindex build recipe, OpenBSD 5.5
@@ -953,9 +954,160 @@ Tag the @file{openbsd55.qcow2} as `build-ready`.
 A pre-build image is available for download, see @xref{Downloads}.
 
 @c ***********************************************************
+@c Open BSD 5.6
+@c ***********************************************************
+@node OpenBSD 5.6,NetBSD 6.1.4, OpenBSD 5.5, Build Recipes
+@section OpenBSD 5.6
+@cindex OpenBSD 5.6, build recipe
+@cindex build recipe, OpenBSD 5.6
+
+OpenBSD 5.6 Homepage: @url{http://www.openbsd.org/56.html}.
+
+@cindex OpenBSD 5.6, download
+@unnumberedsubsec Download
+ISO : @url{http://mirror.esc7.net/pub/OpenBSD/5.6/amd64/install56.iso}
+
+@cindex OpenBSD 5.6, QEMU/KVM notes
+@unnumberedsubsec QEMU/KVM notes
+OpenBSD 5.6 installation works well with default QEMU/KVM settings and
+@option{virtio} drivers.
+See the installation script (@file{build_scripts/build_openbsd56.sh}) for
+download and QMEU/KVM commands.
+
+@cindex OpenBSD 5.6, CD Installation
+@unnumberedsubsec CD Installation/Setup
+
+During setup, select the following options:
+
+@itemize
+@item
+network interface: @var{vio0}, enable @var{dhcp}, no @var{ipv6}
+@item
+Password for root account: @var{12345}
+@item
+Start sshd(8) by default?: @var{yes}
+@item
+Start ntpd(8) by default?: @var{no}
+@item
+Do you expect to run the X Window System?: @var{no}
+@item
+Do you want the X Window System to be started by xdm(1)?: @var{no}
+@item
+Do you want to suspend on lid close?: @var{no}
+@item
+change default console to com0 @var{no} (will be set later)
+@item
+Setup a user: @var{yes} - enter @var{miles}
+@item
+Password for user miles: @var{12345}
+@item
+Disable ssh logins to root: @var{no}
+@item
+What timezone are you in?: @var{US/Eastern}
+@item
+Which disk is the root disk?: @var{sd0}
+@item
+Use DUIDs rather than device names in fstab?: @var{yes}
+@item
+@emph{Disk Partitioning}:
+Instead of using the default disk-paritioning layout, a simpler layout was used:
+@example
+OpenBSD area: 64-10474380; size: 5.0G; free: 0.0G
+#                size           offset  fstype [fsize bsize  cpg]
+  a:             4.3G               64  4.2BSD   2048 16384    1 # /
+  b:             0.7G          9000064    swap
+  c:             5.0G                0  unused
+@end example
+See @url{http://scie.nti.st/2013/3/4/how-to-resize-an-openbsd-root-partition/}
+for information about changing OpenBSD paritioning.
+@item
+set installations: install all sets.
+@end itemize
+
+When installation is complete, type "Reboot", to reboot into the newly
+installed system (from disk).
+
+@cindex OpenBSD 5.6, First Boot
+@unnumberedsubsec First Boot ('clean-install')
+
+Login with @var{root} (password: @var{12345}).
+
+Enable Serial Console for amd64/i386 targets
+(see @url{http://www.openbsd.org/faq/faq7.html#SerCon}):
+@example
+echo "set tty com0" >> /etc/boot.conf
+@end example
+NOTE: Using @var{com0} will prevent QEMU's @option{-curses} from showing
+console log on the screen (though login will still be possible).
+
+Enable Login on Serial Console:
+@example
+sed '/^console/s/off secure/on secure/' /etc/ttys > /tmp/t \
+    && mv /tmp/t /etc/ttys
+@end example
+
+Shorten boot-loader timeout:
+@example
+echo "set timeout 1" >> /etc/boot.conf
+@end example
+
+Enable Sudo without password for 'wheel' members
+@example
+sed '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers > /tmp/s \
+    && mv /tmp/s /etc/sudoers && chmod 0440 /etc/sudoers
+@end example
+
+Stop the VM with @command{/sbin/shutdown -h -p now}, tag the QCOW2 file
+@file{openbsd56.qcow2} as 'clean-install'. A pre-build image is available for
+download, see @xref{Downloads}.
+
+
+@cindex OpenBSD 5.6, Setup build tools
+@unnumberedsubsec Setup build tools ('build-ready')
+
+Start @file{openbsd56.qcow2} with the @command{pretest-run.sh} script.
+
+Once booted, login with @var{root} (password: @var{12345}).
+
+Install development packages:
+@example
+echo 'PKG_PATH="http://mirror.esc7.net/pub/OpenBSD/5.6/packages/$(machine -a)/"' >> .profile
+echo 'export PKG_PATH' >> .profile
+
+echo autoconf-2.69p1 automake-1.14.1 gperf wget nano help2man libtool \
+     xz rsync-3.1.0 git bison gmake | xargs -n1 pkg_add -v
+@end example
+
+Setup autotools for user miles:
+@example
+echo AUTOMAKE_VERSION=1.14 >> ~miles/.profile
+echo AUTOCONF_VERSION=2.69 >> ~miles/.profile
+echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
+@end example
+Without these settings, running @command{autoconf} will terminate with an
+error message complaining about having to select a specific version.
+
+@unnumberedsubsec PreTest Scripts
+
+@file{pretest-guest-init} and @file{pretest-auto-build-check} are installed
+in @file{/usr/local/bin}.
+
+@file{pretest-guest-init} is started from @file{/etc/rc.local}.
+
+@unnumberedsubsec PreTest Image Preparation
+
+Stop the VM with @command{/sbin/halt},
+Enter QEMU's monitor mode (type @kbd{CTRL-A, c}),
+Run @command{commit all} to save changes to @file{openbsd56.qcow2},
+Then @command{quit} to terminate QEMU.
+
+Tag the @file{openbsd56.qcow2} as `build-ready`.
+A pre-build image is available for download, see @xref{Downloads}.
+
+@c ***********************************************************
 @c Net BSD 6.1.4
 @c ***********************************************************
-@node NetBSD 6.1.4, FreeBSD 10, OpenBSD 5.5, Build Recipes
+@node NetBSD 6.1.4, FreeBSD 10, OpenBSD 5.6, Build Recipes
 @section NetBSD 6.1.4
 @cindex NetBSD 6.1.4, build recipe
 @cindex build recipe, NetBSD 6.1.4
@@ -3042,6 +3194,9 @@ Available pre-build virtual machines are congiured as described in
 @item OpenBSD 5.5
 @url{http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz}
 
+@item OpenBSD 5.6
+@url{http://files.housegordon.org/pretest/v0.1/openbsd56.clean-install.qcow2.xz}
+
 @item NetBSD 6.1.4
 @url{http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz}
 
@@ -3097,6 +3252,9 @@ Available pre-build virtual machines are congiured as described in
 
 @item OpenBSD 5.5
 @url{http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz}
+
+@item OpenBSD 5.6
+@url{http://files.housegordon.org/pretest/v0.1/openbsd56.build-ready.qcow2.xz}
 
 @item NetBSD 6.1.4
 @url{http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz}

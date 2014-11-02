@@ -24,6 +24,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 ## Clean-Install images
 
 * [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz)
+* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.clean-install.qcow2.xz)
 * [NetBSD 6.1.4](http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz)
 * [FreeBSD 10](http://files.housegordon.org/pretest/v0.1/freebsd10.clearn-install.qcow2.xz)
 * [FreeBSD 9.3](http://files.housegordon.org/pretest/v0.1/freebsd93.clean-install.qcow2.xz)
@@ -41,6 +42,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 ## Build-Ready images
 
 * [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz)
+* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.build-ready.qcow2.xz)
 * [NetBSD 6.1.4](http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz)
 * [FreeBSD 10](http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz)
 * [FreeBSD 9.3](http://files.housegordon.org/pretest/v0.1/freebsd93.build-ready.qcow2.xz)

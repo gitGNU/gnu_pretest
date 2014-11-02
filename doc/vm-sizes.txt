@@ -22,6 +22,8 @@ netbsd614.build-ready.qcow2.xz      216M  909M
 netbsd614.clean-install.qcow2.xz    119M  646M
 openbsd55.build-ready.qcow2.xz      250M  830M
 openbsd55.clean-install.qcow2.xz    238M  767M
+openbsd56.build-ready.qcow2.xz      344M  981M
+openbsd56.clean-install.qcow2.xz    333M  914M
 opensuse131.build-ready.qcow2.xz    300M  1.4G
 opensuse131.clean-install.qcow2.xz  298M  1.2G
 trisquel601.build-ready.qcow2.xz    351M  1.8G

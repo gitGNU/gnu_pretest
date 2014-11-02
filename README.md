@@ -86,7 +86,7 @@ Read the manual for detailed setup information and usage examples:
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
 * FreeBSD 10, 9.3
 * NetBSD 6.1.4
-* OpenBSD 5.5
+* OpenBSD 5.5, 5.6
 * GNU-Hurd 0.5/Debian
 * MINIX R3.3.0
 
