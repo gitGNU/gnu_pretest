@@ -31,6 +31,12 @@
 * Consider "Travis-CI" like YAML-based build script generator (to specify
   requirements and prerequisites, and other settings?)
 
+* pretest-auto-build-check script:
+    * Use cURL on minix instead of WGET
+    * Avoid non-standard GREP on DilOS (no -E support by /bin/grep) - use
+      GNU grep from another directory
+    * GNU Hurd - install script in /usr/local/bin
+
 ## Guest VMs Improvements
 
 * Enable quiet/silent boot throught grub?
@@ -48,7 +54,7 @@
 
 * Fix Terminal settings (no vt100?) to work better on xterm?
 
-* MINIX: fix WGET
+* MINIX: fix WGET, or use cURL instead.
 
 * Communicate with host when boot process is done, and login through SSH
   when possible.  
