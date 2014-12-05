@@ -23,10 +23,17 @@
 
 set -e
 
-for i in $(find images -name "*.qcow2.xz" | sort);
+if test "$#" -eq 0 ; then
+    echo "missing QCOW.XZ file names to check." >&2
+    echo "example: $0 images-v0.1/trisquel7*.qcow2.xz" >&2
+    exit 1
+fi
+
+for i
 do
+    test -e "$i" || { echo "warning: file '$i' not found" >&2 ; continue ; }
 	BASE=$(basename "$i")
 	XZSIZE=$(stat -c %s "$i" | numfmt --to=iec)
 	UNXZSIZE=$(xz -dc -T2 < "$i" | wc -c | numfmt --to=iec)
-	printf "$BASE\t$XZSIZE\t$UNXZSIZE\n"
+    printf "%-35s %-5s %s\n" "$BASE" "$XZSIZE" "$UNXZSIZE"
 done
