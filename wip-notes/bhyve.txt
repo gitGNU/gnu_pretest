@@ -1,0 +1,53 @@
+Bhyve information contributed by Ed Maste @email{emaste at freebsd dot org}.
+
+Bhyve (http://bhyve.org/) is the BSD Hypervisor. It is available on
+FreeBSD 10.1 and other BSD operating-systems.
+
+Download and uncompress the image:
+
+    curl -o freebsd10.qcow2.xz \
+         http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz
+    xz -d freebsd10.qcow2.xz
+
+As of this writing (Dec. 2014), Bhyve in FreeBSD 10.1 cannot work with qcow2
+images. In the future qcow2 will be supported directly.
+Convert the qcow2 format to raw:
+
+    qemu-img convert -O raw freebsd10.qcow2 freebsd10.raw
+
+NOTE:
+The 'qemu-img' version on FreeBSD 10.1 might be too old to convert qcow2 to raw.
+Always verify the file format after conversion:
+
+    $ file freebsd10*
+    freebsd10.qcow2: QEMU QCOW Image (v3), 5368709120 bytes
+    freebsd10.raw:   DOS/MBR boot sector
+
+If the type of 'freebsd10.raw' is not "boot sector", bhyve will fail to load (it will
+mis-detect the disk image, and deduce thatan installation CD is required).
+If this is the case, either upgrade 'qemu' or convert the image on another machine with newer 'qemu'.
+
+Load the "vmm.ko" driver:
+
+    # kldload vmm.ko
+
+Check `demsg` to ensure the machine is capable of running a virtual machine.
+If the following error appears, the bhyve will not load:
+
+    # dmesg
+    ...
+    vmx_init: processor does not support desired basic capabilities
+    module_register_init: MOD_LOAD (vmm, 0xffffffff81a13d60, 0) error 22
+    ...
+
+Use the "vmrun.sh" script provided with FreeBSD 10.1 to start the guest VM:
+
+    # sh/usr/share/examples/bhyve/vmrun.sh \
+        -m 384 \
+        -d freebsd10.raw \
+        pretest
+
+NOTE:
+1. 'bhyve' has no BIOS or similar; it relies on a userspace operating system loader to boot the system.
+Special configuration  might be required for non-FreeBSD systems.
+2. 'bhyve' uses virtio drivers by default. Some Guest VMs which do not work with virtio (e.g. GNU-Hurd) will fail to load. 
