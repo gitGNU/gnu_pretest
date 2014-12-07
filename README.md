@@ -3,26 +3,56 @@
 PreTest's goal is to provide pre-built virtual-machine images of Free-Software
 POSIX-compliant operating systems, ready for testing *autotools*-based programs.
 
-Learn more at <http://www.nongnu.org/pretest/>
+## Available VM disk images
 
-Typical usage:
+Downloads: <http://www.nongnu.org/pretest/downloads/>
 
-    # Download a VM image
-    wget http://files.housegordon.org/pretest/v0.1/freebsd10.build-ready.qcow2.xz
-    unxz freebsd10.build-ready.qcow2.xz
-
-    # Run with KVM
-    kvm -nographic -m 384 \
-        -snapshot \
-        -net user -net nic,model=virtio \
-        -drive if=virtio,media=disk,index=0,file=freebsd10.build-ready.qcow2
-
-    # For more KVM options, use the supplied helper script
-    ./pretest-run.sh freebsd10.build-ready.qcow2
+Kernel and program versions on each VM: <http://www.nongnu.org/pretest/versions/>
 
 All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
 
-For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/pretest.git/tree/pretest-run.sh) script.
+## Simple QEMU usage
+
+    # Download a VM image
+    wget http://files.housegordon.org/pretest/v0.1/freebsd101.build-ready.qcow2.xz
+    unxz freebsd101.build-ready.qcow2.xz
+
+    # Run with QEMU (press CTRL-A,C for QEMU-Monitor)
+    qemu-system-x86_64 --enable-kvm -nographic -m 384 -snapshot \
+        -net user -net nic,model=virtio \
+        -drive if=virtio,media=disk,index=0,file=freebsd101.build-ready.qcow2
+
+## QEMU Wrapper script
+
+Use the [pretest-run.pl](http://git.savannah.gnu.org/cgit/pretest.git/tree/pretest-run.pl)
+script for easier bootstrap of the configured images:
+
+    # Download script
+    wget http://git.savannah.gnu.org/cgit/pretest.git/plain/pretest-run.pl
+
+    # Start VM, connect to serial console (press CTRL-A,C for QEMU monitor)
+    ./pretest-run.pl --console freebsd101.build-ready.qcow2
+
+    # Optionally:
+    # Copy the host user's SSH Public key to the VM
+    # (so that future boots with SSH connection will not require a password):
+    ./pretest-run.pl --pubkey freebsd101.build-ready.qcow2
+
+    # Start VM, connect through SSH
+    # (when logging off, VM will be automatically shutdown)
+    ./pretest-run.pl freebsd101.build-ready.qcow2
+
+
+See `pretest-run.pl --help` for more options.
+
+All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
+
+## LibVirt Usage
+
+All VMs can be imported to LibVirt.
+
+See [LibVirt](http://www.nongnu.org/pretest/manual/#LibVirt-usage) manual page
+for details.
 
 ## Current and Future plans
 
@@ -93,6 +123,8 @@ Read the manual for detailed setup information and usage examples:
 See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 
 ## Contact
+
+Home page: <http://www.nongnu.org/pretest/
 
 For bug-reports, suggestions, comments and patches, please send emails to
 <pretest-users@nongnu.org>
