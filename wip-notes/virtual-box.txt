@@ -1,0 +1,52 @@
+# Convert to VDI format
+qemu-img convert -O vdi fbsd.qcow2 fbsd.vdi
+
+# Create + Register new VM
+vbm createvm --name "io" --register
+
+# Set 'good enough' settings.
+vbm modifyvm io \
+   --cpus 1 \
+   --graphicscontroller vboxvga \
+  --memory 384 \
+  --nic1 nat \
+  --nictype1 virtio \
+  --mouse ps2 \
+  --keyboard ps2 \
+  --ioapic on \
+  --natpf1 'guestssh,tcp,,2222,,22' \
+  --usb off
+
+# Add disk controller.
+# NOTE: VirtualBox DOES NOT support virtio-blk: only IDE/SATA.
+#       images will not boot as-is.
+vbm storagectl io \
+   --name "SATA Controller" \
+   --add sata \
+   --bootable on
+
+# Attach the converted disk image to the controller
+vbm storageattach "io" \
+   --storagectl "SATA Controller" \
+   --port 0 --device 0 --type hdd \
+   --medium ./fbsd.vdi
+
+# Start the vm
+vbm startvm io
+
+# Stop the VM (nicely)
+vbm modifyvm XXXXX ??
+
+# Connect with SSH to the forwarded port
+ssh -p 2222 miles@localhost
+
+===
+
+Doesn't book from SATA automatically.
+
+In FReeBSD, boot stops and waits for to enter new boot device.
+enter "ufs:/dev/ada0p2".
+
+Then change /etc/fstab:
+   sed -i.bak 's/vtbd0/ada0' /etc/fstab
+
