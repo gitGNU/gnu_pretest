@@ -1454,7 +1454,7 @@ sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
 Enable Console Login on serial port
 (see @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}):
 @example
-echo 'consolcomconsole,vidconsole"' >> /boot/loader.conf
+echo 'console="comconsole,vidconsole"' >> /boot/loader.conf
 sed -i.bak -e '/^ttyu0/s/off/on/' -e '/^ttyu0/s/dialup/vt100/' /etc/ttys
 @end example
 
@@ -1589,7 +1589,7 @@ sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
 Enable Console Login on serial port
 (see @url{https://www.freebsd.org/doc/handbook/serialconsole-setup.html}):
 @example
-echo 'consolcomconsole,vidconsole"' >> /boot/loader.conf
+echo 'console="comconsole,vidconsole"' >> /boot/loader.conf
 @end example
 (NOTE: No need to modify @file{/etc/ttys} -
 @file{ttyu0} will be atuomatically on if console is serial.)
