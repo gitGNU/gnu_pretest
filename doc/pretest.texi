@@ -542,9 +542,111 @@ and a new file @file{REMOTENAME} will be created on the host. Compare the
 @section LibVirt usage
 @cindex libvirt
 
-LibVirt (@url{http://libvirt.org/}) support is planned (e.g. providing a
-libVirt-compatible XML configuration files for each VM image), but is not
-yet available. Patches are welcomed.
+LibVirt (@url{http://libvirt.org/}) is a virtualization framework. PreTest
+virtual-machine images can be easily imported into LibVirt.
+
+Download and uncompress the image:
+@example
+wget http://files.housegordon.org/pretest/v0.1/freebsd101.build-ready.qcow2.xz
+xz -d freebsd101.build-ready.qcow2.xz
+@end example
+
+Define a new Guest VM using @command{virt-install}:
+@example
+virt-install \
+    --name freebsd101 \
+    --disk path=freebsd101.build-ready.qcow2,device=disk,format=qcow2,bus=virtio,perms=rw \
+    --connect qemu:///system \
+    --virt-type kvm \
+    --wait=0 \
+    --ram 384 \
+    --vcpus=1 \
+    --import \
+    --boot hd\
+    --graphics none \
+    --network=network=default,model=virtio
+@end example
+
+Note the following items:
+@itemize
+@item @option{--import} is used to instruct @command{virt-install} that the
+disk image is already installed.
+@item @option{--wait=0} is used to instruct @command{virt-install} not to wait
+for the VM to finish the initial setup - as PreTest images are pre-configured
+and ready to use.
+@item @option{--network=network=default} is used to connect the Guest VM to libvirt's
+default NAT network. This option should work on most libvirt installations.
+Alternatively, use @option{--network=user} for user-mode networking.
+@item libvirt will take ownership on the disk image file:
+@example
+$ ls -l *.qcow2
+total 1120592
+-rw-rw-r-- 1 libvirt-qemu kvm 1199767552 Dec  6 17:40 freebsd101.build-ready.qcow2
+@end example
+@item @option{--graphics none} is uesd since most PreTest images are configured
+to work without requiring a graphic adapter card.
+@item Depending on your libvirt setup and the PreTest image used, different
+options might be required. See @command{man virt-install} for more options.
+@end itemize
+
+To start the Guest VM:
+@example
+$ virsh start freebsd101
+Domain freebsd101 started
+@end example
+
+To connect to the Guest VM's serial console (if the guest VM's displays nothing
+on the screen, press a key to wake it up - this will show the login prompt):
+@example
+$ virsh console freebsd101
+Connected to domain freebsd101
+Escape character is ^]
+
+
+FreeBSD/amd64 (freebsd101) (ttyu0)
+
+login:
+@end example
+
+To disconnect from the guest VM's console (but keep the VM running), press
+@kbd{CTRL-]}.
+
+To stop the VM:
+@example
+$ virsh destroy freebsd101
+Domain freebsd101 destroyed
+@end example
+
+To undefine the VM (that is - remove it from libvirt):
+@example
+$ virsh undefine freebsd101
+@end example
+
+SSH Access, when using libvirt's default networking option:
+@example
+##
+## Find the MAC address of the active VM:
+##
+$ virsh domiflist freebsd101
+Interface  Type       Source     Model       MAC
+-------------------------------------------------------
+vnet0      network    default    virtio      52:54:00:f4:b0:08
+
+##
+## Locate its assigned IP
+##
+$ cat /var/lib/libvirt/dnsmasq/default.leases
+1417908075 52:54:00:f4:b0:08 192.168.122.111 freebsd101 01:52:54:00:f4:b0:08
+
+##
+## Connect with user 'miles' and password '12345':
+##
+$ ssh miles@@192.168.122.111
+Password for miles@@freebsd101:
+Last login: Sat Dec  6 17:23:20 2014
+FreeBSD 10.1-RELEASE (GENERIC) #0 r274401: Tue Nov 11 21:02:49 UTC 2014
+[...]
+@end example
 
 @node Debian Compilers Pack Usage, Build Recipes, Usage, Usage
 @section Debian Compilers Pack Usage
