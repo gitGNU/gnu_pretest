@@ -13,9 +13,37 @@ vbm modifyvm io \
   --nictype1 virtio \
   --mouse ps2 \
   --keyboard ps2 \
-  --ioapic on \
   --natpf1 'guestssh,tcp,,2222,,22' \
-  --usb off
+  --usb off \
+  $EXTRA
+
+$EXTRA = 
+	'--ioacpi off' + SATA works with:
+		debian 7.6
+		CentOS 7, 6.5
+		Fedora 20
+		gNewSense 3.1
+		Trisquel 7
+		Trisquel 6.0.1 (no display on the graphic adapter, but SSH
+works)
+		Ubuntu 14
+
+	Not working as-is:
+		for FreeBSD 10 -- ioacpi on, change boot device required
+
+	'--ioacpi off' + IDE works with:
+	Because output redirected to serial console (and auto-detection
+        doesn't work, it's recommended to add a serial port + 'tail -f')
+		OpenBSD 5.6
+		OpenBSD 5.5
+		Minix R3.3.0 (console login doens't work - must use SSH)
+
+	Hurd 0.5 (seems to require ioapic=on + ide + non-virtio network)
+
+	DilOS - not working ATM
+	NetBSD - not working ATM
+	
+
 
 # Add disk controller.
 # NOTE: VirtualBox DOES NOT support virtio-blk: only IDE/SATA.
@@ -35,7 +63,7 @@ vbm storageattach "io" \
 vbm startvm io
 
 # Stop the VM (nicely)
-vbm modifyvm XXXXX ??
+vbm controlvm acpipoweroff
 
 # Connect with SSH to the forwarded port
 ssh -p 2222 miles@localhost
@@ -49,4 +77,5 @@ enter "ufs:/dev/ada0p2".
 
 Then change /etc/fstab:
    sed -i.bak 's/vtbd0/ada0' /etc/fstab
-
+====
+In NetBSD, boot stops with "can't open /dev/rld0a: device not configued"
