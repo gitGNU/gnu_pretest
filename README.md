@@ -54,6 +54,13 @@ All VMs can be imported to LibVirt.
 See [LibVirt](http://www.nongnu.org/pretest/manual/#LibVirt-usage) manual page
 for details.
 
+## VirtualBox Usage
+
+Most VMs can be imported to VirtualBox.
+
+See [VirtualBox](http://www.nongnu.org/pretest/manual/#VirtualBox-usage)
+manual page for details.
+
 ## Current and Future plans
 
 The current version of PreTest provides pre-configured VMs, which facilitate
@@ -63,8 +70,8 @@ Future versions will provide scripts to automated (or semi-automate) testing
 of a given tarball on multiple operating systems.
 
 If you're interested in helping or improving PreTest, please see the `TODO.md`
-file in the git repository (<http://git.savannah.gnu.org/cgit/pretest.git>),
-and/or write to <pretest-users@nongnu.org>.
+file in the [git repository](http://git.savannah.gnu.org/cgit/pretest.git),
+and/or write to *pretest-users at nongnu.org*.
 
 ## Setup Details
 
@@ -124,10 +131,10 @@ See download page for more information: <http://www.nongnu.org/pretest/downloads
 
 ## Contact
 
-Home page: <http://www.nongnu.org/pretest/
+Home page: <http://www.nongnu.org/pretest/>
 
 For bug-reports, suggestions, comments and patches, please send emails to
-<pretest-users@nongnu.org>
+*pretest-users at nongnu.org*.
 
 To subscribe to the mailing list, visit:
 <https://lists.nongnu.org/mailman/listinfo/pretest-users>
@@ -161,4 +168,4 @@ To view/search past discussions, visit:
     * gNewSense: <http://www.gnewsense.org/Licenses>
 
     If you spot a non-free software in those pre-build images, please send
-    a bug report to <pretest-users@nongnu.org>
+    a bug report to *pretest-users at nongnu.org*.

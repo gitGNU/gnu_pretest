@@ -278,6 +278,7 @@ or as a basis for such servers.
 * Pretest-guest-init script::       Boot-time automation
 * Sending data from Guest to Host:: Using serial port to export data
 * LibVirt usage::                   Using images with libVirt
+* VirtualBox usage::                Using images with VirtualBox
 * Debian Compilers Pack Usage::     Testing multiple compilers
 @end menu
 
@@ -538,7 +539,7 @@ and a new file @file{REMOTENAME} will be created on the host. Compare the
 @emph{NOTE:} The @file{FILE.serial} is truncated every invocation of the
 @command{pretest-run.sh} script.
 
-@node LibVirt usage, Debian Compilers Pack Usage, Pretest-run script, Usage
+@node LibVirt usage, VirtualBox usage, Pretest-run script, Usage
 @section LibVirt usage
 @cindex libvirt
 
@@ -583,7 +584,7 @@ $ ls -l *.qcow2
 total 1120592
 -rw-rw-r-- 1 libvirt-qemu kvm 1199767552 Dec  6 17:40 freebsd101.build-ready.qcow2
 @end example
-@item @option{--graphics none} is uesd since most PreTest images are configured
+@item @option{--graphics none} is used since most PreTest images are configured
 to work without requiring a graphic adapter card.
 @item Depending on your libvirt setup and the PreTest image used, different
 options might be required. See @command{man virt-install} for more options.
@@ -648,7 +649,105 @@ FreeBSD 10.1-RELEASE (GENERIC) #0 r274401: Tue Nov 11 21:02:49 UTC 2014
 [...]
 @end example
 
-@node Debian Compilers Pack Usage, Build Recipes, Usage, Usage
+@node  VirtualBox usage, Debian Compilers Pack Usage, LibVirt usage, Usage
+@section VirtualBox usage
+@cindex VirtualBox
+
+VirtualBox (@url{http://www.virtualbox.org/}) is a virtualization product
+from Sun (now Oracle).  Most PreTest virtual-machine images can be easily
+imported into VirtualBox.
+
+Download and uncompress the image:
+@example
+wget http://files.housegordon.org/pretest/v0.1/freebsd101.build-ready.qcow2.xz
+xz -d freebsd101.build-ready.qcow2.xz
+@end example
+
+Convert to VDI format:
+@example
+qemu-img convert -O vdi freebsd101.build-ready.qcow2 freebsd101.vdi
+@end example
+
+Create a new VirtualBox machine using the command line tool
+@command{VBoxManage} (alternatively, the same can be performed using the
+VirtualBox GUI application):
+@example
+# Create + Register new VM
+VBoxManage createvm --name MyVM1 --register
+
+# Setup VM with reasonable options
+VBoxManage modifyvm MyVM1 \
+    --cpus 1 \
+    --graphicscontroller vboxvga \
+    --memory 384 \
+    --nic1 nat \
+    --nictype1 virtio \
+    --mouse ps2 \
+    --keyboard ps2 \
+    --natpf1 'guestssh,tcp,,2222,,22' \
+    --usb off
+
+# Create IDE Controller
+VBoxManage storagectl MyVM1\
+   --name "IDE Controller" \
+   --add ide \
+   --bootable on
+
+# Attach the converted disk image to the controller
+# (NOTE: the './' is required)
+VBoxManage storageattach MyVM1 \
+   --storagectl "IDE Controller" \
+   --port 0 --device 0 --type hdd \
+   --medium ./freebsd101.vdi
+@end example
+
+OS-Sepcific Settings:
+@itemize
+@item FreeBSD - requires APIC. run the following:
+@example
+VBoxManage modifyvm MyVM1 --ioapic on
+@end example
+
+@item Hurd - requires APIC, and can't use Virtio network. run the following:
+@example
+VBoxManage modifyvm MyVM1 --ioapic on --nictype1 82540EM
+@end example
+
+@item OpenBSD,Minix - the PreTest OpenBSD images are configured to use only
+serial console and fail to auto-detect a VGA adapter. It is recommended to add
+a serial port redirection to view the output from the console, to verify the
+boot process:
+@example
+VBoxManage modifyvm MyVM1 \
+    --uart1 0x03f8 4 \
+    --uartmode1 server /tmp/myvm1.sock
+@end example
+Then, after starting the VM, connect to the serial console with:
+@example
+socat unix:/tmp/myvm1.sock -
+@end example
+
+@item NetBSD, DilOS - these PreTest virtual-machines do not currently work
+with VirtualBox. Patches/Suggestions are welcomed.
+@end itemize
+
+To start the VM:
+@example
+VBoxManage startvm MyVM1
+@end example
+
+To connect using SSH:
+@example
+ssh -p 2222 miles@@localhost
+@end example
+
+To gracefully shutdown the VM:
+@example
+VBoxManage controlvm MyVM1 acpipowerbutton
+@end example
+
+
+@node Debian Compilers Pack Usage, Build Recipes, VirtualBox usage, Usage
 @section Debian Compilers Pack Usage
 @cindex Cross Compilers, usage
 @cindex Compilers Pack
