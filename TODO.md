@@ -56,6 +56,8 @@
 
 * MINIX: fix WGET, or use cURL instead.
 
+* Hurd image: add 'pretest-auto-build-check'
+
 * Communicate with host when boot process is done, and login through SSH
   when possible.  
   Perhaps with a serial device, with `tail -f` or `inotify` on host
