@@ -1463,6 +1463,59 @@ Reduce bootloader wait time:
 echo 'autoboot_delay="1"' >> /boot/loader.conf
 @end example
 
+Switch to disk-labels instead of disk-devices:
+The default installation will use device names in @file{/etc/fstab} (e.g.
+@file{/dev/vtbd0p2}). Switching to disk-labels will enable changing the block
+device configuration (e.g. SATA/IDE/Virtio) without booting problems. For more
+information see @url{https://www.freebsd.org/doc/handbook/geom-glabel.html}.
+@itemize
+@item reboot to single-user mode (press and hold @kbd{s} during boot-loader
+screen).
+@item Press @kbd{ENTER} at the prompt to run @file{/bin/sh}.
+@item Check the current partitions, ensure the match the expected (below)
+before labelling them:
+@example
+# cat /etc/fstab
+Device          Mountpoint   FStype    Options  Dump Pass
+/dev/vtbd0p2    /            ufs       rw       1    1
+/dev/vtbd0p3    none         swap      sw       0    0
+
+# mount
+/dev/vtbd0p2 on / (ufs, local, read-only)
+devfs on /dev (devfs, local, multilabel)
+
+# glabel status
+                                      Name  Status  Components
+gptid/cc85fa99-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p1
+                    ufsid/542204ac6d0b964a     N/A  vtbd0p2
+gptid/cc86ab53-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p2
+gptid/cc874cab-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p3
+@end example
+
+@item Set new labels
+@example
+glabel label ptswap /dev/vtbd0p3
+glabel label ptroot /dev/vtbd0p2
+@end example
+
+@item Change @file{/etc/fstab} and load the geomerty/label driver:
+@example
+mount -o rw /
+echo 'geom_label_load="YES"' >> /boot/loader.conf
+sed -i.bak -e 's;vtbd0p2;label/ptroot;' -e 's;vtbd0p3;label/ptswap;' /etc/fstab
+@end example
+
+@item Type @code{reboot} to reboot - verify the reboot succeeded.
+@item Login with @var{root} (password: @var{12345}), and run @command{mount}
+to ensure the label are used. If the physical device name appears (e.g.
+@file{/dev/vtbd0p2} instead of @file{/dev/label/ptroot}), something went wrong.
+@example
+# mount
+dev/label/ptroot on / (ufs, local, journaled soft-updates)
+devfs on /dev (devfs, local, multilabel)
+@end example
+@end itemize
+
 Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{freebsd10.qcow2}
  as 'clean-install'.
 A pre-build image is available for download, see @xref{Downloads}.
@@ -1598,6 +1651,59 @@ Reduce bootloader wait time:
 @example
 echo 'autoboot_delay="1"' >> /boot/loader.conf
 @end example
+
+Switch to disk-labels instead of disk-devices:
+The default installation will use device names in @file{/etc/fstab} (e.g.
+@file{/dev/vtbd0p2}). Switching to disk-labels will enable changing the block
+device configuration (e.g. SATA/IDE/Virtio) without booting problems. For more
+information see @url{https://www.freebsd.org/doc/handbook/geom-glabel.html}.
+@itemize
+@item reboot to single-user mode (press and hold @kbd{s} during boot-loader
+screen).
+@item Press @kbd{ENTER} at the prompt to run @file{/bin/sh}.
+@item Check the current partitions, ensure the match the expected (below)
+before labelling them:
+@example
+# cat /etc/fstab
+Device          Mountpoint   FStype    Options  Dump Pass
+/dev/vtbd0p2    /            ufs       rw       1    1
+/dev/vtbd0p3    none         swap      sw       0    0
+
+# mount
+/dev/vtbd0p2 on / (ufs, local, read-only)
+devfs on /dev (devfs, local, multilabel)
+
+# glabel status
+                                      Name  Status  Components
+gptid/cc85fa99-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p1
+                    ufsid/542204ac6d0b964a     N/A  vtbd0p2
+gptid/cc86ab53-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p2
+gptid/cc874cab-437a-11e4-9d3e-59ab471cbeae     N/A  vtbd0p3
+@end example
+
+@item Set new labels
+@example
+glabel label ptswap /dev/vtbd0p3
+glabel label ptroot /dev/vtbd0p2
+@end example
+
+@item Change @file{/etc/fstab} and load the geomerty/label driver:
+@example
+mount -o rw /
+echo 'geom_label_load="YES"' >> /boot/loader.conf
+sed -i.bak -e 's;vtbd0p2;label/ptroot;' -e 's;vtbd0p3;label/ptswap;' /etc/fstab
+@end example
+
+@item Type @code{reboot} to reboot - verify the reboot succeeded.
+@item Login with @var{root} (password: @var{12345}), and run @command{mount}
+to ensure the label are used. If the physical device name appears (e.g.
+@file{/dev/vtbd0p2} instead of @file{/dev/label/ptroot}), something went wrong.
+@example
+# mount
+dev/label/ptroot on / (ufs, local, journaled soft-updates)
+devfs on /dev (devfs, local, multilabel)
+@end example
+@end itemize
 
 Stop the VM with @command{/sbin/halt}, tag the QCOW2 file @file{freebsd93.qcow2}
  as 'clean-install'.
