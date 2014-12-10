@@ -43,6 +43,8 @@
 
 * Add libz-dev
 
+* Add mercurial, cmake, gmake in all VMs
+
 * Add custom 'pretest-guest-shutdown' to each VM, instead of guessing the
   shutdown command in `pretest-run.sh`.
 
@@ -80,7 +82,7 @@
 
 * Cygwin VM (without Windows) ?
 
-* More OSes: Haiku, Plan9 ?
+* More OSes: Haiku, Plan9, ReactOS, xv6, FreeRTOS ?
 
 ## Manual/Texinfo improvements
 
