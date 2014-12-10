@@ -6,7 +6,7 @@ Steps for adding a new VM/OS:
 
 3. Re-run VM without snapshot, add build tools, using:
 
-        ./pretest-run.pl --console -S xxxx.qcow2
+        ./pretest-run.pl --console -S -p 1025 xxxx.qcow2
 
     `--console` is required instead of `--ssh` (the default), otherwise the
     VM will shutdown upon SSH logoff, without proper shutdown.
@@ -23,10 +23,6 @@ Steps for adding a new VM/OS:
               misc_scripts/pretest-auto-build-check \
               misc_scripts/pretest-guest-init \
            miles@localhost:
-        The authenticity of host '[localhost]:1025 ([127.0.0.1]:1025)' can't be established.
-        ECDSA key fingerprint is e4:f7:1b:4b:c9:f9:42:e1:ca:99:36:ca:61:1c:2b:9c.
-        Are you sure you want to continue connecting (yes/no)? yes
-        Warning: Permanently added '[localhost]:1025' (ECDSA) to the list of known hosts.
         Password for miles@freebsd101:
         pretest-auto-build-check                                      100% 8807     8.6KB/s   00:00
         pretest-guest-init                                            100% 7655     7.5KB/s   00:00
@@ -48,7 +44,32 @@ Steps for adding a new VM/OS:
         pretest-auto-build-check http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
         pretest-auto-build-check git://git.sv.gnu.org/datamash.git
 
-7. Update doc/vm-sizes
+7. For GNU/Linux (or other compatible OS/Filesystems), use "virt-sparsify" to
+   reduce the size of the QCOW2 image before compression:
+
+        sudo virt-sparsify freebsd101.clean-install.qcow2 \
+                           freebsd101.clean-install.sparse.qcow2
+
+   Test the sparsified-qcow2 image, ensuring it can still boot:
+
+        ./pretest-run.pl freebsd101.clean-install.sparse.qcow2
+
+   If it boots - good. Use it.
+   If it doesn't - discard it and use the non-sparse qcow2 file.
+
+8. Compress the qcow2 images
+
+        xz -T3 < freebsd101.clean-install.sparse.qcow2 \
+               > images-v0.1/freebsd101.clean-install.qcow2.xz
+        xz -T3 < freebsd101.build-ready.sparse.qcow2 \
+               > images-v0.1/freebsd101.build-ready.qcow2.xz
+
+9. Upload images
+
+        hgfiles-upload.sh images-v0.1/freebsd101.clean-install.qcow2.xz pretest/v0.1
+        hgfiles-upload.sh images-v0.1/freebsd101.build-ready.qcow2.xz pretest/v0.1
+
+10. Update doc/vm-sizes
 
     $ ./misc_scripts/collect-image-sizes.sh images-v0.1/trisquel7*
     trisquel7.build-ready.qcow2.xz      301M  1.5G
@@ -56,13 +77,11 @@ Steps for adding a new VM/OS:
 
    Add the above two lines to 'doc/vm-size' and re-sort.
 
-8. Update versions/OS.hs   using misc_scripts/get-versions.sh
+11. Update `versions/XXX` using `misc_scripts/get-versions.sh`
 
     $ ./pretest-run.pl \
         workdir/trisquel7.build-ready.qcow2 \
         < misc_scripts/get-versions.sh > versions/trisquel7.txt
-    Pseudo-terminal will not be allocated because stdin is not a terminal.
-    Warning: Permanently added '[127.0.0.1]:1025' (ECDSA) to the list of known hosts.
     miles@127.0.0.1's password: ### Enter '12345'
 
   Manually inspect `versions/trisquel7.txt` - remove any login messages.
@@ -78,30 +97,30 @@ Steps for adding a new VM/OS:
        19 versions/freebsd93.txt
        <...>
 
-9. run `./misc_scripts/build-os-versions-table.sh` ,
+12. run `./misc_scripts/build-os-versions-table.sh` ,
    then inspect `./os-versions.html`.
 
-10. Update 'README.md', add new OS/version.
+13. Update 'README.md', add new OS/version.
 
-11. Update 'download.md', add new qcow2.xz URLs.
+14. Update 'download.md', add new qcow2.xz URLs.
 
-12. run `make website` to re-generate some index files.
+15. run `make website` to re-generate some index files.
 
-13. Manually inspect the updates:
+16. Manually inspect the updates:
 
     meld web/ ../pretest-website/pretest/
 
     Ensure that 'downloads/index.html' is NOT modified (or doesn't exist)
     in ./web/ - it must be manually updated.
 
-14. Update the website files:
+17. Update the website files:
 
     cp -r web/* ../pretest-website/pretest/
 
-15. manually update `../pretest-website/pretest/downloads/index.html` with
+18. manually update `../pretest-website/pretest/downloads/index.html` with
     the URLs and sizes of the new OS/vm.
 
-16. Inspect changes in source code 'git' repository, and commit the
+19. Inspect changes in source code 'git' repository, and commit the
     appropriate files:
 
         $ git status --short
@@ -115,7 +134,7 @@ Steps for adding a new VM/OS:
         $ git push hg
         $ git push gnu
 
-17. Commit the changes to the website:
+20. Commit the changes to the website:
 
         $ cd ../pretest-website/pretest
         $ cvs diff --brief
