@@ -56,8 +56,6 @@
 
 * MINIX: fix WGET, or use cURL instead.
 
-* Hurd image: add 'pretest-auto-build-check'
-
 * Communicate with host when boot process is done, and login through SSH
   when possible.  
   Perhaps with a serial device, with `tail -f` or `inotify` on host
@@ -91,3 +89,7 @@
 * Mention no sudo on minix
 
 * Mention `scp -o Port=2222  FILE  miles@localhost:` method to copy files.
+
+* Change `kvm` to `qemu-syste-x86_64`
+
+* Change `pretest-run.sh` to `pretest-run.pl`
