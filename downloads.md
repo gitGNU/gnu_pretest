@@ -39,6 +39,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [Ubuntu 14.04.1](http://files.housegordon.org/pretest/v0.1/ubuntu14.clean-install.qcow2.xz)
 * [Trisquel 6.0.1](http://files.housegordon.org/pretest/v0.1/trisquel601.clean-install.qcow2.xz)
 * [Trisquel 7](http://files.housegordon.org/pretest/v0.1/trisquel7.clean-install.qcow2.xz)
+* [OpenSUSE 13.2](http://files.housegordon.org/pretest/v0.1/opensuse132.clean-install.qcow2.xz)
 * [OpenSUSE 13.1](http://files.housegordon.org/pretest/v0.1/opensuse131.clean-install.qcow2.xz)
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz)
 
@@ -62,5 +63,6 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [Ubuntu 14.04.1](http://files.housegordon.org/pretest/v0.1/ubuntu14.build-ready.qcow2.xz)
 * [Trisquel 6.0.1](http://files.housegordon.org/pretest/v0.1/trisquel601.build-ready.qcow2.xz)
 * [Trisquel 7](http://files.housegordon.org/pretest/v0.1/trisquel7.build-ready.qcow2.xz)
+* [OpenSUSE 13.2](http://files.housegordon.org/pretest/v0.1/opensuse132.build-ready.qcow2.xz)
 * [OpenSUSE 13.1](http://files.housegordon.org/pretest/v0.1/opensuse131.build-ready.qcow2.xz)
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz)
