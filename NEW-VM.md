@@ -11,6 +11,9 @@ Steps for adding a new VM/OS:
     `--console` is required instead of `--ssh` (the default), otherwise the
     VM will shutdown upon SSH logoff, without proper shutdown.
 
+    To shutdown and save changes, run `shutdown` or `/sbin/halt` (or another
+    appropriate command for the OS).
+
 4. copy `misc_scripts/pretest-auto-check-build` and
    `misc_scripts/pretest-guest-init` to the guest VM:
 
@@ -44,40 +47,20 @@ Steps for adding a new VM/OS:
         pretest-auto-build-check http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
         pretest-auto-build-check git://git.sv.gnu.org/datamash.git
 
-7. For GNU/Linux (or other compatible OS/Filesystems), use "virt-sparsify" to
-   reduce the size of the QCOW2 image before compression:
+7. Test the images with `--console` to ensure console log messages and getty
+   are properly set:
 
-        sudo virt-sparsify freebsd101.clean-install.qcow2 \
-                           freebsd101.clean-install.sparse.qcow2
+        ./pretest-run.pl --console freebsd101.clean-install.qcow2
 
-   Test the sparsified-qcow2 image, ensuring it can still boot:
+8. Test the image with `--ssh` (the default, with no options) to ensure SSH
+   is properly configured (e.g. firewall + openssh on OpenSUSE):
 
-        ./pretest-run.pl freebsd101.clean-install.sparse.qcow2
+        ./pretest-run.pl freebsd101.clean-install.qcow2
 
-   If it boots - good. Use it.
-   If it doesn't - discard it and use the non-sparse qcow2 file.
+9. Test login with user 'miles' password '12345', ensure `sudo` works without
+   requiring a password
 
-8. Compress the qcow2 images
-
-        xz -T3 < freebsd101.clean-install.sparse.qcow2 \
-               > images-v0.1/freebsd101.clean-install.qcow2.xz
-        xz -T3 < freebsd101.build-ready.sparse.qcow2 \
-               > images-v0.1/freebsd101.build-ready.qcow2.xz
-
-9. Upload images
-
-        hgfiles-upload.sh images-v0.1/freebsd101.clean-install.qcow2.xz pretest/v0.1
-        hgfiles-upload.sh images-v0.1/freebsd101.build-ready.qcow2.xz pretest/v0.1
-
-10. Update doc/vm-sizes
-
-    $ ./misc_scripts/collect-image-sizes.sh images-v0.1/trisquel7*
-    trisquel7.build-ready.qcow2.xz      301M  1.5G
-    trisquel7.clean-install.qcow2.xz    188M  1.1G
-
-   Add the above two lines to 'doc/vm-size' and re-sort.
-
-11. Update `versions/XXX` using `misc_scripts/get-versions.sh`
+10. Update `versions/XXX` using `misc_scripts/get-versions.sh`
 
     $ ./pretest-run.pl \
         workdir/trisquel7.build-ready.qcow2 \
@@ -97,30 +80,66 @@ Steps for adding a new VM/OS:
        19 versions/freebsd93.txt
        <...>
 
-12. run `./misc_scripts/build-os-versions-table.sh` ,
+  If any program is missing (e.g. `autoconf` or `make` or `makeinfo`), go back
+  and install them in the build-ready image.
+
+11. run `./misc_scripts/build-os-versions-table.sh` ,
    then inspect `./os-versions.html`.
 
-13. Update 'README.md', add new OS/version.
+12. For GNU/Linux (or other compatible OS/Filesystems), use "virt-sparsify" to
+   reduce the size of the QCOW2 image before compression:
 
-14. Update 'download.md', add new qcow2.xz URLs.
+        sudo virt-sparsify freebsd101.clean-install.qcow2 \
+                           freebsd101.clean-install.sparse.qcow2
 
-15. run `make website` to re-generate some index files.
+   Test the sparsified-qcow2 image, ensuring it can still boot:
 
-16. Manually inspect the updates:
+        ./pretest-run.pl freebsd101.clean-install.sparse.qcow2
+
+   If it boots - good. Use it.
+   If it doesn't - discard it and use the non-sparse qcow2 file.
+
+13. Compress the qcow2 images
+
+        xz -T3 < freebsd101.clean-install.sparse.qcow2 \
+               > images-v0.1/freebsd101.clean-install.qcow2.xz
+        xz -T3 < freebsd101.build-ready.sparse.qcow2 \
+               > images-v0.1/freebsd101.build-ready.qcow2.xz
+
+14. Upload images
+
+        hgfiles-upload.sh images-v0.1/freebsd101.clean-install.qcow2.xz pretest/v0.1
+        hgfiles-upload.sh images-v0.1/freebsd101.build-ready.qcow2.xz pretest/v0.1
+
+15. Update doc/vm-sizes
+
+    $ ./misc_scripts/collect-image-sizes.sh images-v0.1/trisquel7*
+    trisquel7.build-ready.qcow2.xz      301M  1.5G
+    trisquel7.clean-install.qcow2.xz    188M  1.1G
+
+   Add the above two lines to 'doc/vm-size' and re-sort.
+
+16. Update 'README.md', add new OS/version.
+
+17. Update 'download.md', add new qcow2.xz URLs.
+
+18. run `make website` to re-generate some index files.
+
+19. Manually inspect the updates:
 
     meld web/ ../pretest-website/pretest/
 
     Ensure that 'downloads/index.html' is NOT modified (or doesn't exist)
     in ./web/ - it must be manually updated.
 
-17. Update the website files:
+20. Update the website files:
 
     cp -r web/* ../pretest-website/pretest/
 
-18. manually update `../pretest-website/pretest/downloads/index.html` with
+21. manually update `../pretest-website/pretest/downloads/index.html` with
     the URLs and sizes of the new OS/vm.
 
-19. Inspect changes in source code 'git' repository, and commit the
+22. Inspect changes in source code 'git' repository, and commit the
     appropriate files:
 
         $ git status --short
@@ -134,7 +153,7 @@ Steps for adding a new VM/OS:
         $ git push hg
         $ git push gnu
 
-20. Commit the changes to the website:
+23. Commit the changes to the website:
 
         $ cd ../pretest-website/pretest
         $ cvs diff --brief
