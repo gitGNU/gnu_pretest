@@ -16,3 +16,76 @@ non-root user: miles (password 12345)
 Virtio Driver:
 http://openindiana.org/pipermail/openindiana-discuss/2011-October/005903.html
 
+====
+
+use "e1000" network card (as it is reliabley automatically detected, "virtio"
+requeres drives, which can't be downloaded without network).
+use "ide" block driver.
+
+qemu-system-x86_64 \
+    -enable-kvm \
+    -name openindiana151a8 \
+      -m 1024 \
+       -machine pc-1.1 \
+       -net nic,model=e1000 \
+       -net user \
+       -boot cd \
+       -drive file=openindiana151a8.qcow2,if=ide,index=0,media=disk \
+       -redir tcp:2222::22 -curses
+
+After installation, install "vrtio" drivers:
+
+   sudo pkg search  virtio
+       
+   sudo pkg install 
+
+       sudo pkg contents virtio
+       sudo pkg contents vioblk
+       
+       sudo modload /kernel/misc/amd64/virtio
+       sudo modinfo | grep virt
+       
+      add_drv -m '* 0666 root sys' vioblk
+
+       add to /rpool/boot/grub/menu.lst:
+            console=com1 com1=9600,8n1
+       
+Serial Console:
+       http://wiki.openindiana.org/oi/4.6+Remote+Console
+       
+#https://docs.oracle.com/cd/E19150-01/820-1853-16/AppB.html
+  #     http://docs.oracle.com/cd/E19082-01/819-2379/fvbbb/index.html
+
+===
+enable password-less sudo
+
+sudo sed -i -e '/^miles ALL=/s/(ALL)/(ALL) NOPASSWD:/' /etc/sudoers
+===
+Mount TMP from a disk-image, not 'tmpfs' (to reduce ram consumption of the
+VM):
+
+sudo sed -i -e '/^swap.*\/tmp.*tmpfs/s/^/#/' /etc/vfstab
+===
+change boot to use console:
+
+    timeout 5
+    serial --unit=0 --spoeed=9600 --word=8 --parity=no --stop=1
+    terminal --timeout=10 console serial
+    kernel$ /platform/i86pc/kernel/$ISADIR/unix -B $ZFS-BOOTFS,console=ttya
+===
+Allow root login everywhere:
+    sudo sed -i -e '/^CONSOLE=/s/^/#/'  /etc/default/login
+    sudo sed -i -e '/^PermitRootLogin/s/no/yes/'  /etc/ssh/sshd_config
+    sudo sed -i -e '/^root:::/s/;type=role//' /etc/user_attr
+===
+Save as "clean-install"
+
+====
+pkg install gcc-dev
+## pkg install /developer/build/automake-111
+pkg install /developer/gperf
+pkg install /compress/xz
+pkg install /system/library/math/header-math
+pkg install /text/gnu-gettext
+====
+sudo ln -s $(which automake-1.10) /usr/bin/automake

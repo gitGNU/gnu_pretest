@@ -42,6 +42,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [OpenSUSE 13.2](http://files.housegordon.org/pretest/v0.1/opensuse132.clean-install.qcow2.xz)
 * [OpenSUSE 13.1](http://files.housegordon.org/pretest/v0.1/opensuse131.clean-install.qcow2.xz)
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz)
+* [OpenIndiana 151a8](http://files.housegordon.org/pretest/v0.1/openindiana151a8.clean-install.qcow2.xz)
 
 ## Build-Ready images
 
@@ -66,3 +67,4 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [OpenSUSE 13.2](http://files.housegordon.org/pretest/v0.1/opensuse132.build-ready.qcow2.xz)
 * [OpenSUSE 13.1](http://files.housegordon.org/pretest/v0.1/opensuse131.build-ready.qcow2.xz)
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz)
+* [OpenIndiana 151a8](http://files.housegordon.org/pretest/v0.1/openindiana151a8.build-ready.qcow2.xz)

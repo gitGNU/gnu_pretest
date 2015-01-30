@@ -126,6 +126,7 @@ Read the manual for detailed setup information and usage examples:
 * OpenBSD 5.5, 5.6
 * GNU-Hurd 0.5/Debian
 * MINIX R3.3.0
+* OpenIndiana 151a8
 
 See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 

@@ -313,6 +313,18 @@ sub setup_vm_hacks
 		$ram_size = 768;
 	}
 
+	# OpenIndiana (Illumos/OpenSolaris-like)
+	if ($vm_name =~ /openindiana/i) {
+		# Requires a VGA adapter
+		$graphics_if = "vncnone";
+		$disk_if = "ide";
+		$net_if = "e1000";
+		# Fails to boot (kernel panic) without these devices
+		@extra_qemu_params = ("-machine","pc-1.1");
+		# DilOS runs too much stuff to be usable with only 384
+		$ram_size = 1024;
+	}
+
 	return;
 }
 
