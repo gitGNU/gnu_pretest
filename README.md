@@ -126,7 +126,7 @@ Read the manual for detailed setup information and usage examples:
 * OpenBSD 5.5, 5.6
 * GNU-Hurd 0.5/Debian
 * MINIX R3.3.0
-* OpenIndiana 151a8
+* OpenIndiana 151a8 (OpenSolaris-like system, running SunOS 5.11)
 
 See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 
@@ -167,6 +167,7 @@ To view/search past discussions, visit:
     * OpenSUSE: <https://en.opensuse.org/openSUSE:License>
     * Trisquel: <http://trisquel.info/en/under-what-license-trisquel-distributed>
     * gNewSense: <http://www.gnewsense.org/Licenses>
+    * OpenIndiana: <http://wiki.openindiana.org/pages/viewpage.action?pageId=1048863>
 
     If you spot a non-free software in those pre-build images, please send
     a bug report to *pretest-users at nongnu.org*.
