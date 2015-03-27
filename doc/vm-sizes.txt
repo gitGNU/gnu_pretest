@@ -5,6 +5,8 @@ centos7.clean-install.qcow2.xz      277M  1.1G
 debian76.build-ready.qcow2.xz       193M  987M
 debian76.clean-install.qcow2.xz     294M  1.2G
 debian76.compilers-pack.qcow2.xz    763M  2.7G
+debian7-kfreebsd.build-ready.qcow2.xz     257M  864M
+debian7-kfreebsd.clean-install.qcow2.xz   252M  770M
 dilos137.build-ready.qcow2.xz       690M  2.7G
 dilos137.clean-install.qcow2.xz     319M  1.7G
 fedora21.build-ready.qcow2.xz       365M  1.4G

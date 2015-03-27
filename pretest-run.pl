@@ -325,6 +325,11 @@ sub setup_vm_hacks
 		$ram_size = 1024;
 	}
 
+	# Debian 7 GNU/kFreeBSD (FreeBSD Kernel 9) - no support for virtio
+	if ($vm_name =~ /kfreebsd/i) {
+		$disk_if = "ide";
+		$net_if = "e1000";
+	}
 	return;
 }
 

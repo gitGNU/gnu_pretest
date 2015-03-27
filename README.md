@@ -127,6 +127,7 @@ Read the manual for detailed setup information and usage examples:
 * GNU-Hurd 0.5/Debian
 * MINIX R3.3.0
 * OpenIndiana 151a8 (OpenSolaris-like system, running SunOS 5.11)
+* Debian 7 GNU/kFreeBSD (GNU userspace with FreeBSD kernel)
 
 See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 
