@@ -1,0 +1,76 @@
+http://files.housegordon.org/pretest/v0.1/hurd06.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/hurd06.build-ready.qcow2.xz
+
+hurd06.build-ready.qcow2.xz         304M  1.6G
+hurd06.clean-install.qcow2.xz       233M  1.3G
+
+https://people.debian.org/~sthibault/hurd-i386/installer/cdimage/
+
+wget http://people.debian.org/~sthibault/hurd-i386/installer/cdimage/cd-1.iso
+
+qemu-img create -q -f qcow2 hurd-install.qemu 5G
+
+ qemu-system-i386 --enable-kvm -m 512 -net nic,model=ne2k_pci -net user -hda hurd-install.qemu -cdrom cd-1.iso -boot d -serial mon:stdio
+ 
+ qemu-system-i386 --enable-kvm  -m 512 \
+     -net nic,model=ne2k_pci \
+     -net user,hostfwd=tcp:127.0.0.1:2222-:22 \
+     -snapshot \
+     -drive file=hurd-install.qemu,media=disk,if=ide \
+     -boot c \
+     -serial mon:stdio
+ 
+ Installer:
+	language: C
+	Continent: North America
+	Country: United States
+	Keymap: English
+	Hostname: hurd06
+	root pw: 12345
+	user: miles
+	user pw: 12345
+	timezone: easten
+	
+	partitioning: guide - entire disk
+	disk: /dev/hd0
+	parittioning scheme: all files in one paritiotn
+	Guided paritioning: "Finish Parittinin and write changes to disk"
+	Write changes to disk: Yes
+	(package installion)
+	Use a network mirror: NO (due to recommendation on Hurd WEbsite, no network mirriro during install)
+	(more package installion)
+	Participate in package survey: no
+	
+	Software To install: Standard Systrem utiolities
+	(more package installion)
+	Install Grub on Boot Record: yes
+	Device for boot loader installation: /dev/hd0
+
+First installation:
+https://www.debian.org/ports/hurd/hurd-install.html
+
+	sed -i -e '/ftp/s/^#//' \
+	       -e '/cdrom/s/^/#/' \
+	       -e '$adeb http://ftp.fr.debian.org/debian unstable main' \
+	       /etc/apt/sources.list
+	apt-get update
+	apt-get upgrade -y
+	apt-get install -y screen curl wget vim sudo openssh-server
+
+	sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+	adduser miles sudo
+	
+	sed -i -e /^PermitRootLogin/s/without-password/yes/' \
+	       -e /^#AuthorizedKeysFile/s/^#//' \
+	       /etc/ssh/sshd_config
+	
+	sed -i -e '/GRUB_TIMEOUT/s/=.*$/=1/' \
+               -e '$aGRUB_CMDLINE_GNUMACH="console=com0"' \
+	       /etc/default/grub
+	update-grub
+
+Build-Ready
+        sudo apt-get install -y build-essential autopoint automake autoconf gettext libtool \
+			        git gawk vim wget rsync gperf texinfo pkg-config help2man \
+                                libncurses-dev nano flex bison
+				

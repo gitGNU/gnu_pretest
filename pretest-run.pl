@@ -293,7 +293,7 @@ sub parse_commandline ## no critic (ProhibitExcessComplexity)
 
 sub setup_vm_hacks
 {
-	## GNU Hurd 0.5 -
+	## GNU Hurd 0.5/0.6 -
 	## Doesn't suppoort Virtio drivres
 	if ($vm_name =~ /hurd/i) {
 		$disk_if = "ide";

@@ -22,6 +22,8 @@ freebsd93.clean-install.qcow2.xz    406M  1.8G
 gnewsense31.build-ready.qcow2.xz    175M  881M
 gnewsense31.clean-install.qcow2.xz  303M  1.1G
 hurd05.build-ready.qcow2.xz         296M  1.9G
+hurd06.build-ready.qcow2.xz         304M  1.6G
+hurd06.clean-install.qcow2.xz       233M  1.3G
 minixR330.clean-install.qcow2.xz    44M   462M
 minixR330.build-ready.qcow2.xz      307M  1.2G
 netbsd614.build-ready.qcow2.xz      216M  909M
