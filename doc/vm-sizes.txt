@@ -42,3 +42,5 @@ trisquel7.build-ready.qcow2.xz      301M  1.5G
 trisquel7.clean-install.qcow2.xz    188M  1.1G
 ubuntu14.build-ready.qcow2.xz       249M  1.4G
 ubuntu14.clean-install.qcow2.xz     463M  2.0G
+ubuntu15.clean-install.qcow2.xz     264M  1.4G
+ubuntu15.build-ready.qcow2.xz       295M  1.5G
