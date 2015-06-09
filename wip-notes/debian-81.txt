@@ -1,0 +1,58 @@
+Debian 8.1
+==========
+
+Language: Englush
+Country: United-States
+Keymap to use: American English
+
+Hostname: debian81
+
+Root pw: 12345
+Full user name: miles
+user name: miles
+password: 12345
+
+Timezone: Eastern
+
+Partitioning: Guided - Use enitre disk
+Select Partition: "virtual disk 1 (Vda)"
+Partitioning scheme: All files inone partition
+Partition disks: "Finish partiioning and write changes to disk"
+Write Changes to disk?: "Yes"
+
+Configure Package manager:
+   Select Debian archive mirror counter: United States
+   Mirror: ftp.us.debian.org
+   Proxy: [empty]
+
+Participate in Usage Survey: no
+
+Software Selection:
+	SSH Server
+
+Install Grub: yes
+	Device for boot: /dev/vda
+
+
+First Boot Setup (Clean Install)
+================================
+
+    apt-get install sudo
+    sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+   
+    sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/^#GRUB_TERMINAL/aGRUB_TERMINAL_INPUT="serial console"' \
+         -e '/^#GRUB_TERMINAL/aGRUB_TERMINAL_OUTPUT="serial console"' \
+         -e '/^#GRUB_TERMINAL/aGRUB_SERIAL_COMMAND="serial --unit=2 --speed=9600 --word=8 --parity=no --stop=1"' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=ttyS0,9600n8 console=tty0"/' \
+         /etc/default/grub
+                 
+    sed -i -e /^PermitRootLogin/s/without-password/yes/' \
+              /etc/ssh/sshd_config
+
+Build Tools Setup (build-ready)
+===============================
+
+    apt-get install -y build-essential autopoint automake autoconf gettext \
+                       libtool git gawk vim wget rsync gperf texinfo \
+                       pkg-config help2man libncurses-dev nano flex bison
