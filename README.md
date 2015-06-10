@@ -17,12 +17,16 @@ All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
     wget http://files.housegordon.org/pretest/v0.1/freebsd101.build-ready.qcow2.xz
     unxz freebsd101.build-ready.qcow2.xz
 
-    # Run with QEMU (press CTRL-A,C for QEMU-Monitor)
-    # Using 384MB of RAM, forwarding host TCP port 1025 to guest's 22.
+    # Run with QEMU (press CTRL-A,C for QEMU-Monitor),
+    # using 384MB of RAM,
+    # forwarding host TCP port 1025 to guest's 22,
+    # discarding any disk changes (-snapshot),
+    # and connecting the guest's serial port to the terminal.
     qemu-system-x86_64 --enable-kvm -m 384 \
         -nographic -nodefaults -snapshot \
         -net user,hostfwd=tcp:127.0.0.1:1025-:22 \
         -net nic,model=virtio \
+        -serial mon:stdio \
         -drive if=virtio,media=disk,index=0,file=freebsd101.build-ready.qcow2
 
 ## QEMU Wrapper script
