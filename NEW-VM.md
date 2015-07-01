@@ -129,8 +129,8 @@ Steps for adding a new VM/OS:
 
     meld web/ ../pretest-website/pretest/
 
-    Ensure that 'downloads/index.html' is NOT modified (or doesn't exist)
-    in ./web/ - it must be manually updated.
+    Ensure that 'index.htmk' 'downloads/index.html' are NOT modified
+    (or doesn't exist) in ./web/ - it must be manually updated.
 
 20. Update the website files:
 
@@ -138,6 +138,8 @@ Steps for adding a new VM/OS:
 
 21. manually update `../pretest-website/pretest/downloads/index.html` with
     the URLs and sizes of the new OS/vm.
+    manually update `../pretest-website/pretest/index.html` with
+    the version numbers of the new VMs.
 
 22. Inspect changes in source code 'git' repository, and commit the
     appropriate files:
