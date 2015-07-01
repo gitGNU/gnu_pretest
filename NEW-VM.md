@@ -34,17 +34,21 @@ Steps for adding a new VM/OS:
 
         sudo mv ~miles/pretest* /usr/local/bin/
         sudo chmod a+x /usr/local/bin/pretest-*
+        sudo chown root:root /usr/local/bin/pretest-*
 
 5. Add the `pretest-guest-init` script to the boot sequence (OS-specific)
 
 6. Boot the 'build-ready' VM in snapshot mode, and check the required programs:
 
-        make,gmake,cc,gcc,clang,autoconf,automake,autopoint,git,etc.
+        make,gmake,cc,gcc,clang,autoconf,automake,autopoint,git
+        bison,flex,patch
+        etc.
 
    Test building GNU packages, from tarballs and git:
 
         pretest-auto-build-check http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
         pretest-auto-build-check http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+        pretest-auto-build-check git://git.sv.gnu.org/coreutils.git
         pretest-auto-build-check git://git.sv.gnu.org/datamash.git
 
 7. Test the images with `--console` to ensure console log messages and getty
@@ -140,6 +144,8 @@ Steps for adding a new VM/OS:
     the URLs and sizes of the new OS/vm.
     manually update `../pretest-website/pretest/index.html` with
     the version numbers of the new VMs.
+    manually update `../pretest-website/pretest/vm-images.js` with
+    the new image information.
 
 22. Inspect changes in source code 'git' repository, and commit the
     appropriate files:
