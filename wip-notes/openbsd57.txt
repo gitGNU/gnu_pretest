@@ -1,0 +1,122 @@
+OpenBSD 5.7
+===========
+
+Wlecome to OpenBSD: (I)nstall
+Keyboard layout: [default]
+System Hostname: obsd57
+Network Interface: vio0
+IPv4: enable DHCP
+IPv6: none
+"which network interfaces do you wish to configure": "done"
+password for root account: 12345
+start sshd(8) by default: yes
+start ntpd(8) by default: no
+	
+Do you expect to run the X Window System? [yes] no
+Do you want the X Window System to be started by xdm(1)?: no
+change default console to com0: Yes
+	  Which speed should com0 use? (or 'done') [9600]
+
+Setup a user: yes - enter miles
+Password for user miles: 12345
+Disable ssh logins to root: no
+
+Which disk is the root disk?: sd0
+Use DUIDs rather than device names in fstab?: yes
+
+MBR has invalid signature; not showing it.
+Use (W)hole disk or (E)dit the MBR? [whole] 
+
+Disk Layout: (E)dit
+===
+ > p
+           OpenBSD area: 64-10474380; size: 10474316; free: 44
+           #                size           offset  fstype [fsize bsize  cpg]
+             a:          1953600               64  4.2BSD   2048 16384    1 # /
+             b:           524288          1953664    swap
+             c:         10485760                0  unused
+             d:          6291456          2477952  4.2BSD   2048 16384    1 # /usr
+             e:          1704928          8769408  4.2BSD   2048 16384    1 # /home
+           > d a
+           > d b
+           > d d
+	   > d e
+
+           > a a
+           offset: [64] 
+           size: [10474316] 4.3G
+           FS type: [4.2BSD] 
+           mount point: [none] /
+> p g
+           OpenBSD area: 64-10474380; size: 5.0G; free: 0.7G
+           #                size           offset  fstype [fsize bsize  cpg]
+             a:             4.3G               64  4.2BSD   2048 16384    1 # /
+             c:             5.0G                0  unused
+           > a b
+           offset: [9028512] 
+           size: [1445868]  
+           FS type: [swap] 
+  > p g
+           OpenBSD area: 64-10474380; size: 5.0G; free: 0.0G
+           #                size           offset  fstype [fsize bsize  cpg]
+             a:             4.3G               64  4.2BSD   2048 16384    1 # /
+             b:             0.7G          9028512    swap
+             c:             5.0G                0  unused
+        
+
+===
+Location of sets: [cd]
+ Which CD-ROM contains the install media? (or 'done') [cd0]
+Pathname to the sets? (or 'done') [5.7/amd64] 
+
+Set name(s)? (or 'abort' or 'done') :  -game57.tgz -xbase57.tgz -xshare57.tgz -xfont57.tgz -xserv57.tgz
+Directory does not contain SHA256.sig. Continue without verification? : yes
+             Installing bsd          100% |**************************|  9794 KB    00:01    
+           Installing bsd.rd       100% |**************************|  7414 KB    00:00
+           Installing base57.tgz   100% |**************************| 56035 KB    00:07    
+           Extracting etc.tgz      100% |**************************|   110 KB    00:00
+           Installing comp57.tgz   100% |**************************| 50045 KB    00:07    
+           Installing man57.tgz    100% |**************************|  8773 KB    00:01    
+           Location of sets? (cd disk http or 'done') [done] 
+
+
+What timezone are you in?: US/Eastern
+
+First Boot (clean-install)
+==========================
+
+echo "set timeout 1" >> /etc/boot.conf
+Enable Sudo without password for 'wheel' members
+
+sed '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers > /tmp/s \
+    && mv /tmp/s /etc/sudoers && chmod 0440 /etc/sudoers
+    
+    
+Build Tools (build-ready)
+=========================
+
+echo 'PKG_PATH="http://mirror.esc7.net/pub/OpenBSD/5.6/packages/$(machine -a)/"' >> .profile
+echo 'export PKG_PATH' >> .profile
+
+echo autoconf-2.69p1 automake-1.15 gperf wget nano help2man libtool \
+     xz rsync-3.1.1 git bison gmake | xargs -n1 pkg_add -v
+
+echo AUTOMAKE_VERSION=1.15 >> ~miles/.profile
+echo AUTOCONF_VERSION=2.69 >> ~miles/.profile
+echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
+
+pretest-auto-build-check
+========================
+add:
+
+    . /home/miles/.profile
+
+URLs
+====
+http://files.housegordon.org/pretest/v0.1/openbsd57.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/openbsd57.build-ready.qcow2.xz
+
+Sizes
+=====
+openbsd57.build-ready.qcow2.xz      83M   556M
+openbsd57.clean-install.qcow2.xz    71M   484M
