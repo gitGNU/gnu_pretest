@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<title>Hello from Flask</title>
+
+<style>
+table.reports {
+  white-space: nowrap;
+  font-family: "Courier New", Courier, monospace;
+  border-collapse: collapse;
+}
+table.reports tr:nth-child(2n) {
+background: #F0F0F0;
+}
+table.reports th {
+  text-align: left;
+}
+table.reports tr:hover {
+  background: #FF5599;
+}
+table.reports tr td {
+  padding-right: 1em;
+}
+
+div.status_ok {
+  background-color: #00FF00;
+}
+div.status_notok {
+  background-color: #FF0000;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Pretest Build Reports</h1>
+
+<table class="reports">
+ <thead>
+ <tr>
+   <th>Upload Time</th>
+   <th>Project</th>
+   <th>System</th>
+   <th>Status</th>
+   <th>Download logs</th>
+ </tr>
+ </thead>
+ <tbody>
+{% for r in reports %}
+<tr>
+  <td>{{ r.time }}</td>
+  <td>{{ r.basename }}</td>
+  <td>{{ r.system_id }}</td>
+  <td>
+    <div class="{% if r.status=="ok" %}status_ok{% else %}status_notok{% endif %}">
+    {{ r.status }}
+    </div>
+  </td>
+  <td><a href="./s/{{ r.id }}/{{r.basename}}.pretest-build-report.build-{{r.id}}.tar.gz">
+      {{r.basename}}.pretest-build-report.build-{{r.id}}.tar.gz</a></td>
+</tr>
+{% endfor %}
+</table>
+
+</body>
+</html>
