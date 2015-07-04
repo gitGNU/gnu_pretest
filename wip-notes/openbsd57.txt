@@ -95,7 +95,7 @@ sed '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers > /tmp/s \
 Build Tools (build-ready)
 =========================
 
-echo 'PKG_PATH="http://mirror.esc7.net/pub/OpenBSD/5.6/packages/$(machine -a)/"' >> .profile
+echo 'PKG_PATH="ftp://mirror.jmu.edu/pub/OpenBSD/5.6/packages/$(machine -a)/"' >> .profile
 echo 'export PKG_PATH' >> .profile
 
 echo autoconf-2.69p1 automake-1.15 gperf wget nano help2man libtool \
@@ -110,6 +110,9 @@ pretest-auto-build-check
 add:
 
     . /home/miles/.profile
+    
+Shuttdown command: shutdown -hp now
+
 
 URLs
 ====

@@ -74,6 +74,8 @@ Update software:
     dnf -y install wget gperf gettext-devel texinfo automake autoconf \
                    nano help2man ncurses-devel libtool bison flex patch
 
+    dnf -y install redhat-lsb-core
+    
 Use disk-based /tmp (instead of memory-based tmpfs) - For build-automation we use VMs with very little memory. (see http://fedoraproject.org/wiki/Features/tmp-on-tmpfs.)
 
     systemctl mask tmp.mount
