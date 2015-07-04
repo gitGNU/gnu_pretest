@@ -60,6 +60,7 @@ OPTIONS:
    -c PARAM    - Add PARAM as parameter to './configure'
    -m PARAM    - Add PARAM as parameter to 'make'
    -e NAME=VAL - Add NAME=VAL as environment variable to all commands.
+   -r URL      - upload logs and results to URL (with HTTP POST)
 
 NOTE:
   1. When building from tarball, will use './configure && make && make check'
@@ -111,27 +112,43 @@ report_system_versions()
     ## Report values for several 'uname' options
     for FLAG in -s -r -m -p -i -o -v ;
     do
-        printf "uname$FLAG: "
-        if uname $FLAG 2>/dev/null 1>/dev/null ; then
-            uname $FLAG
-        else
-            echo
-        fi
+        VAL=$(uname $FLAG 2>/dev/null)
+        echo "uname$FLAG: $VAL"
     done
 
     ## Report values for several 'lsb_release' options
     if which lsb_release 1>/dev/null 2>/dev/null ; then
         for FLAG in -v -i -d -r -c ;
         do
-            printf "lsb_release$FLAG: "
-            lsb_release -s $FLAG
+            VAL=$(lsb_release -s $FLAG 2>/dev/null)
+            echo "lsb_release$FLAG: $VAL"
         done
     else
         for FLAG in -v -i -d -r -c ;
         do
-            printf "lsb_release$FLAG: N/A"
+            echo "lsb_release$FLAG:"
         done
     fi
+}
+
+report_environment()
+{
+    echo "PATH=$PATH"
+    echo "SHELL=$SHELL"
+    echo "PWD=$PWD"
+
+    printf "hostname="
+    hostname
+}
+
+report_input()
+{
+    echo "SOURCE=$SOURCE"
+    echo "BASENAME=$BASENAME"
+    echo "configure_extra_params=$configure_params"
+    echo "make_extra_params=$make_params"
+    echo "env_extra_params=$env_params"
+    echo "git_branch=$git_branch"
 }
 
 
@@ -155,7 +172,8 @@ configure_params=
 make_params=
 env_params=
 git_branch=
-while getopts b:c:m:e:h name
+upload_report_url=
+while getopts r:b:c:m:e:h name
 do
         case $name in
         b)      git_branch="-b '$OPTARG'"
@@ -170,6 +188,8 @@ do
                 env_params="$env_PARAMS $OPTARG"
                 ;;
         h)      show_help=y
+                ;;
+        r)      upload_report_url=$OPTARG
                 ;;
         ?)      die "Try -h for help."
         esac
@@ -206,10 +226,8 @@ DIR=$(mktemp -d -t "${BASENAME}.XXXXXX") \
     || die "failed to create temporary directory"
 cd "$DIR" || exit 1
 
-BOOTSTRAP_LOG="$DIR/$BASENAME.bootstrap.log"
-CONFIGURE_LOG="$DIR/$BASENAME.configure.log"
-MAKE_LOG="$DIR/$BASENAME.make.log"
-MAKE_CHECK_LOG="$DIR/$BASENAME.make_check.log"
+LOGDIR="$DIR/logs"
+mkdir "$LOGDIR" || die "failed to create log directory '$LOGDIR'"
 
 ##
 ## Validate source (git, remote file, local file)
@@ -259,9 +277,10 @@ fi
 ##
 ## Report system information
 ##
-timestamp "START"
-report_system_versions
-
+timestamp "START" | tee "$LOGDIR/timestamp.start.txt"
+report_system_versions | tee "$LOGDIR/versions.txt"
+report_environment | tee "$LOGDIR/environment.txt"
+report_input | tee "$LOGDIR/input.txt"
 
 ##
 ## Extract the tarball (if needed)
@@ -279,41 +298,135 @@ if test -n "$TARBALL" ; then
     $COMPPROG -dc "$TARBALL" | tar -xf - \
         || die "failed to extract '$DIR/$TARBALL' (using $COMPPROG)"
 
-    SRCDIR=$(find . -maxdepth 1 -type d | tail -n 1)
+    SRCDIR=$(find . -maxdepth 1 -type d \! -name "logs" | tail -n 1)
     test -d "$SRCDIR" || die "failed to find source directory after " \
                              "extracting '$DIR/$TARBALL'"
-    cd "$SRCDIR" || exit 1
+    cd "$SRCDIR" || die "failed to cd into '$SRCDIR'"
 fi
 
 
 ##
 ## Clone the GIT repository (if needed)
 ##
+need_bootstrap=0
 if test -n "$GIT_REPO" ; then
     git clone $git_branch "$GIT_REPO" "$BASENAME" \
         || die "failed to clone '$GIT_REPO' to local directory '$BASENAME'"
-    cd $BASENAME || exit 1
+    cd $BASENAME || die "failed to cd into '$BASENAME'"
 
-    ## TODO:
-    ## accomodate for optional 'autogen.sh' or similar scripts
-    ./bootstrap || die "./bootstrap failed"
+    need_bootstrap=1
+
 fi
 
 ##
 ## common building steps
 ##
-./configure $configure_params || die "./configure failed"
+status=""
 
-make $make_params || die "make failed"
+## Run the build steps.
+## returns 0 if all steps succeeded.
+## returns 1 if a step failed, and sets 'status' to the failed step.
+do_build()
+{
+    ## TODO:
+    ## accomodate for optional 'autogen.sh' or similar scripts
+    if test "$need_bootstrap" -eq 1 ; then
+        if test -e "./bootstrap" ; then
+            { ./bootstrap 2>&1 && touch "$LOGDIR/bootstrap.ok" ; } \
+                | tee "$LOGDIR/bootstrap.sh"
 
-# TODO:
-# If make-check fails, post the test-suite.log somewhere
-make check || die "make-check failed"
+            if ! test -e "$LOGDIR/bootstrap.ok" ; then
+                status="bootstrap failed"
+                return 1
+            fi
+        fi
+    fi
+
+    ##
+    ## Configure
+    ##
+    { ./configure $configure_params 2>&1 && touch "$LOGDIR/configure.ok" ; } \
+         | tee "$LOGDIR/configure.log"
+
+    if ! test -e "$LOGDIR/configure.ok" ; then
+        status="configure failed"
+        return 1
+    fi
+
+
+    ##
+    ## Make
+    ##
+    { make $make_params 2>&1 && touch "$LOGDIR/make.ok" ; } \
+        | tee "$LOGDIR/make.log"
+
+    if ! test -e "$LOGDIR/make.ok" ; then
+        status="make failed"
+        return 1
+    fi
+
+    ##
+    ## Make check
+    ##
+    { make check VERBOSE=yes 2>&1 && touch "$LOGDIR/make-check.ok" ; } \
+        | tee "$LOGDIR/make-check.log"
+
+    if ! test -e "$LOGDIR/make-check.ok" ; then
+        status="make-check failed"
+        return 1
+    fi
+
+    status="ok"
+    return 0
+}
+
+
+##
+## Build the program
+##
+do_build
+build_ok=$?
+echo "$status" > "$LOGDIR/status"
+
+# Copy configure's output files into the log directory
+# Note: failure is silently ignored.
+for i in config.log config.status config.h ;
+do
+    test -e "$i" && cp "$i" "$LOGDIR/"
+done
+
+# Copy all files named 'test-suite.log', add sequence number to the filename
+# incase there's more than one.
+# NOTE: this assumes files do not have newlines (or other funky characters)
+idx=0
+find . -name "test-suite.log" | while read i  ;
+do
+    # convert ./tests/test-suite.log to test-suite.0.log
+    DST=$(basename "$i" .log).$idx.log
+    idx=$((idx+1))
+    cp "$i" "$LOGDIR/$DST"
+done
+
+#
+# Archive all the status/log files
+#
+TAR="$DIR/$BASENAME.pretest-build-report.tar.bz2"
+( cd "$DIR" ; tar -cf - logs/ ) | bzip2 -9 > "$TAR"
+
+#
+# Upload the report
+#
+if test "$upload_report_url" ; then
+    curl -F "a=@$TAR" "$upload_report_url" \
+        || echo "WARNING: failed to upload report '$TAR' to '$upload_report_url'" >&2
+fi
 
 ##
 ## Done
 ##
-# TODO: report completion ?
+echo "status = $status"
+echo "logdir = $LOGDIR"
+echo "logtar = $TAR"
 
 
 ## vim: set shiftwidth=4:
