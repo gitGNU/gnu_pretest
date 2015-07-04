@@ -41,7 +41,7 @@ Steps for adding a new VM/OS:
 6. Boot the 'build-ready' VM in snapshot mode, and check the required programs:
 
         make,gmake,cc,gcc,clang,autoconf,automake,autopoint,git
-        bison,flex,patch
+        bison,flex,patch,bzip2,curl,lsb_release
         etc.
 
    Test building GNU packages, from tarballs and git:
