@@ -129,6 +129,16 @@ report_system_versions()
             echo "lsb_release$FLAG:"
         done
     fi
+
+    ## First non-empty line of '/etc/release' - useful in some edge-cases
+    VAL=$(cat /etc/release 2>/dev/null \
+                | sed 's/^  *//' | sed 's/  *$//' | grep -v '^$' | head -n1)
+    echo "etc_release: $VAL"
+
+    ## First non-empty line of '/etc/issue' - useful in some edge-cases
+    VAL=$(cat /etc/issue 2>/dev/null \
+                | sed 's/^  *//' | sed 's/  *$//' | grep -v '^$' | head -n1)
+    echo "etc_issue: $VAL"
 }
 
 report_environment()
