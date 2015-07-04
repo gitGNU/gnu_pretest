@@ -18,6 +18,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os,sys,re,json,datetime,random,string
+import argparse
+from warnings import warn
+from datetime import date
 from subprocess import Popen,PIPE
 import yaml
 from flask import Flask, url_for, request, g,\
@@ -28,20 +31,32 @@ import tarfile
 import sqlite3
 import logging
 
-db_filename = "pretest.db"
-app_port = 5167
-storage_directory = "./tarfiles/"
+# These will be set by commandline parameters
+db_filename = None
+storage_directory = None
 
 app = Flask(__name__)
 base58 = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
 dbconn = None
 
 def tar_read_line(tar,filename):
+    """
+    Returns the first line from an archived file ('filename')
+    inside the tarfile object 'tar'.
+    """
     f = tar.extractfile(filename)
     l = f.readline().strip()
     return l
 
 def tar_read_dict(tar,filename,sep=":"):
+    """
+    Reads a text file 'filename' in the tarfile object 'tar'.
+    The file is assumed to have lines with separator 'sep', e.g.
+       foo: bar
+       hello: world
+
+    returns a dictionary of the items.
+    """
     f = tar.extractfile(filename)
     d = {}
     for l in f.readlines():
@@ -58,6 +73,26 @@ def get_system_id(ver_dict):
     uname_s  = ver_dict.get("uname-s","")
     uname_r  = ver_dict.get("uname-r","")
     uname_m  = ver_dict.get("uname-m","")
+    etc_release  = ver_dict.get("etc_release","")
+    etc_issue    = ver_dict.get("etc_release","")
+
+    # Few exceptions (not generic enough, customized
+    # for pretest VMs:
+    if uname_s == "GNU" and lsb_id == "Debian":
+        return "GNU Hurd %s (on debian %s) (%s)" % (uname_r, lsb_rel, uname_m)
+
+    if uname_s == "GNU/kFreeBSD" and lsb_id == "Debian":
+        return "kFreeBSD %s/Debian %s (%s)" % (uname_r, lsb_rel, uname_m)
+
+    # Fallback to '/etc/release' to tell OracleSolaris vs OpenIndiana
+    # and other OpenSolarises.
+    if uname_s == "SunOS":
+        provider = "Unknown"
+        if etc_release.lower().find("oracle") != -1:
+            provider = "Oracle"
+        elif etc_release.lower().find("openindiana") != -1:
+            provider = "OpenIndiana"
+        return "%s %s %s (%s)" % (provider, uname_s, uname_r, uname_m)
 
     # For GNU/Linuxes, 'lsb' contains the distribution name
     # and version, which is usually informative enough.
@@ -170,9 +205,13 @@ def index():
 select id,basename,system_id,status,
         datetime(timestamp, 'unixepoch', 'localtime') as time,
         tarfile
-    from pretest_reports order by timestamp desc
+    from pretest_reports order by timestamp desc limit 100
 ''')
     return render_template('index.html', reports=reports)
+
+@app.route("/tarhelp", methods=['GET'])
+def tarhelp():
+    return render_template('tarhelp.html')
 
 @app.route("/upload", methods=['POST'])
 def create():
@@ -229,9 +268,35 @@ def save_file(fileobj):
     app.logger.info("storing new file in: " + filepath)
     return Response(txt,mimetype="text/plain")
 
+def parse_commandline():
+    parser = argparse.ArgumentParser(description="""Pretest Report Server
+            Waits for build report uploads and displays results.
+
+            Copyright (C) 2015 Assaf Gordon.
+            License: AGPLv3-or-later.
+            """,
+            epilog="""see http://pretest.nongnu.org for details.
+            send questions/suggestions to pretest-users@nongnu.org .""")
+    parser.add_argument("-p", "--port",     help="TCP Port to listen on",
+                        type=int, default=5167)
+    parser.add_argument("-i", "--ip",       help="IP to listen on",
+                        default='127.0.0.1')
+    parser.add_argument("--debug",  action="store_true", help="Enable FLASK debugging (never enable on public server)")
+    parser.add_argument("-d", "--database",  help="sqlite3 database file",
+                        default='pretest.db')
+    parser.add_argument("-s", "--storage",  help="storage directory for tarball uploads",
+                        default='./tarfiles/')
+    args = parser.parse_args()
+    return args;
+
 if __name__ == "__main__":
-    dbconn = sqlite3.connect('pretest.db')
+    args = parse_commandline()
+
+    db_filename = args.database
+    storage_directory = args.storage
+
+    dbconn = sqlite3.connect(db_filename)
     create_pretest_db(dbconn)
 
-    app.run(host='0.0.0.0',port=app_port,debug=True)
+    app.run(host=args.ip, port=args.port, debug=args.debug)
 
