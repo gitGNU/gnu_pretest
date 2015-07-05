@@ -1,0 +1,158 @@
+================================================
+   PreTest 0.1: ./test-suite.log
+================================================
+
+# TOTAL: 579
+# PASS:  409
+# SKIP:  1
+# XFAIL: 0
+# FAIL:  1
+# XPASS: 0
+# ERROR: 0
+
+.. contents:: :depth: 2
+
+SKIP: tests/tail-2/inotify-race
+===============================
+
++ 'initial_cwd_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24'
++ fail=0
++ 'testdir_prefix_'
++ printf gt
++ 'pfx_=gt'
++ 'mktempd_' '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24' 'gt-inotify-race.sh.XXXX'
++ 'destdir_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24'
++ 'template_=gt-inotify-race.sh.XXXX'
++ 'MAX_TRIES_=4'
++ unset TMPDIR
++ 'd=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ test -d '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ ls -dgo '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ tr S -
++ 'perms=drwx------ 2 512 July   4 06:11 /tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ test 0 = 0
++ echo '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ return
++ 'test_dir_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ cd '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ 'gl_init_sh_nl_=
+'
++ 'IFS= 	
+'
++ expr 1 '+' 128
++ eval 'trap '\''Exit 129'\'' 1'
++ trap 'Exit 129' 1
++ expr 2 '+' 128
++ eval 'trap '\''Exit 130'\'' 2'
++ trap 'Exit 130' 2
++ expr 3 '+' 128
++ eval 'trap '\''Exit 131'\'' 3'
++ trap 'Exit 131' 3
++ expr 13 '+' 128
++ eval 'trap '\''Exit 141'\'' 13'
++ trap 'Exit 141' 13
++ expr 15 '+' 128
++ eval 'trap '\''Exit 143'\'' 15'
++ trap 'Exit 143' 15
++ trap 'remove_tmp_' 0
++ 'path_prepend_' './src'
++ test 1 '!=' 0
++ 'path_dir_=./src'
++ 'abs_path_dir_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/./src'
++ 'PATH=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/./src:/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/src:/usr/bin:/bin:/usr/pkg/bin:/sbin:/usr/sbin'
++ 'create_exe_shims_' '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/./src'
++ return 0
++ shift
++ test 0 '!=' 0
++ export PATH
++ 'print_ver_' tail
++ test yes = yes
++ local i
++ env tail --version
+tail (GNU coreutils) 8.24
+Copyright (C) 2015 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Paul Rubin, David MacKenzie, Ian Lance Taylor,
+and Jim Meyering.
++ touch file
++ touch 'tail.out'
++ cat 'gdb.out'
++ 'break_src=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/src/tail.c'
++ grep -n '^tail_forever_inotify' '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/src/tail.c'
++ 'break_line=1372:tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,'
++ echo '1372:tail_forever_inotify (int wd, struct File_spec *f, size_t n_files,'
++ cut '-d:' -f1
++ 'break_line=1372'
++ env sleep 10
++ sleep=3004
++ gdb -nx --batch-silent '--eval-command=break 1372' '--eval-command=run --pid=3004 -f file' --eval-command=quit tail
++ kill 3004
+kill: 3004: No such process
++ 'skip_' 'breakpoint not hit'
++ 'warn_' 'inotify-race.sh: skipped test: breakpoint not hit'
++ printf '%s\n' 'inotify-race.sh: skipped test: breakpoint not hit'
+inotify-race.sh: skipped test: breakpoint not hit
++ test 9 = 2
++ printf '%s\n' 'inotify-race.sh: skipped test: breakpoint not hit'
++ sed 1q
++ Exit 77
++ set '+e'
++ exit 77
++ exit 77
++ 'remove_tmp_'
++ '__st=77'
++ 'cleanup_'
++ kill
++ kill 3004
++ cd '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24'
++ chmod -R 'u+rwx' '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ rm -rf '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-inotify-race.sh.jqLL'
++ exit 77
+SKIP tests/tail-2/inotify-race.sh (exit status: 77)
+
+
+FAIL: tests/tail-2/retry
+========================
+
++ 'initial_cwd_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24'
++ fail=0
++ 'testdir_prefix_'
++ printf gt
++ 'pfx_=gt'
++ 'mktempd_' '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24' 'gt-retry.sh.XXXX'
++ 'destdir_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24'
++ 'template_=gt-retry.sh.XXXX'
++ 'MAX_TRIES_=4'
++ unset TMPDIR
++ 'd=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ test -d '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ ls -dgo '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ tr S -
++ 'perms=drwx------ 2 512 July   4 06:13 /tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ test 0 = 0
++ echo '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ return
++ 'test_dir_=/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ cd '/tmp/coreutils-8.24.XXXXXX.000469aa/coreutils-8.24/gt-retry.sh.66CP'
++ 'gl_init_sh_nl_=
+'
++ 'IFS=         
+'
++ expr 1 '+' 128
++ eval 'trap '\''Exit 129'\'' 1'
++ trap 'Exit 129' 1
++ expr 2 '+' 128
++ eval 'trap '\''Exit 130'\'' 2'
++ trap 'Exit 130' 2
++ expr 3 '+' 128
++ eval 'trap '\''Exit 131'\'' 3'
++ trap 'Exit 131' 3
++ expr 13 '+' 128
++ eval 'trap '\''Exit 141'\'' 13'
++ trap 'Exit 141' 13
++ expr 15 '+' 128
++ eval 'trap '\''Exit 143'\'' 15'
++ trap 'Exit 143' 15

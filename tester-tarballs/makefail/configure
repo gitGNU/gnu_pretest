@@ -1,0 +1,17 @@
+#!/bin/sh
+
+##
+## A configure file that will surely fail
+##
+
+echo "This is a dummy project for Pretest (http://pretest.gnu.org)."
+echo ""
+echo "It is designed to fail during the 'make' step (at it will)."
+
+
+echo "Creating 'Makefile'..."
+cp Makefile.in Makefile || exit 1
+
+echo "This is 'configure' - simulating success."
+
+exit 0

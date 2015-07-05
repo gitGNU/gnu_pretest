@@ -1,0 +1,42 @@
+
+.PHONY: all
+all: info
+	@echo "This is 'make' step - simulating success"
+
+.PHONY: info
+info:
+	@echo "This is a tester project for 'PreTest' (http://pretest.nongnu.org)"
+	@echo "It is designed to fail during the 'make check' step"
+	@echo "(AND to generate a test-suite.log)"
+	@echo ""
+
+.PHONY: check
+check: info info2
+
+.PHONY: info2
+info2:
+	@echo "This is 'make-check' step - generating 'test-suite.log'"
+	cp test-suite.template.log test-suite.log
+	@echo ""
+	@echo "================================================"
+	@echo "   PreTest 0.1: ./test-suite.log"
+	@echo "================================================"
+	@echo ""
+	@echo "# TOTAL: 579"
+	@echo "# PASS:  409"
+	@echo "# SKIP:  1"
+	@echo "# XFAIL: 0"
+	@echo "# FAIL:  1"
+	@echo "# XPASS: 0"
+	@echo "# ERROR: 0"
+	@echo ""
+	@echo "and simulating failure.... now:"
+	false
+
+.PHONY: clean
+clean:
+	rm -f Makefile test-suite.log
+
+.PHONY: distclean
+distclean:
+	rm -f Makefile test-suite.log

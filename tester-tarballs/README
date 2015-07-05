@@ -1,0 +1,4 @@
+This dummy 'projects' can be used to test the
+'pretest-auto-build-check' script.
+They are designed to fail at different stages of a typical
+autotools build commands (configure/make/make check).

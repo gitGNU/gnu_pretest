@@ -1,0 +1,25 @@
+
+.PHONY: all
+all: info
+	@echo "This is 'make' step - simulating success"
+
+.PHONY: info
+info:
+	@echo "This is a tester project for 'PreTest' (http://pretest.nongnu.org)"
+	@echo "It is designed to fail during the 'make check' step."
+	@echo ""
+
+.PHONY: check
+check: info info2 non-existing-file
+
+.PHONY: info2
+info2:
+	@echo "This is 'make-check' step - simulating failure.... now:"
+
+.PHONY: clean
+clean:
+	rm -f Makefile
+
+.PHONY: distclean
+distclean:
+	rm -f Makefile
