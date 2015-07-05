@@ -33,8 +33,8 @@ import sqlite3
 import logging
 
 # These will be set by commandline parameters
-db_filename = None
-storage_directory = None
+db_filename = "pretest.db"
+storage_directory = "./tarfiles/"
 
 app = Flask(__name__)
 base58 = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
