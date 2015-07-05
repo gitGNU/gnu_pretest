@@ -41,7 +41,12 @@ pre {
 
 <h1>Pretest Build Reports - Log tarball details</h1>
 
+<a href="{{url_for("index")}}">&larr; back to report list</a>
+<br/>
+<br/>
+
 For more information, see <a href="http://pretest.nongnu.org">http://pretest.nongnu.org</a>.
+<br/>
 <br/>
 
 The <a href="http://git.savannah.gnu.org/cgit/pretest.git/tree/misc_scripts/pretest-auto-build-check">
@@ -250,6 +255,20 @@ GNU coreutils 8.24: ./tests/test-suite.log
 # ERROR: 0
 ...</pre></td>
 </tr>
+
+<tr>
+  <td class="filename">./logs/tail-error.log</td>
+  <td>last 50 lines from the relevant log file (of the failed step)</td>
+  <td>Example: if <code>make check</code> failed, these will be the last
+      50 lines from <code>make-check.log</code></td>
+</tr>
+
+<tr>
+  <td class="filename">./logs/tests-suite-summary.log</td>
+  <td>The test counts and failed tests from <code>test-suite.log</code> files</td>
+  <td></td>
+</tr>
+
 
 </table>
 

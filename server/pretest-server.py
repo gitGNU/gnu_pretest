@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os,sys,re,json,datetime,random,string
 import argparse
+from collections import OrderedDict
 from warnings import warn
 from datetime import date
 from subprocess import Popen,PIPE
@@ -58,13 +59,24 @@ def tar_read_dict(tar,filename,sep=":"):
     returns a dictionary of the items.
     """
     f = tar.extractfile(filename)
-    d = {}
+    d = OrderedDict()
     for l in f.readlines():
         k,v = l.split(sep,1)
         k = k.strip()
         v = v.strip()
         d[k] = v
     return d
+
+def tar_read_file(tar,filename):
+    """
+    Reads a text file 'filename' in the tarfile object 'tar'.
+    returns the lines as a list
+    """
+    f = tar.extractfile(filename)
+    # TODO: this is very memory-inefficient. read line-by-line and filter?
+    lines = f.readlines()
+    lines = [line.strip() for line in lines]
+    return lines
 
 def get_system_id(ver_dict):
     lsb_id   = ver_dict.get("lsb_release-i","")
@@ -103,6 +115,36 @@ def get_system_id(ver_dict):
     # reported by uname usually corresponds with
     # the OS/distribution name.
     return "%s %s (%s)" % (uname_s, uname_r, uname_m)
+
+def filter_test_suite_log(lines):
+    # The first 11 lines are (always?) the same:
+    #   ================================================
+    #   GNU coreutils 8.24: ./tests/test-suite.log
+    #   ================================================
+    #
+    #   # TOTAL: 579
+    #   # PASS:  432
+    #   # SKIP:  147
+    #   # XFAIL: 0
+    #   # FAIL:  0
+    #   # XPASS: 0
+    #   # ERROR: 0
+    header = lines[:11]
+
+    l = header
+
+    # Iterate the rest of the lines, extract "FAIL" data
+    in_fail=False
+    for i in lines:
+         new_good_test = i.startswith("SKIP:") or i.startswith("PASS:") or i.startswith("XFAIL:") or i.startswith("XPASS")
+         new_bad_test  = i.startswith("FAIL:") or i.startswith("ERROR:")
+         if in_fail and new_good_test:
+            in_fail = False
+         if not in_fail and new_bad_test:
+            in_fail = True
+         if in_fail:
+            l.append(i)
+    return l
 
 def create_pretest_db(dbconn):
     # Create table
@@ -230,7 +272,7 @@ def create():
     txt = "missing POST parmater"
     return Response(txt,mimetype="text/plain"), 400
 
-@app.route("/s/<id>/<filename>")
+@app.route("/s/<int:id>/<filename>")
 def getfile(id,filename):
     try:
         id = int(id)
@@ -238,7 +280,7 @@ def getfile(id,filename):
         app.logger.error("got invalid ID: '%s'" % ( id ) )
         return Response("invalid ID"), 400
 
-    reports = query_db('select basename,tarfile from pretest_reports where id = %d' % (id),one=True)
+    reports = query_db('select id,basename,tarfile from pretest_reports where id = %d' % (id),one=True)
     if reports is None:
         app.logger.error("got invalid ID: '%s' (not found in DB)" % ( id ) )
         return Response("invalid ID"), 400
@@ -255,8 +297,67 @@ def getfile(id,filename):
     return send_from_directory(storage_directory, tarfile,as_attachment=True,
                                 attachment_filename=filename)
 
+@app.route("/d/<id>")
+def details(id):
+    try:
+        id = int(id)
+    except:
+        app.logger.error("got invalid ID: '%s'" % ( id ) )
+        return Response("invalid ID"), 400
+
+    reports = query_db('select * from pretest_reports where id = %d' % (id),one=True)
+    if reports is None:
+        app.logger.error("got invalid ID: '%s' (not found in DB)" % ( id ) )
+        return Response("invalid ID"), 400
+
+    tarfilename = reports['tarfile']
+
+    filepath = os.path.join(storage_directory,tarfilename)
+    if not os.path.exists(filepath):
+        app.logger.error("got non-existing ID: '%s'" % ( id ) )
+        return Response("invalid ID"), 400
+
+    tar = tarfile.open(filepath, "r:bz2")
+    status = tar_read_line(tar,"logs/status")
+
+    versions = tar_read_dict(tar,"logs/versions.txt",":")
+    environment = tar_read_dict(tar,"logs/environment.txt","=")
+    inputs = tar_read_dict(tar,"logs/input.txt","=")
+    sys_id = get_system_id(versions)
+
+    log_tail_filename = ""
+    log_tail = ""
+    try:
+        log_tail = tar_read_file(tar,"logs/tail-error.log")
+        log_tail = "\n".join(log_tail)
+        log_tail_filename = "tail-error.log"
+    except:
+        pass
+
+    test_log_filename = ""
+    test_log_lines = ""
+    try:
+        test_log_lines = tar_read_file(tar,"logs/tests-suite-summary.log")
+        test_log_lines = "\n".join(test_log_lines)
+        test_log_filename = "tests-suite-summary.log"
+    except:
+        pass
+
+    tar.close()
+
+    return render_template('details.html',
+                build=reports,
+                versions=versions,
+                environment=environment,
+                inputs=inputs,
+                log_tail=log_tail,
+                log_tail_filename=log_tail_filename,
+                test_log_filename=test_log_filename,
+                test_log_lines=test_log_lines
+            )
+
 def save_file(fileobj):
-    filepath = get_random_id(storage_directory)
+    filepath = get_random_id(storage_directory) + ".tar.bz2"
     fileobj.save(filepath)
     id = os.path.basename(filepath)
 
@@ -264,7 +365,7 @@ def save_file(fileobj):
     add_tar_to_db(tar,id)
     tar.close()
 
-    txt = url_for("getfile", _external=True, id=id, filename="dummy.tar.bz2") + "\n"
+    txt = url_for("getfile", _external=True, id=1, filename="dummy.tar.bz2") + "\n"
     app.logger.info("storing new file in: " + filepath)
     return Response(txt,mimetype="text/plain")
 

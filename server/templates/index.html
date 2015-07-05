@@ -16,7 +16,7 @@ table.reports th {
   text-align: left;
 }
 table.reports tr:hover {
-  background: #FF5599;
+  background: #FFCCee;
 }
 table.reports tr td {
   padding-right: 1em;
@@ -28,6 +28,11 @@ div.status_ok {
 div.status_notok {
   background-color: #FF0000;
 }
+
+a.build {
+  text-decoration: none;
+}
+
 </style>
 
 </head>
@@ -36,10 +41,14 @@ div.status_notok {
 
 <h1>Pretest Build Reports</h1>
 
+For more information see <a href="http://pretest.nongnu.org">
+http://pretest.nongnu.org</a>.<br/>
+<br/>
+
 <table class="reports">
  <thead>
  <tr>
-   <th>Upload Time</th>
+   <th>Upload Time<br/><small>click for details</small></th>
    <th>Project</th>
    <th>System</th>
    <th>Status</th>
@@ -49,7 +58,7 @@ div.status_notok {
  <tbody>
 {% for r in reports %}
 <tr>
-  <td>{{ r.time }}</td>
+  <td><a class="build" href="{{url_for("details",id=r.id)}}">{{ r.time }}</a></td>
   <td>{{ r.basename }}</td>
   <td>{{ r.system_id }}</td>
   <td>

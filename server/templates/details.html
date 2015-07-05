@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<title>PreTest Build Reports - build {{ build.id }} details</title>
+
+<style>
+table.details {
+  white-space: nowrap;
+  font-family: "Courier New", Courier, monospace;
+  border-collapse: collapse;
+}
+table.details tr:nth-child(2n) {
+background: #F0F0F0;
+}
+table.details th {
+  text-align: left;
+}
+table.details tr td {
+  padding-right: 1em;
+}
+
+div.status_ok {
+  background-color: #00FF00;
+}
+div.status_notok {
+  background-color: #FF0000;
+}
+
+a.build {
+  text-decoration: none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Pretest Build Reports - Build {{ build.id }} details</h1>
+
+For more information see <a href="http://pretest.nongnu.org">
+http://pretest.nongnu.org</a>.<br/>
+<br/>
+
+<a href="{{url_for("index")}}">&larr; back to list</a>
+<br/>
+<br/>
+
+<table class="details">
+
+<tr>
+  <th>Project:</th>
+  <td>{{ build.basename }}</td>
+</tr>
+<tr>
+  <th>Source:</th>
+  <td>{{ inputs.SOURCE }}</td>
+</tr>
+<tr>
+  <th>System:</th>
+  <td>{{ build.system_id }}</td>
+</tr>
+<tr>
+  <th>Status:</th>
+  <td>
+    <div class="{% if build.status=="ok" %}status_ok{% else %}status_notok{% endif %}">
+    {{ build.status }}
+    </div>
+  </td>
+</tr>
+<tr>
+  <th>Download logs (<a href="{{url_for("tarhelp")}}">what's inside?</a>)</th>
+  <td><a href="{{ url_for("getfile",id=build.id,
+                          filename=build.basename+".pretest-build-report.build-"~build.id~".tar.gz")}}">
+      {{build.basename}}.pretest-build-report.build-{{build.id}}.tar.gz</a></td>
+</tr>
+
+{% if test_log_filename %}
+<tr>
+  <th>Failed tests from <code>{{test_log_filename}}</code>:</th>
+  <td><pre>{{ test_log_lines }}</pre></td>
+</tr>
+{% endif %}
+
+{% if log_tail_filename %}
+<tr>
+  <th>Last lines of <code>{{log_tail_filename}}</code>:</th>
+  <td><pre>{{ log_tail }}</pre></td>
+</tr>
+{% endif %}
+</table>
+
+
+<h2>Build host information</h2>
+
+<table class="details">
+{% for k in versions %}
+<tr>
+  <th>{{ k }}</th>
+  <td>{{ versions[k] }}</td>
+</tr>
+{% endfor %}
+{% for k in environment %}
+<tr>
+  <th>{{ k }}</th>
+  <td>{{ environment[k] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+
+</table>
+
+</body>
+</html>
