@@ -22,6 +22,14 @@
 ## a tarball (after 'make dist') or git repository.
 ##
 
+# Terrible hack for OpenSolaris:
+# The default grep,tail are not posix complient (doesn't support -E/-n)
+# And find doesn't support '-maxdepth'
+if test SunOS = "$(uname -s)" && test -d /usr/gnu/bin ; then
+    PATH=/usr/gnu/bin:$PATH
+    export PATH
+fi
+
 die()
 {
     BASE=$(basename "$0")
@@ -133,12 +141,12 @@ report_system_versions()
     ## First non-empty line of '/etc/release' - useful in some edge-cases
     VAL=$(cat /etc/release 2>/dev/null \
                 | sed 's/^  *//' | sed 's/  *$//' | grep -v '^$' | head -n1)
-    echo "etc_release: $VAL"
+    printf "etc_release: %s\n" "$VAL"
 
     ## First non-empty line of '/etc/issue' - useful in some edge-cases
     VAL=$(cat /etc/issue 2>/dev/null \
                 | sed 's/^  *//' | sed 's/  *$//' | grep -v '^$' | head -n1)
-    echo "etc_issue: $VAL"
+    printf "etc_issue: %s\n" "$VAL"
 }
 
 report_environment()
@@ -343,7 +351,7 @@ do_build()
     if test "$need_bootstrap" -eq 1 ; then
         if test -e "./bootstrap" ; then
             { ./bootstrap 2>&1 && touch "$LOGDIR/bootstrap.ok" ; } \
-                | tee "$LOGDIR/bootstrap.sh"
+                | tee "$LOGDIR/bootstrap.log"
 
             if ! test -e "$LOGDIR/bootstrap.ok" ; then
                 status="bootstrap failed"
@@ -390,6 +398,25 @@ do_build()
     return 0
 }
 
+##
+## Reads a standard autotools test-suite.log file,
+## extracts the header (number of tests passed/skipped/failed/etc.)
+## and the content of each failed tests (after "FAIL: XXX" line)
+##
+## The overly-verbose awk script works nicely on all sorts of systems
+## (especially non-gnu awk on FreeBSD/NetBSD/Oracle-Solaris) -
+## so don't try to make it more concise.
+extract_failed_test_log()
+{
+    awk 'NR<=12 {print}
+        ($1=="SKIP:" || $1=="PASS:" || $1=="XPASS:" || $1=="XFAIL:") { new_good_test=1 }
+        ($1=="FAIL:" || $1=="ERROR:") { new_bad_test=1 }
+        in_fail==1 && new_good_test==1 { in_fail=0 }
+        in_fail==0 && new_bad_test==1 { in_fail=1 }
+        in_fail==1 { print }
+        1==1 { new_bad_test=0; new_good_test=0 ; }' "$@"
+}
+
 
 ##
 ## Build the program
@@ -415,7 +442,30 @@ do
     DST=$(basename "$i" .log).$idx.log
     idx=$((idx+1))
     cp "$i" "$LOGDIR/$DST"
+
+    # Summarized the tests, keeping only failed tests
+    extract_failed_test_log "$i" >> "$LOGDIR/tests-suite-summary.log"
 done
+
+# Lazy-mode on:
+# If the build failed, extract the tail of the relevant log file
+# into a new file (saves 10 seconds of finding the relevant file and
+# scrolling down...)
+extract_error_tail()
+{
+    echo "$1 failed, tail of $1.log:" > "$LOGDIR/tail-error.log"
+    echo >> "$LOGDIR/tail-error.log"
+    tail -n 50 "$LOGDIR/$1.log" >> "$LOGDIR/tail-error.log"
+}
+if test "$status" = "bootstrap failed" ; then
+    extract_error_tail bootstrap
+elif test "$status" = "configure failed" ; then
+    extract_error_tail configure
+elif test "$status" = "make failed" ; then
+    extract_error_tail make
+elif test "$status" = "make-check failed" ; then
+    extract_error_tail make-check
+fi
 
 #
 # Archive all the status/log files
@@ -438,6 +488,8 @@ echo "status = $status"
 echo "logdir = $LOGDIR"
 echo "logtar = $TAR"
 
+# Exit with the relevant error code (from 'make check')
+exit $build_ok
 
 ## vim: set shiftwidth=4:
 ## vim: set tabstop=4:
