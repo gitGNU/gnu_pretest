@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2014 Assaf Gordon (assafgordon@gmail.com)
+# Copyright (C) 2014-2015 Assaf Gordon (assafgordon@gmail.com)
 #
 # This file is part of PreTest
 #
@@ -18,11 +18,11 @@
 # along with PreTest If not, see <http://www.gnu.org/licenses/>.
 
 NAME=opensuse132
-ISO_URL=http://mirror.metrocast.net/opensuse/distribution/12.3/iso/openSUSE-12.3-NET-x86_64.iso
+ISO_URL=http://download.opensuse.org/distribution/13.2/iso/openSUSE-13.2-NET-x86_64.iso
 ISO_FILE=$(basename "$ISO_URL")
 INSECURE_DOWNLOAD=yes
 QCOW2_SIZE=5G
-RAM=512
+RAM=1024
 QCOW2_FILE="$NAME.qcow2"
 
 die() { BASE=$(basename "$0") ; echo "$BASE: error: $@" >&2 ; exit 1 ; }
@@ -51,7 +51,7 @@ kvm -name "$NAME" \
     -drive file="$QCOW2_FILE",if=virtio,media=disk,index=0 \
     -cdrom "$ISO_FILE" \
     -redir tcp:2222::22 \
-    -vga cirrus
+    -vga std
 
 ## vim: set shiftwidth=4:
 ## vim: set tabstop=4:
