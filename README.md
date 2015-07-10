@@ -129,7 +129,7 @@ Read the manual for detailed setup information and usage examples:
 * Trisquel 6.0.1 (based on Ubuntu 12.04 LTS), 7 (=Ubuntu 14.04.1 LTS)
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
 * FreeBSD 10.1, 10, 9.3
-* NetBSD 6.1.4
+* NetBSD 6.1.4, 7.0_RC1
 * OpenBSD 5.5, 5.6, 5.7
 * GNU-Hurd (Debian/Hurd) 0.5, 0.6
 * MINIX R3.3.0

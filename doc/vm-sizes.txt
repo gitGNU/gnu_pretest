@@ -30,6 +30,8 @@ hurd06.build-ready.qcow2.xz         304M  1.6G
 hurd06.clean-install.qcow2.xz       233M  1.3G
 minixR330.clean-install.qcow2.xz    44M   462M
 minixR330.build-ready.qcow2.xz      307M  1.2G
+netbsd7rc1.build-ready.qcow2.xz     201M  955M
+netbsd7rc1.clean-install.qcow2.xz   138M  721M
 netbsd614.build-ready.qcow2.xz      216M  909M
 netbsd614.clean-install.qcow2.xz    119M  646M
 openbsd55.build-ready.qcow2.xz      250M  830M
