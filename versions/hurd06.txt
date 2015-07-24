@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.14.1
+autopoint-version: /usr/bin/autopoint (GNU gettext-tools) 0.19.3
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: GNU Make 4.0
+gmake-version: missing
+makeinfo-version: makeinfo (GNU texinfo) 5.2
+git-version: git version 2.1.4
+wget-version: GNU Wget 1.16.3 built on gnu.
+rsync-version: rsync  version 3.1.1  protocol version 31
+gcc-version: gcc (Debian 4.9.2-10) 4.9.2
+cc-version: cc (Debian 4.9.2-10) 4.9.2
+uname-s: GNU
+uname-r: 0.6
+uname-m: i686-AT386
+uname-p: unknown
+uname-i: unknown
+uname-o: GNU
+uname-v: GNU-Mach 1.4+git20150409-486/Hurd-0.6
