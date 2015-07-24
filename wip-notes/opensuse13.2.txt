@@ -1,0 +1,71 @@
+Installation
+------------
+
+Requires 1GB ram to install
+(a warning about low-memory and possible failures appears otherwise)
+
+On Installation boot screen:
+ click F3 to select TEXT MODE (saves a lot of pain)
+
+Add Online Repositories Before Installation - yes
+
+Click "Edit Proposal Settings"
+In the opened dialog window, select:
+  NO lvm
+  file system for Root partition: BtrFS
+  NO enable snapshot
+  NO separate home partition
+  NO enable swap for suspend
+
+Repositories:
+  MAIN (OSS)
+  Official Updates (OSS)
+
+Desktop Selection:
+  Other -> Minimal Server Selection (text mode)
+
+===
+user;s full name: miles
+username: miles
+password: 12345
+==
+Firewall settings:
+	Disable Firewall
+	Enable SSH Server
+
+=== Clean Install
+
+Add user miles to the 'sudo' group, enable sudo without password:
+
+    usermod -g wheel miles
+    sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+
+Enable Console on serial port, reduce boot-loader timeout to 1 second:
+
+sed -i -e '/^GRUB_CMDLINE_LINUX_DEFAULT=/ { s/splash=silent/splash=0/ ; s/quiet// ; s/"$/ text nomodeset console=tty0 console=ttyS0,9600n8"/ }' \
+         -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/GRUB_BACKGROUND=/s/^/#/' \
+         -e '/GRUB_THEME=/s/^/#/' \
+         -e '/GRUB_TERMINAL=/s/^/#/' \
+         -e '/^#GRUB_TERMINAL/aGRUB_TERMINAL_INPUT="serial console"' \
+         -e '/^#GRUB_TERMINAL/aGRUB_TERMINAL_OUTPUT="serial console"' \
+         -e '/^#GRUB_TERMINAL/aGRUB_SERIAL_COMMAND="serial --unit=0 --speed=9600 --word=8 --parity=no --stop=1"' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=ttyS0,9600n8 console=tty0"/' \
+
+         /etc/default/grub
+
+Update GRUB boot-loader configuration:
+
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+
+Install LSB_RELEASE:
+  zypper install lsb-release
+
+=== Build-Ready
+
+zypper update
+zypper install -y gcc gcc-c++
+zypper install -y -y git automake autoconf bison xz rsync flex
+zypper install -y makeinfo gperf make nano help2man patch
+zypper install -y libtool ncurses-devel gettext-tools gettext-runtime
+
