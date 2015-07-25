@@ -8,3 +8,19 @@ images/*.qcow2.xz
 images/*.iso.xz
 images/*.qcow2
 images/*.iso
+
+# Python server related data files
+server/pretest-server.pyc
+server/pretest.db
+server/tarfiles
+
+# compressed VM images (same as available for download)
+images-v0.1/
+
+# Uncompressed VM images
+workdir/
+
+# Installation CD/DVD ISO files
+install-iso-images/
+
+
