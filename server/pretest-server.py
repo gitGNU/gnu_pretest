@@ -78,7 +78,7 @@ def tar_read_file(tar,filename):
     lines = [line.strip() for line in lines]
     return lines
 
-def get_system_id(ver_dict):
+def get_system_id(ver_dict, inputs_dict):
     lsb_id   = ver_dict.get("lsb_release-i","")
     lsb_rel  = ver_dict.get("lsb_release-r","")
     lsb_desc = ver_dict.get("lsb_release-d","")
@@ -88,33 +88,60 @@ def get_system_id(ver_dict):
     etc_release  = ver_dict.get("etc_release","")
     etc_issue    = ver_dict.get("etc_release","")
 
+    custom_config_params = inputs_dict.get("configure_extra_params","")
+    custom_cc = ""
+    t = re.findall(r'(CC=[^ ]+)',custom_config_params)
+    if t:
+        custom_cc = t[0]
+
+    sys_id = ""
+
+    # Find the optimal (most informative) short description
+    # for a given system.
+
     # Few exceptions (not generic enough, customized
     # for pretest VMs:
     if uname_s == "GNU" and lsb_id == "Debian":
-        return "GNU Hurd %s (on debian %s) (%s)" % (uname_r, lsb_rel, uname_m)
+        # GNU Hurd uses 'GNU' is kernel name,
+        # but that's not informative enough.
+        sys_id = "GNU Hurd %s (on debian %s)" % (uname_r, lsb_rel)
 
-    if uname_s == "GNU/kFreeBSD" and lsb_id == "Debian":
-        return "kFreeBSD %s/Debian %s (%s)" % (uname_r, lsb_rel, uname_m)
+    elif uname_s == "GNU/kFreeBSD" and lsb_id == "Debian":
+        # Debian/kFreeBSD has 'lsb', but the kernel isn't linux,
+        # so handle it specially
+        sys_id = "kFreeBSD %s/Debian %s" % (uname_r, lsb_rel)
 
-    # Fallback to '/etc/release' to tell OracleSolaris vs OpenIndiana
-    # and other OpenSolarises.
-    if uname_s == "SunOS":
+    elif uname_s == "SunOS":
+        # For SunOS (=solaris), tell apart Oracle vs OpenIndiana vs others.
+        # 'uname' on SunOS is not helpful enough.
         provider = "Unknown"
         if etc_release.lower().find("oracle") != -1:
             provider = "Oracle"
         elif etc_release.lower().find("openindiana") != -1:
             provider = "OpenIndiana"
-        return "%s %s %s (%s)" % (provider, uname_s, uname_r, uname_m)
+        sys_id = "%s %s %s" % (provider, uname_s, uname_r)
 
-    # For GNU/Linuxes, 'lsb' contains the distribution name
-    # and version, which is usually informative enough.
-    if lsb_id and lsb_rel:
-        return "%s %s (%s)" % (lsb_id, lsb_rel, uname_m)
+    elif lsb_id and lsb_rel:
+        # For GNU/Linuxes, 'lsb' contains the distribution name
+        # and version, which is usually informative enough.
+        sys_id = "%s %s" % (lsb_id, lsb_rel)
 
-    # For other OSes, the kernel name and version
-    # reported by uname usually corresponds with
-    # the OS/distribution name.
-    return "%s %s (%s)" % (uname_s, uname_r, uname_m)
+    else:
+        # For other OSes, the kernel name and version
+        # reported by uname usually corresponds with
+        # the OS/distribution name.
+        sys_id = "%s %s" % (uname_s, uname_r)
+
+    # Now add the machine type.
+    sys_id = sys_id + " (" + uname_m
+
+    # If a non-default compiler was used, mention it
+    if custom_cc:
+        sys_id = sys_id + "," + custom_cc
+
+    sys_id = sys_id +")"
+
+    return sys_id
 
 def filter_test_suite_log(lines):
     # The first 11 lines are (always?) the same:
@@ -178,7 +205,7 @@ def add_tar_to_db(tar,filename_on_disk):
     versions = tar_read_dict(tar,"logs/versions.txt",":")
     inputs = tar_read_dict(tar,"logs/input.txt","=")
 
-    sys_id = get_system_id(versions)
+    sys_id = get_system_id(versions, inputs)
     values = [
             versions.get("uname-s",""),
             versions.get("uname-r",""),
@@ -323,7 +350,7 @@ def details(id):
     versions = tar_read_dict(tar,"logs/versions.txt",":")
     environment = tar_read_dict(tar,"logs/environment.txt","=")
     inputs = tar_read_dict(tar,"logs/input.txt","=")
-    sys_id = get_system_id(versions)
+    sys_id = get_system_id(versions, inputs)
 
     log_tail_filename = ""
     log_tail = ""
