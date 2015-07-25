@@ -25,8 +25,8 @@
 # Terrible hack for OpenSolaris:
 # The default grep,tail are not posix complient (doesn't support -E/-n)
 # And find doesn't support '-maxdepth'
-if test SunOS = "$(uname -s)" && test -d /usr/gnu/bin ; then
-    PATH=/usr/gnu/bin:$PATH
+if test SunOS = "$(uname -s)" ; then
+    PATH=/usr/gnu/bin:/usr/xpg6/bin:/usr/xpg4/bin/:/opt/csw/bin:usr/sfw/bin:$PATH
     export PATH
 fi
 
@@ -40,7 +40,7 @@ die()
 validate_simple_name()
 {
     # ensure the name contains only 'simple' characters
-    ___tmp1=$(echo "$1" | tr -d -c '[:alnum:].\-_%^')
+    ___tmp1=$(echo "$1" | tr -d -c 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._%^-')
     test "x$1" = "x${___tmp1}" \
     || die "name '$1' contains non-regular characters; " \
            "Aborting to avoid potential troubles. " \
@@ -316,7 +316,7 @@ if test -n "$TARBALL" ; then
     $COMPPROG -dc "$TARBALL" | tar -xf - \
         || die "failed to extract '$DIR/$TARBALL' (using $COMPPROG)"
 
-    SRCDIR=$(find . -maxdepth 1 -type d \! -name "logs" | tail -n 1)
+    SRCDIR=$(find . -type d \! -name "logs" | grep -v '^\.$' | sort | head -n 1)
     test -d "$SRCDIR" || die "failed to find source directory after " \
                              "extracting '$DIR/$TARBALL'"
     cd "$SRCDIR" || die "failed to cd into '$SRCDIR'"
@@ -471,7 +471,7 @@ fi
 # Archive all the status/log files
 #
 TAR="$DIR/$BASENAME.pretest-build-report.tar.bz2"
-( cd "$DIR" ; tar -cf - logs/ ) | bzip2 -9 > "$TAR"
+( cd "$DIR" ; tar -cf - logs ) | bzip2 -9 > "$TAR"
 
 #
 # Upload the report
