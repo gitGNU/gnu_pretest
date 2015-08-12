@@ -1,0 +1,209 @@
+MirBSD 10
+=========
+
+URL: https://www.mirbsd.org/MirOS/current/cdrom10.iso
+Requires "ide" disk, can't use "virtio".
+
+Installation manual: https://www.mirbsd.org/htman/i386/man7/install.i386.htm
+
+HTTP Mirror URL: http://www.mirbsd.org/MirOS/current/i386/
+
+Installation:
+  Type: (I)nstall
+  Terminal: vt220
+  Kbd mapping: none
+  Proceed with Install? yes
+  
+  Which disk: wd0
+  use *all* of wd0: yes
+
+Disk editor (uses all disk by default):
+====
+> p g
+device: /dev/rwd0c
+type: ESDI
+disk: ESDI/IDE disk
+label: QEMU HARDDISK   
+bytes/sector: 512
+sectors/track: 63
+tracks/cylinder: 16
+sectors/cylinder: 1008
+cylinders: 10402
+total bytes: 5.0G
+free bytes: 5.0G
+rpm: 3600
+
+16 partitions:
+#             size        offset  fstype [fsize bsize  cpg]
+  a:          5.0G          0.0G  unused      0     0      
+  c:          5.0G          0.0G  unused      0     0      
+> a a
+offset: [63] 
+size: [10474317] 4.7G
+Rounding to nearest cylinder: 9856161
+FS type: [4.2BSD] 
+mount point: [none] /
+> a b
+offset: [9856224] 
+size: [618156] 
+FS type: [swap] 
+> p g
+device: /dev/rwd0c
+type: ESDI
+disk: ESDI/IDE disk
+label: QEMU HARDDISK   
+bytes/sector: 512
+sectors/track: 63
+tracks/cylinder: 16
+sectors/cylinder: 1008
+cylinders: 10402
+total bytes: 5.0G
+free bytes: 0.0G
+rpm: 3600
+
+16 partitions:
+#             size        offset  fstype [fsize bsize  cpg]
+  a:          4.7G          0.0G  4.2BSD   2048 16384   16 # /
+  b:          0.3G          4.7G    swap                   
+  c:          5.0G          0.0G  unused      0     0      
+> w
+> q
+====
+
+The next step *DESTROYS* all existing data on these partitions!
+Are you really sure that you're ready to proceed? [no]  yes
+
+System hostname: mirbsd10
+configure network: yes
+Available interfaces are: em0 plip0 irip0 irip1.
+Which one do you wish to initialise? (or 'done') [em0] 
+The media options for em0 are currently
+        media: Ethernet autoselect (1000baseT full-duplex)
+Do you want to change the media options? [no] 
+
+IPv4 address for em0? (or 'none' or 'dhcp') dhcp
+Issuing hostname-associated DHCP request for em0.
+DHCPDISCOVER on em0 to 255.255.255.255 port 67 interval 1
+DHCPDISCOVER on em0 to 255.255.255.255 port 67 interval 1
+DHCPDISCOVER on em0 to 255.255.255.255 port 67 interval 2
+DHCPOFFER from 10.0.2.2
+DHCPOFFER from 10.0.2.2
+DHCPOFFER already seen.
+DHCPREQUEST on em0 to 255.255.255.255 port 67
+DHCPACK from 10.0.2.2
+bound to 10.0.2.15 -- renewal in 43200 seconds.
+IPv6 address for em0? (or 'rtsol' or 'none') [none]
+Available interfaces are: plip0 irip0 irip1.
+Which one do you wish to initialise? (or 'done') [plip0] done
+
+DNS domain name? (e.g. 'bar.com') [my.domain] 
+DNS nameserver? (IP address or 'none') [10.0.2.3] 
+Use the nameserver now? [yes] 
+Default IPv4 route? (IPv4 address, 'dhcp' or 'none') [dhcp] 
+Edit hosts with ed? [no] 
+Do you want to do any manual network configuration? [no] 
+
+Location of sets? (cd disk ftp http shttp nfs or 'done') [cd] http
+HTTP/FTP proxy URL? (e.g. 'http://proxy:8080', or 'none') [none] 
+Server? (IP address, hostname or 'done'): [www.mirbsd.org]
+Server directory? [MirOS/current/i386] 
+
+Select sets by entering a set name, a file name pattern or 'all'. De-select
+sets by prepending a '-' to the set name, file name pattern or 'all'. Selected
+sets are labelled '[x]'.
+
+        [X] bsd
+        [ ] bsd.rd
+        [X] base10.ngz
+        [X] etc10.ngz
+        [X] gnu10.ngz
+        [X] dev10.ngz
+        [ ] ada10.ngz
+        [ ] xbase10.ngz
+        [ ] xetc10.ngz
+        [ ] unfree10.ngz
+        [ ] pkgutl10.ngz
+        [ ] ports10.ngz
+        [ ] source10.ngz
+        [ ] xfree10.ngz
+	[X] fixes10.ngz
+	[ ] site10.ngz
+===
+Set name? (or 'done') [bsd.rd]  pkgutl10.ngz
+
+Set name? (or 'done') done
+Ready to install sets? [yes] yes
+----
+Start sshd(8) by default: yes
+Start ntpd(8) by default: yes
+RSA Host key have (or 'done')? [4096]
+run X window system? [no]
+
+Change the default console to com0? [yes]
+Speed for com0? [9600]
+
+User name? [miles]
+full name? [miles]
+password: 12345
+Everything OK? [yes]
+Timezone? [UTC]
+
+----- dropped to shell upon completion:
+
+# sync
+# reboot
+======
+To shutdown:
+   sudo halt -p
+   
+===
+
+# Enable sudo without password:
+
+   sed -e '/^%wheel/s/^/#/' \
+       -e '/# %wheel.*NOPASSWD/s/^# //' /etc/sudoers > /tmp/sudoers.t
+   mv /tmp/sudoers.t /etc/sudoers 
+   chmod 0440 /etc/sudoers
+   chown root:wheel /etc/sudoers
+
+# Reduce boot timeout
+   echo "set timeout 1" >> /boot.cfg
+
+==== Build-Ready
+
+See available packages (and versions) here:
+   https://www.mirbsd.org/Pkgs/current/i386/
+   
+Install with:
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/bzip2-1.0.6-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/curl-7.18.2-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/autoconf-2.61-1.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/automake-1.9.6-6.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/ca-certificates-201403292100-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/gcc-4.4.7-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/rsync-3.0.9-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/xz-5.0.4-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/gmake-3.81-0.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/git-1.6.3.1-1.cgz
+   sudo pkg_add https://www.mirbsd.org/Pkgs/current/i386/gettext-0.10.40-3.cgz
+   
+   echo export CC=gcc-4.4 >> ~miles/.profile
+   
+   ===
+    cd /usr
+   sudo mkdir mirports
+   sudo chown miles mirports
+   cvs -d _anoncvs@anoncvs.mirbsd.org:/cvs co -d mirports ports
+   cd mirports/
+   make setup
+   
+   cd /usr/mirports/net/wget
+   mmake install clean
+   
+
+====
+http://files.housegordon.org/pretest/v0.1/mirbsd10.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/mirbsd10.build-ready.qcow2.xz
+
+mirbsd10.build-ready.qcow2.xz       94M   653M
+mirbsd10.clean-install.qcow2.xz     44M   321M
