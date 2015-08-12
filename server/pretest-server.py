@@ -90,9 +90,13 @@ def get_system_id(ver_dict, inputs_dict):
 
     custom_config_params = inputs_dict.get("configure_extra_params","")
     custom_cc = ""
+    host_cc = ""
     t = re.findall(r'(CC=[^ ]+)',custom_config_params)
     if t:
         custom_cc = t[0]
+    t = re.findall(r'--host=([^ ]+)', custom_config_params)
+    if t:
+        host_cc = t[0]
 
     sys_id = ""
 
@@ -138,6 +142,8 @@ def get_system_id(ver_dict, inputs_dict):
     # If a non-default compiler was used, mention it
     if custom_cc:
         sys_id = sys_id + "," + custom_cc
+    if host_cc:
+        sys_id = sys_id + ", host=" + host_cc
 
     sys_id = sys_id +")"
 

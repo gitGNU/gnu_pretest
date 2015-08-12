@@ -90,6 +90,22 @@ http://pretest.nongnu.org</a>.<br/>
 {% endif %}
 </table>
 
+<h2>Build information</h2>
+
+<table class="details">
+{% for k in environment %}
+<tr>
+  <th>{{ k }}</th>
+  <td>{{ environment[k] }}</td>
+</tr>
+{% endfor %}
+{% for k in inputs %}
+<tr>
+  <th>{{ k }}</th>
+  <td>{{ inputs[k] }}</td>
+</tr>
+{% endfor %}
+</table>
 
 <h2>Build host information</h2>
 
@@ -98,12 +114,6 @@ http://pretest.nongnu.org</a>.<br/>
 <tr>
   <th>{{ k }}</th>
   <td>{{ versions[k] }}</td>
-</tr>
-{% endfor %}
-{% for k in environment %}
-<tr>
-  <th>{{ k }}</th>
-  <td>{{ environment[k] }}</td>
 </tr>
 {% endfor %}
 </table>
