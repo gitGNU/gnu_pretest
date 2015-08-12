@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.61-MirPorts-1
+automake-version: automake (GNU automake) 1.9.6-MirPorts-6
+autopoint-version: missing
+autoreconf-version: autoreconf (GNU Autoconf) 2.61-MirPorts-1
+make-version: no-version
+gmake-version: GNU Make 3.81
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 1.6.3.1
+wget-version: GNU Wget 1.10.2
+rsync-version: rsync  version 3.0.9  protocol version 30
+gcc-version: missing
+cc-version: missing
+uname-s: MirBSD
+uname-r: 10
+uname-m: i386
+uname-p: i386
+uname-i: 
+uname-o: 
+uname-v: GENERIC#1446
