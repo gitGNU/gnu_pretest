@@ -1,11 +1,4 @@
 
-http://files.housegordon.org/pretest/v0.1/ubuntu15.clean-install.qcow2.xz
-http://files.housegordon.org/pretest/v0.1/ubuntu15.build-ready.qcow2.xz
-
-ubuntu15.build-ready.qcow2.xz       295M  1.5G
-ubuntu15.clean-install.qcow2.xz     264M  1.4G
-
-
 ubuntu 15.04
 
 Language: English
@@ -35,25 +28,33 @@ Install GRUB to the master boot record: yes
 
 Clean Install:
    sudo sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
-   
+
    printf "12345\n12345\n" | sudo passwd -q root
-  sudo passwd -u root
-  
-  
-  sudo sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+   sudo passwd -u root
+
+
+   sudo sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
          -e '/^#GRUB_HIDDEN_TIMEOUT/s/^#//' \
          -e '/GRUB_HIDDEN_TIMEOUT=/s/=.*/=1/' \
-	 -e '/^GRUB_HIDDEN_TIMEOUT_QUIET=/s/=.*/=false/' \
-	 -e '/^#GRUB_TERMINAL/s/^#//' \
-	 -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+         -e '/^GRUB_HIDDEN_TIMEOUT_QUIET=/s/=.*/=false/' \
+         -e '/^#GRUB_TERMINAL/s/^#//' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
          /etc/default/grub
-		 
-	sed -i -e /^PermitRootLogin/s/without-password/yes/' \
-	       -e /^#AuthorizedKeysFile/s/^#//' \
-	       /etc/ssh/sshd_config
-	 
-	 
-	         sudo apt-get install -y build-essential autopoint automake autoconf gettext libtool \
-			        git gawk vim wget rsync gperf texinfo pkg-config help2man \
-                                libncurses-dev nano flex bison
-	 
+
+   sudo sed -i -e '/^PermitRootLogin/s/without-password/yes/' \
+               -e '/^#AuthorizedKeysFile/s/^#//' \
+               /etc/ssh/sshd_config
+
+   sudo apt-get install -y build-essential autopoint automake autoconf gettext \
+                           libtool git gawk vim wget rsync gperf texinfo \
+                           pkg-config help2man libncurses-dev nano flex bison
+
+
+
+Sizes:
+  ubuntu15.build-ready.qcow2.xz       295M  1.5G
+  ubuntu15.clean-install.qcow2.xz     264M  1.4G
+
+Download URLs:
+  http://files.housegordon.org/pretest/v0.1/ubuntu15.clean-install.qcow2.xz
+  http://files.housegordon.org/pretest/v0.1/ubuntu15.build-ready.qcow2.xz
