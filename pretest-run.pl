@@ -330,6 +330,13 @@ sub setup_vm_hacks
 		$disk_if = "ide";
 		$net_if = "e1000";
 	}
+
+
+	# MirBSD10/current doesn't support virtio
+	if ($vm_name =~ /mirbsd/i) {
+		$disk_if = "ide";
+		$net_if = "e1000";
+	}
 	return;
 }
 
