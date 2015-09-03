@@ -67,6 +67,7 @@ OPTIONS:
                  (instead of the default 'master' branch)
    -c PARAM    - Add PARAM as parameter to './configure'
    -m PARAM    - Add PARAM as parameter to 'make'
+   -n PARAM    - Add PARAM as parameter to 'make check'
    -e NAME=VAL - Add NAME=VAL as environment variable to all commands.
    -r URL      - upload logs and results to URL (with HTTP POST)
 
@@ -165,6 +166,7 @@ report_input()
     echo "BASENAME=$BASENAME"
     echo "configure_extra_params=$configure_params"
     echo "make_extra_params=$make_params"
+    echo "make_check_extra_params=$make_check_params"
     echo "env_extra_params=$env_params"
     echo "git_branch=$git_branch"
 }
@@ -188,10 +190,11 @@ timestamp()
 show_help=
 configure_params=
 make_params=
+make_check_params=
 env_params=
 git_branch=
 upload_report_url=
-while getopts r:b:c:m:e:h name
+while getopts r:b:c:m:n:e:h name
 do
         case $name in
         b)      git_branch="-b '$OPTARG'"
@@ -199,6 +202,8 @@ do
         c)      configure_params="$configure_params $OPTARG"
                 ;;
         m)      make_params="$make_params $OPTARG"
+                ;;
+        n)      make_check_params="$make_check_params $OPTARG"
                 ;;
         e)      echo "$OPTARG" | grep -E -q '^[A-Za-z0-9]+=' ||
                    die "error: '-e $OPTARG' doesn't look like a " \
@@ -386,7 +391,8 @@ do_build()
     ##
     ## Make check
     ##
-    { make check VERBOSE=yes 2>&1 && touch "$LOGDIR/make-check.ok" ; } \
+    { make check VERBOSE=yes $make_check_params 2>&1 \
+        && touch "$LOGDIR/make-check.ok" ; } \
         | tee "$LOGDIR/make-check.log"
 
     if ! test -e "$LOGDIR/make-check.ok" ; then
