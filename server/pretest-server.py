@@ -76,6 +76,7 @@ def tar_read_file(tar,filename):
     # TODO: this is very memory-inefficient. read line-by-line and filter?
     lines = f.readlines()
     lines = [line.strip() for line in lines]
+    lines = [line.encode('ascii','ignore') for line in lines]
     return lines
 
 def get_system_id(ver_dict, inputs_dict):
