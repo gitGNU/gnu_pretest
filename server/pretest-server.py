@@ -307,11 +307,7 @@ def create():
 
 @app.route("/s/<int:id>/<filename>")
 def getfile(id,filename):
-    try:
-        id = int(id)
-    except:
-        app.logger.error("got invalid ID: '%s'" % ( id ) )
-        return Response("invalid ID"), 400
+    id = int(id)
 
     reports = query_db('select id,basename,tarfile from pretest_reports where id = %d' % (id),one=True)
     if reports is None:
@@ -330,13 +326,9 @@ def getfile(id,filename):
     return send_from_directory(storage_directory, tarfile,as_attachment=True,
                                 attachment_filename=filename)
 
-@app.route("/d/<id>")
+@app.route("/d/<int:id>")
 def details(id):
-    try:
-        id = int(id)
-    except:
-        app.logger.error("got invalid ID: '%s'" % ( id ) )
-        return Response("invalid ID"), 400
+    id = int(id)
 
     reports = query_db('select * from pretest_reports where id = %d' % (id),one=True)
     if reports is None:
@@ -398,7 +390,7 @@ def save_file(fileobj):
     add_tar_to_db(tar,id)
     tar.close()
 
-    txt = url_for("getfile", _external=True, id=1, filename="dummy.tar.bz2") + "\n"
+    txt = url_for("details", _external=True, id=id) + "\n"
     app.logger.info("storing new file in: " + filepath)
     return Response(txt,mimetype="text/plain")
 
