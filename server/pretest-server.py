@@ -262,6 +262,16 @@ def get_db():
         db.row_factory = sqlite3.Row
     return db
 
+
+# Setup logging even under flask+gunicorn
+# see https://github.com/benoitc/gunicorn/issues/379
+@app.before_first_request
+def setup_logging():
+    if not app.debug:
+        # In production mode, add log handler to sys.stderr.
+        app.logger.addHandler(logging.StreamHandler())
+        app.logger.setLevel(logging.INFO)
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
