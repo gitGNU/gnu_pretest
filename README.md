@@ -121,7 +121,7 @@ Read the manual for detailed setup information and usage examples:
 ## Available Pre-Configured VM images
 
 * CentOS 7.0, 6.5
-* Fedora 22, 21, 20
+* Fedora 23, 22, 21, 20
 * Debian 7.6, 8.1
 * gNewSense 3.1 (based on Debian 6)
 * OpenSUSE 13.2, 13.1

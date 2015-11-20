@@ -11,6 +11,8 @@ debian7-kfreebsd.build-ready.qcow2.xz     257M  864M
 debian7-kfreebsd.clean-install.qcow2.xz   252M  770M
 dilos137.build-ready.qcow2.xz       690M  2.7G
 dilos137.clean-install.qcow2.xz     319M  1.7G
+fedora23.build-ready.qcow2.xz       625M  1.6G
+fedora23.clean-install.qcow2.xz     558M  1.3G
 fedora22.build-ready.qcow2.xz       474M  1.4G
 fedora22.clean-install.qcow2.xz     232M  822M
 fedora21.build-ready.qcow2.xz       365M  1.4G

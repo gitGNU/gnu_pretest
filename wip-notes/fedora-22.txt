@@ -72,7 +72,7 @@ Update software:
     dnf -y update
     dnf groupinstall -y "Development Tools"
     dnf -y install wget gperf gettext-devel texinfo automake autoconf \
-                   nano help2man ncurses-devel libtool bison flex patch
+                   nano help2man ncurses-devel libtool bison flex patch bzip2
 
     dnf -y install redhat-lsb-core
     

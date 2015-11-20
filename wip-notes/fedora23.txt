@@ -1,0 +1,8 @@
+Everything from 'wip-notes/fedora22.txt', plus:
+
+http://files.housegordon.org/pretest/v0.1/fedora23.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/fedora23.build-ready.qcow2.xz
+
+fedora23.clean-install.qcow2.xz     558M  1.3G
+fedora23.build-ready.qcow2.xz       625M  1.6G
+
