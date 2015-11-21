@@ -62,7 +62,9 @@ Disk Layout: (E)dit
              a:             4.3G               64  4.2BSD   2048 16384    1 # /
              b:             0.7G          9028512    swap
              c:             5.0G                0  unused
-        
+
+  > w
+  > x
 
 ===
 Location of sets: [cd]
@@ -99,7 +101,7 @@ echo 'PKG_PATH="ftp://mirror.jmu.edu/pub/OpenBSD/5.6/packages/$(machine -a)/"' >
 echo 'export PKG_PATH' >> .profile
 
 echo autoconf-2.69p1 automake-1.15 gperf wget nano help2man libtool \
-     xz rsync-3.1.1 git bison gmake | xargs -n1 pkg_add -v
+     xz rsync-3.1.1 git bison gmake bzip2 | xargs -n1 pkg_add -v
 
 echo AUTOMAKE_VERSION=1.15 >> ~miles/.profile
 echo AUTOCONF_VERSION=2.69 >> ~miles/.profile

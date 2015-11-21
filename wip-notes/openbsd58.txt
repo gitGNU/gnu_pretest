@@ -1,0 +1,126 @@
+Install
+=======
+
+IPv4 address for vio0? (or 'dhcp' or 'none') [dhcp] 
+DHCPDISCOVER on vio0 - interval 1
+DHCPOFFER from 10.0.2.2 (52:55:0a:00:02:02)
+DHCPREQUEST on vio0 to 255.255.255.255
+DHCPACK from 10.0.2.2 (52:55:0a:00:02:02)
+bound to 10.0.2.15 -- renewal in 43200
+seconds.
+IPv6 address for vio0? (or 'rtsol' or
+'none') [none] 
+Available network interfaces are: vio0
+vlan0.
+Which network interface do you wish to
+configure? (or 'done') [done] 
+Using DNS domainname my.domain
+Using DNS nameservers at 10.0.2.3
+
+Password for root account? (will not echo) 
+Password for root account? (again) 
+Start sshd(8) by default? [yes] yes
+Do you expect to run the X Window System?  [yes] no
+Change the default console to com0? [no] yes
+Which speed should com0 use? (or 'done') [9600] 
+Setup a user? (enter a lower-case loginname, or 'no') [no] miles
+Full name for user miles? [miles] 
+Password for user miles? (will not echo) 
+Password for user miles? (again) 
+
+WARNING: root is targeted by password guessing attacks, pubkeys are safer.
+                                   Allow root ssh login? (yes, no, prohibit-password) [no] yes
+
+What timezone are you in? ('?' for list) [US/Eastern] 
+
+## Disk Layout editing
+
+
+Let's install the sets!
+                                   Location of sets? (cd0 disk http or 'done')
+[cd0] 
+
+     [X] bsd           [X] base58.tgz    [X] game58.tgz    [ ] xfont58.tgz
+                                       [X] bsd.rd        [X] base58.tgz    [ ]
+game58.tgz    [ ] xfont58.tgz
+                                       [X] bsd.rd        [X] comp58.tgz    [ ]
+xbase58.tgz   [ ] xserv58.tgz
+                                   Set [ ] bsd.mpor 'abor[X] man58.tgz     [ ]
+xshare58.tgz
+                                   Set name(s)? (or 'abort' or 'done') [done] 
+                                   Directory does not contain SHA256.sig.
+Continue without verification? [no] 
+
+
+ Directory does not contain SHA256.sig. Continue without verification? [no]
+yes
+                                   Installing bsd          100%
+|**************************|  9741 KB    00:01
+                                   Installing bsd.rd       100%
+|**************************|  7463 KB    00:00
+                                   Installing base58.tgz   100%
+|**************************| 54741 KB    00:07    
+                                   Extracting etc.tgz      100%
+|**************************|   109 KB    00:00
+                                   Installing comp58.tgz   100%
+|**************************| 50565 KB    00:08    
+                                   Installing man58.tgz    100%
+|**************************|  8780 KB    00:01    
+                                   Location of sets? (cd0 disk http or 'done')
+[done] 
+
+ Location of sets? (cd0 disk http or 'done') [done] 
+                                   Saving configuration files...done.
+                                   Making all device nodes...done.
+
+                                   CONGRATULATIONS! Your OpenBSD install has
+been successfully completed!
+                                   To boot the new system, enter 'reboot' at
+the command prompt.
+                                   When you login to your new system the first
+time, please read your mail
+                                   using the 'mail' command.
+
+                                   # 
+
+# reboot
+
+Clean-Install setup
+===================
+
+Shorten Boottimeout:
+
+    echo "set timeout 1" >> /etc/boot.conf
+
+After first boot, enable 'doas' (sudo's replacement):
+(Note: exteremely permissive and insecure setup, but suitible for pretest).
+
+    echo "permit nopass root" > /etc/doas.conf
+    echo "permit nopass miles" >> /etc/doas.conf
+
+Build-Ready setup
+=================
+
+echo 'PKG_PATH="ftp://mirror.jmu.edu/pub/OpenBSD/$(uname -r)/packages/$(machine -a)/"' >> .profile
+echo 'export PKG_PATH' >> .profile
+echo autoconf-2.69p1 automake-1.15 gperf wget nano help2man libtool \
+     xz rsync-3.1.1 git bison gmake bzip2 | xargs -n1 pkg_add -v
+
+echo AUTOMAKE_VERSION=1.15 >> ~miles/.profile
+echo AUTOCONF_VERSION=2.69 >> ~miles/.profile
+echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~miles/.profile
+
+$ doas mv pretest-* /usr/local/bin/
+$ doas chmod a+x /usr/local/bin/pretest-*
+$ doas chown root:wheel /usr/local/bin/pretest-*
+
+URLS
+====
+http://files.housegordon.org/pretest/v0.1/openbsd58.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/openbsd58.build-ready.qcow2.xz
+
+
+Sizes
+=====
+openbsd58.clean-install.qcow2.xz    71M   483M
+openbsd58.build-ready.qcow2.xz      80M   541M
