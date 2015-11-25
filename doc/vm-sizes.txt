@@ -34,8 +34,8 @@ minixR330.clean-install.qcow2.xz    44M   462M
 minixR330.build-ready.qcow2.xz      307M  1.2G
 mirbsd10.build-ready.qcow2.xz       94M   653M
 mirbsd10.clean-install.qcow2.xz     44M   321M
-netbsd7rc1.build-ready.qcow2.xz     201M  955M
-netbsd7rc1.clean-install.qcow2.xz   138M  721M
+netbsd70.build-ready.qcow2.xz       429M  1.2G
+netbsd70.clean-install.qcow2.xz     331M  917M
 netbsd614.build-ready.qcow2.xz      216M  909M
 netbsd614.clean-install.qcow2.xz    119M  646M
 openbsd55.build-ready.qcow2.xz      250M  830M

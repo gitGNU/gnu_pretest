@@ -1,0 +1,95 @@
+NetBSD 7.0-rc1
+==============
+
+URL: http://ftp.netbsd.org/pub/NetBSD/images/7.0_RC1/NetBSD-7.0_RC1-amd64.iso
+
+
+Setup:
+ a: installation messages in English
+Keyboard: a: unchanged
+a: Install NetBSD to Hard-disk
+
+Shall we continue: Yes or No (yes)
+On which disk: ld0
+a: this is the correct geometry
+a: Edit the MBR partition table
+partition: a, 5120MB, active, Install, Kind=NetBSD
+Do you want to install NetBSD BootCode: yes
+
+Final Partition table:
+
+  Start  MB   End  MB  Size  MB FS type    Newfs Mount Mount point
+              --------- --------- --------- ---------- ----- ----- -----------
+           a:         0      4734      4735 FFSv2      Yes   Yes   /
+          >b:      4735      5119       384 swap
+           c:         0      5119      5119 NetBSD partition
+           d:         0      5119      5120 Whole disk
+           e:         0         0         0 unused
+           f: Show all unused partitions
+           g: Change input units (sectors/cylinders/MB)
+           x: Partition sizes ok
+
+
+Bootblocks selection: "b: Use serial port com0"
+
+Select your distribution: "Installation without X11"
+
+Install From: HTTP (Use default HTTP settings)
+
+Configure the additional items as needed:
+  d: change root password: "12345"
+  g: Enable SSHD: "yes"
+  o: add user:
+        username: miles
+        add user to group 'wheel': yes
+        user shell: ksh
+        password: 12345
+  x: Finish Configuration
+
+-- Clean Install --
+
+Login as root, edit '~root/.profile', uncomment the PKG_PATH setting, then:
+   pkg_add -v pkgin
+   pkgin -y update
+   pkgin -y install sudo
+
+Enable passwordless sudo for 'wheel' group:
+   sed -i '/# %wheel.*NOPASSWD/s/^#  *//' /usr/pkg/etc/sudoers
+
+Enable console on serial port:
+  echo "consdev=auto" >> /boot.cfg
+
+Shorten boot delay:
+  sed -i '/^timeout=/s/=.*/=1/' /boot.cfg
+
+shutdown with:
+  shutdown -p now
+
+--- Build Ready ---
+
+Edit `~miles/.profile`, put '/usr/pkg/bin' at the front of the PATH
+(before /usr/bin ).
+
+echo git-base binutils bison perl autoconf \
+     automake wget rsync pkg-config bash gperf wget curl \
+     gettext gmake bmake gtexinfo help2man nano libtool \
+     | xargs -n1 pkgin -y install
+
+--- URLs ---
+
+http://files.housegordon.org/pretest/v0.1/netbsd7rc1.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/netbsd7rc1.build-ready.qcow2.xz
+
+netbsd7rc1.build-ready.qcow2.xz     201M  955M
+netbsd7rc1.clean-install.qcow2.xz   138M  721M
+
+SIZES
+=====
+netbsd70.clean-install.qcow2.xz     331M  917M
+netbsd70.build-ready.qcow2.xz       429M  1.2G
+
+URLS
+====
+http://files.housegordon.org/pretest/v0.1/netbsd70.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/netbsd70.build-ready.qcow2.xz
+

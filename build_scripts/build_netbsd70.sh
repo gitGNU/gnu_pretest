@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PreTest If not, see <http://www.gnu.org/licenses/>.
 
-NAME=netbsd7rc1
-ISO_URL=http://ftp.netbsd.org/pub/NetBSD/images/7.0_RC1/NetBSD-7.0_RC1-amd64.iso
+NAME=netbsd70
+ISO_URL=http://ftp.netbsd.org/pub/NetBSD/images/7.0/NetBSD-7.0-amd64.iso
 INSECURE_DOWNLOAD=yes
 QCOW2_SIZE=5G
 RAM=384
@@ -41,7 +41,7 @@ if ! test -e "$ISO_FILE" ; then
         || die "failed to download '$ISO_URL'"
 fi
 
-## Run KVM and install NetBSD-7.0-rc1
+## Run KVM and install NetBSD-7.0
 ##
 ## NOTE:
 ##   1. During installation, virtio disk must appear BEFORE ide cdrom.
