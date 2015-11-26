@@ -124,7 +124,7 @@ Read the manual for detailed setup information and usage examples:
 * Fedora 23, 22, 21, 20
 * Debian 7.6, 8.1
 * gNewSense 3.1 (based on Debian 6)
-* OpenSUSE 13.2, 13.1
+* OpenSUSE 42.1 (LEAP), 13.2, 13.1
 * Ubuntu 14.04.1, 15.04
 * Trisquel 6.0.1 (based on Ubuntu 12.04 LTS), 7 (=Ubuntu 14.04.1 LTS)
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)

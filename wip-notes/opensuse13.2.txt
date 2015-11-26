@@ -51,7 +51,6 @@ sed -i -e '/^GRUB_CMDLINE_LINUX_DEFAULT=/ { s/splash=silent/splash=0/ ; s/quiet/
          -e '/^#GRUB_TERMINAL/aGRUB_TERMINAL_OUTPUT="serial console"' \
          -e '/^#GRUB_TERMINAL/aGRUB_SERIAL_COMMAND="serial --unit=0 --speed=9600 --word=8 --parity=no --stop=1"' \
          -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=ttyS0,9600n8 console=tty0"/' \
-
          /etc/default/grub
 
 Update GRUB boot-loader configuration:

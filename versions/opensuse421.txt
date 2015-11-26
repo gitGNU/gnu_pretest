@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.13.4
+autopoint-version: /usr/bin/autopoint (GNU gettext-tools) 0.19.2
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: GNU Make 4.0
+gmake-version: GNU Make 4.0
+makeinfo-version: makeinfo (GNU texinfo) 4.13
+git-version: git version 2.6.2
+wget-version: GNU Wget 1.14 built on linux-gnu.
+rsync-version: rsync  version 3.1.0  protocol version 31
+gcc-version: gcc (SUSE Linux) 4.8.5
+cc-version: cc (SUSE Linux) 4.8.5
+uname-s: Linux
+uname-r: 4.1.12-1-default
+uname-m: x86_64
+uname-p: x86_64
+uname-i: x86_64
+uname-o: GNU/Linux
+uname-v: #1 SMP PREEMPT Thu Oct 29 06:43:42 UTC 2015 (e24bad1)

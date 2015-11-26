@@ -47,7 +47,7 @@ Steps for adding a new VM/OS:
    Test building GNU packages, from tarballs and git:
 
         pretest-auto-build-check http://ftp.gnu.org/gnu/hello/hello-2.9.tar.gz
-        pretest-auto-build-check http://ftp.gnu.org/gnu/coreutils/coreutils-8.23.tar.xz
+        pretest-auto-build-check http://ftp.gnu.org/gnu/coreutils/coreutils-8.24.tar.xz
         pretest-auto-build-check git://git.sv.gnu.org/coreutils.git
         pretest-auto-build-check git://git.sv.gnu.org/datamash.git
 
