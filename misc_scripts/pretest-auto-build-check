@@ -247,7 +247,6 @@ validate_simple_name "$BASENAME"
 # works on all tested systems (non GNU as well)
 DIR=$(mktemp -d -t "${BASENAME}.XXXXXX") \
     || die "failed to create temporary directory"
-cd "$DIR" || exit 1
 
 LOGDIR="$DIR/logs"
 mkdir "$LOGDIR" || die "failed to create log directory '$LOGDIR'"
@@ -265,19 +264,21 @@ elif echo "$SOURCE" |
 	grep -E -q '^(ht|f)tp://[A-Za-z0-9\_\.\/:-]*\.tar\.(gz|bz2|xz)' ; then
     ## a remote tarball source
     TMP1=$(basename "$SOURCE") || die "failed to get basename of '$SOURCE'"
-    if [ -e "$TMP1" ] ; then
-    echo "$TMP1 already exists locally, skipping download." >&2
+    TARBALL="$DIR/$TMP1"
+    if [ -e "$TARBALL" ] ; then
+    echo "$TARBALL already exists locally, skipping download." >&2
     else
-    wget -O "$TMP1" "$SOURCE" || die "failed to download '$SOURCE'"
+    wget -O "$TARBALL" "$SOURCE" || die "failed to download '$SOURCE'"
     fi
-    TARBALL="$TMP1"
 else
     ## assume a local tarball source
-    [ -e "$SOURCE" ] || die "source file $SOURCE not found"
+    [ -f "$SOURCE" ] || die "source file $SOURCE not found"
     cp "$SOURCE" "$DIR/" || die "failed to copy '$SOURCE' to '$DIR/'"
-    TARBALL=$(basename "$SOURCE") || exit 1
+    TMP1=$(basename "$SOURCE") || die "failed to get basename of '$SOURCE'"
+    TARBALL="$DIR/$TMP1"
 fi
 
+cd "$DIR" || exit 1
 
 ##
 ## If it's a local file, determine compression type
