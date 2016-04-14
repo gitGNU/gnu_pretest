@@ -148,6 +148,13 @@ report_system_versions()
     VAL=$(cat /etc/issue 2>/dev/null \
                 | sed 's/^  *//' | sed 's/  *$//' | grep -v '^$' | head -n1)
     printf "etc_issue: %s\n" "$VAL"
+
+    ## Get information from the /etc/os-release file
+    ## (if exists)
+    if test -e /etc/os-release ; then
+        cat /etc/os-release \
+            | sed -e 's/^/etc_os_release_/' -e 's/=/: /' -e 's/"//g'
+    fi
 }
 
 report_environment()
