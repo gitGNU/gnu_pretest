@@ -136,6 +136,7 @@ Read the manual for detailed setup information and usage examples:
 * MINIX R3.3.0
 * OpenIndiana 151a8 (OpenSolaris-like system, running SunOS 5.11)
 * Debian 7 GNU/kFreeBSD (GNU userspace with FreeBSD kernel)
+* Alpine (Linux kernel + musl-libc + busybox) 3.3.3
 
 See download page for more information: <http://www.nongnu.org/pretest/downloads/>
 
