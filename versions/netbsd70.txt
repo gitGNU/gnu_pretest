@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.15
+autopoint-version: /usr/pkg/bin/autopoint (GNU gettext-tools) 0.19.4
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: no-version
+gmake-version: GNU Make 4.1
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 2.5.2
+wget-version: GNU Wget 1.16.3 built on netbsd.
+rsync-version: rsync  version 3.1.1  protocol version 31
+gcc-version: gcc (nb2 20150115) 4.8.4
+cc-version: cc (nb2 20150115) 4.8.4
+uname-s: NetBSD
+uname-r: 7.0
+uname-m: amd64
+uname-p: x86_64
+uname-i: 
+uname-o: 
+uname-v: NetBSD 7.0 (GENERIC.201509250726Z)
