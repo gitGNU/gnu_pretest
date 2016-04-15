@@ -23,4 +23,5 @@ workdir/
 # Installation CD/DVD ISO files
 install-iso-images/
 
-
+# temp files
+*~
