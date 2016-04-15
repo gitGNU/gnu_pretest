@@ -132,7 +132,7 @@ Read the manual for detailed setup information and usage examples:
 * NetBSD 6.1.4, 7.0
 * OpenBSD 5.9, 5.8, 5.7, 5.6, 5.5
 * MirBSD 10
-* GNU-Hurd (Debian/Hurd) 0.5, 0.6
+* GNU-Hurd (Debian/Hurd) 0.7, 0.6, 0.5
 * MINIX R3.3.0
 * OpenIndiana 151a8 (OpenSolaris-like system, running SunOS 5.11)
 * Debian 7 GNU/kFreeBSD (GNU userspace with FreeBSD kernel)

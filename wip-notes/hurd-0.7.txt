@@ -1,0 +1,48 @@
+Language: C
+Region: North America
+Country: United States
+Keymap to use: American English
+
+Hostname: hurd07
+root pw: 12345
+
+user: miles
+pw: 12345
+
+Timezone: Eastern
+
+Partition Disk: Guided - Use Entire Disk
+Select disk to partition: /dev/hd0 - 5.4 GB
+Partitioning Scheme: all files on one paritition
+
+Write changes to disk: yes
+Debian Mirror Country: US
+
+Device for Boot Loader Installation: /dev/hd0
+
+
+After boot:
+  login as 'root' (pw: 12345)
+
+  apt-get -y install curl sudo ssh
+
+  sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+  adduser miles sudo
+
+  echo 'GRUB_CMDLINE_GNUMACH="console=com0"' >> /etc/default/grub
+  update-grub
+
+Enable password-less SSH login:
+   sed -i '/^#AuthorizedKeysFile/s/^#//' /etc/ssh/sshd_config
+
+
+
+URLS
+====
+http://files.housegordon.org/pretest/v0.1/hurd07.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/hurd07.build-ready.qcow2.xz
+
+SIZES
+=====
+hurd07.clean-install.qcow2.xz       184M  919M
+hurd07.build-ready.qcow2.xz         402M  1.7G

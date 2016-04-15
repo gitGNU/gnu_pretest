@@ -32,6 +32,8 @@ gnewsense31.clean-install.qcow2.xz  303M  1.1G
 hurd05.build-ready.qcow2.xz         296M  1.9G
 hurd06.build-ready.qcow2.xz         304M  1.6G
 hurd06.clean-install.qcow2.xz       233M  1.3G
+hurd07.clean-install.qcow2.xz       184M  919M
+hurd07.build-ready.qcow2.xz         402M  1.7G
 minixR330.clean-install.qcow2.xz    44M   462M
 minixR330.build-ready.qcow2.xz      307M  1.2G
 mirbsd10.build-ready.qcow2.xz       94M   653M
