@@ -46,6 +46,8 @@ openbsd57.build-ready.qcow2.xz      83M   556M
 openbsd57.clean-install.qcow2.xz    71M   484M
 openbsd58.clean-install.qcow2.xz    71M   483M
 openbsd58.build-ready.qcow2.xz      80M   541M
+openbsd59.clean-install.qcow2.xz    72M   482M
+openbsd59.build-ready.qcow2.xz      82M   546M
 openindiana151a8.clean-install.qcow2.xz 673M  3.1G
 openindiana151a8.build-ready.qcow2.xz   789M  3.5G
 opensuse421.build-ready.qcow2.xz    352M  1.6G
