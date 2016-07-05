@@ -21,6 +21,8 @@ fedora21.build-ready.qcow2.xz       365M  1.4G
 fedora21.clean-install.qcow2.xz     289M  1.1G
 fedora20.build-ready.qcow2.xz       313M  1.5G
 fedora20.clean-install.qcow2.xz     215M  1.1G
+freebsd103.build-ready.qcow2.xz     262M  1.2G
+freebsd103.clean-install.qcow2.xz   190M  960M
 freebsd101.build-ready.qcow2.xz     248M  1.2G
 freebsd101.clean-install.qcow2.xz   181M  917M
 freebsd10.build-ready.qcow2.xz      248M  1.2G

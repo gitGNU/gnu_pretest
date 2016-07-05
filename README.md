@@ -14,8 +14,8 @@ All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
 ## Simple QEMU usage
 
     # Download a VM image
-    wget http://files.housegordon.org/pretest/v0.1/freebsd101.build-ready.qcow2.xz
-    unxz freebsd101.build-ready.qcow2.xz
+    wget http://files.housegordon.org/pretest/v0.1/freebsd103.build-ready.qcow2.xz
+    unxz freebsd103.build-ready.qcow2.xz
 
     # Run with QEMU (press CTRL-A,C for QEMU-Monitor),
     # using 384MB of RAM,
@@ -27,7 +27,7 @@ All VMs have user 'miles' with password '12345' and 'sudo' (or 'su') access.
         -net user,hostfwd=tcp:127.0.0.1:1025-:22 \
         -net nic,model=virtio \
         -serial mon:stdio \
-        -drive if=virtio,media=disk,index=0,file=freebsd101.build-ready.qcow2
+        -drive if=virtio,media=disk,index=0,file=freebsd103.build-ready.qcow2
 
 ## QEMU Wrapper script
 
@@ -38,16 +38,16 @@ script for easier bootstrap of the configured images:
     wget http://git.savannah.gnu.org/cgit/pretest.git/plain/pretest-run.pl
 
     # Start VM, connect to serial console (press CTRL-A,C for QEMU monitor)
-    ./pretest-run.pl --console freebsd101.build-ready.qcow2
+    ./pretest-run.pl --console freebsd103.build-ready.qcow2
 
     # Optionally:
     # Copy the host user's SSH Public key to the VM
     # (so that future boots with SSH connection will not require a password):
-    ./pretest-run.pl --pubkey freebsd101.build-ready.qcow2
+    ./pretest-run.pl --pubkey freebsd103.build-ready.qcow2
 
     # Start VM, connect through SSH
     # (when logging off, VM will be automatically shutdown)
-    ./pretest-run.pl freebsd101.build-ready.qcow2
+    ./pretest-run.pl freebsd103.build-ready.qcow2
 
 
 See `pretest-run.pl --help` for more options.
@@ -128,7 +128,7 @@ Read the manual for detailed setup information and usage examples:
 * Ubuntu 14.04.1, 15.04
 * Trisquel 6.0.1 (based on Ubuntu 12.04 LTS), 7 (=Ubuntu 14.04.1 LTS)
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
-* FreeBSD 10.1, 10, 9.3
+* FreeBSD 10.3, 10.1, 10, 9.3
 * NetBSD 6.1.4, 7.0
 * OpenBSD 5.9, 5.8, 5.7, 5.6, 5.5
 * MirBSD 10

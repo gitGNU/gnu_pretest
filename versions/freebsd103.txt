@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.15
+autopoint-version: /usr/local/bin/autopoint (GNU gettext-tools) 0.19.8.1
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: no-version
+gmake-version: missing
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 2.9.0
+wget-version: GNU Wget 1.18 built on freebsd10.1.
+rsync-version: rsync  version 3.1.2  protocol version 31
+gcc-version: missing
+cc-version: FreeBSD clang version 3.4.1 (tags/RELEASE_34/dot1-final 208032) 20140512
+uname-s: FreeBSD
+uname-r: 10.3-RELEASE
+uname-m: amd64
+uname-p: amd64
+uname-i: GENERIC
+uname-o: FreeBSD
+uname-v: FreeBSD 10.3-RELEASE #0 r297264: Fri Mar 25 02:10:02 UTC 2016     root@releng1.nyi.freebsd.org:/usr/obj/usr/src/sys/GENERIC 
