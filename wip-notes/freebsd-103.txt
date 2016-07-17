@@ -1,0 +1,45 @@
+
+Tiemzone:
+  America
+  48 - Eastern / EDT
+
+"System Configuration" - which services to start a boot?
+select 'sshd', 'dumpdev'
+
+Would you like to add users? yes
+
+   miles
+
+"Final Configuration" - select "Exit"
+
+"Manual Configuration" - would you like to open shell? no
+
+"Complete" - select "reboot"
+
+
+first boot
+----------
+
+need:
+   echo 'console="comconsole,vidconsole"' >> /boot/loader.conf
+don't need: sed for ttyu0
+
+
+build-reardy
+---------
+
+pkg install gettext
+
+
+
+final
+-----
+
+freebsd103.build-ready.qcow2.xz     262M  1.2G
+freebsd103.clean-install.qcow2.xz   190M  960M
+
+
+URL
+http://files.housegordon.org/pretest/v0.1/freebsd103.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/freebsd103.build-ready.qcow2.xz
+
