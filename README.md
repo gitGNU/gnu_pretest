@@ -125,7 +125,7 @@ Read the manual for detailed setup information and usage examples:
 * Debian 7.6, 8.1
 * gNewSense 3.1 (based on Debian 6)
 * OpenSUSE 42.1 (LEAP), 13.2, 13.1
-* Ubuntu 14.04.1, 15.04
+* Ubuntu 16.04, 15.04, 14.04.1
 * Trisquel 6.0.1 (based on Ubuntu 12.04 LTS), 7 (=Ubuntu 14.04.1 LTS)
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
 * FreeBSD 10.3, 10.1, 10, 9.3

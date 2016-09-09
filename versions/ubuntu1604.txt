@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.15
+autopoint-version: /usr/bin/autopoint (GNU gettext-tools) 0.19.7
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: GNU Make 4.1
+gmake-version: missing
+makeinfo-version: texi2any (GNU texinfo) 6.1
+git-version: git version 2.7.4
+wget-version: GNU Wget 1.17.1 built on linux-gnu.
+rsync-version: rsync  version 3.1.1  protocol version 31
+gcc-version: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.2) 5.4.0 20160609
+cc-version: cc (Ubuntu 5.4.0-6ubuntu1~16.04.2) 5.4.0 20160609
+uname-s: Linux
+uname-r: 4.4.0-36-generic
+uname-m: x86_64
+uname-p: x86_64
+uname-i: x86_64
+uname-o: GNU/Linux
+uname-v: #55-Ubuntu SMP Thu Aug 11 18:01:55 UTC 2016

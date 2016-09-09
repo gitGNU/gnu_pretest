@@ -1,0 +1,132 @@
+ubuntu 16.04
+
+Language: English
+Menu: Install
+Language: English
+Country: United States
+Detect Keyboard Layout: no
+Keyboard Layout: English
+Hostname: ubuntu1604
+Select mirror: United States
+HTTP Proxy: [leave black for none2]
+User name: miles
+Password: 12345
+Use weak password: yes
+Encrypt Home Directory: no
+Select your time zone: Eastern
+Timezone Correct: Yes
+
+Disk Partitioning Method: Guided Use entire disk (NO LVM!)
+Disk to partition: Virtual Disk 1
+Wrtite Changes to disk: Yes
+
+Proxy: NONE
+Automatic Updates: no automatic updates
+Software to Install:
+   * Standard system utilities
+   * OpenSSH Server
+
+
+Install GRUB to the master boot record: yes
+
+
+Clean Install:
+   sudo sed -i -e '/^%sudo/s/ALL$/NOPASSWD: ALL/' /etc/sudoers
+
+   printf "12345\n12345\n" | sudo passwd -q root
+   sudo passwd -u root
+
+
+   sudo sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' \
+         -e '/GRUB_HIDDEN_TIMEOUT=/s/^/#/' \
+         -e '/^GRUB_HIDDEN_TIMEOUT_QUIET=/s/=.*/=false/' \
+         -e '/^#GRUB_TERMINAL/s/^#//' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/"$/ text console=tty0 console=ttyS0,9600n8"/' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/splash//' \
+         -e '/GRUB_CMDLINE_LINUX_DEFAULT=/s/quiet//' \
+         /etc/default/grub
+
+   sudo update-grub
+
+   sudo sed -i -e '/^PermitRootLogin/s/prohibit-password/yes/' \
+               -e '/^#AuthorizedKeysFile/s/^#//' \
+               /etc/ssh/sshd_config
+
+Network problems:
+
+    ~# ifconfig -a
+    ens2      Link encap:Ethernet  HWaddr 52:54:00:12:34:56  
+              BROADCAST MULTICAST  MTU:1500  Metric:1
+              RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1000 
+              RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+    
+    lo        Link encap:Local Loopback  
+              inet addr:127.0.0.1  Mask:255.0.0.0
+              inet6 addr: ::1/128 Scope:Host
+              UP LOOPBACK RUNNING  MTU:65536  Metric:1
+              RX packets:160 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:160 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1 
+              RX bytes:11840 (11.8 KB)  TX bytes:11840 (11.8 KB)
+    
+
+    $ ifconfig -a
+    ens2      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+              inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+              inet6 addr: fe80::5054:ff:fe12:3456/64 Scope:Link
+              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+              RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:9 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1000
+              RX bytes:1180 (1.1 KB)  TX bytes:1262 (1.2 KB)
+
+    lo        Link encap:Local Loopback
+              inet addr:127.0.0.1  Mask:255.0.0.0
+              inet6 addr: ::1/128 Scope:Host
+              UP LOOPBACK RUNNING  MTU:65536  Metric:1
+              RX packets:160 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:160 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1
+              RX bytes:11840 (11.8 KB)  TX bytes:11840 (11.8 KB)
+
+    $ cat /etc/network/interfaces
+    # This file describes the network interfaces available on your system
+    # and how to activate them. For more information, see interfaces(5).
+
+    source /etc/network/interfaces.d/*
+
+    # The loopback network interface
+    auto lo
+    iface lo inet loopback
+
+    # The primary network interface
+    auto ens1
+    iface ens1 inet dhcp
+    auto ens2
+    iface ens2 inet dhcp
+    auto ens3
+    iface ens3 inet dhcp
+    auto ens4
+    iface ens4 inet dhcp
+
+
+
+
+Build-Ready install:
+
+   sudo apt-get install -y build-essential autopoint automake autoconf gettext \
+                           libtool git gawk vim wget rsync gperf texinfo \
+                           pkg-config help2man libncurses-dev nano flex bison \
+                           curl
+
+
+
+Sizes:
+  ubuntu1604.clean-install.qcow2.xz   262M  1.3G
+  ubuntu1604.build-ready.qcow2.xz     384M  1.6G
+
+Download URLs:
+  http://files.housegordon.org/pretest/v0.1/ubuntu1604.clean-install.qcow2.xz
+  http://files.housegordon.org/pretest/v0.1/ubuntu1604.build-ready.qcow2.xz
