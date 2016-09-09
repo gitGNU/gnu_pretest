@@ -1,0 +1,210 @@
+Install
+=======
+
+(I)nstall, (U)pgrade, (A)utoinstall or (S)hell? I
+
+Choose your keyboard layout ('?' or 'L' for list) [default] 
+
+System hostname? (short form, e.g. 'foo') [obsd59]
+
+Available network interfaces are: vio0 vlan0.
+Which network interface do you wish to configure? (or 'done') [vio0] 
+
+IPv4 address for vio0? (or 'dhcp' or 'none') [dhcp] 
+DHCPDISCOVER on vio0 - interval 1
+DHCPOFFER from 10.0.2.2 (52:55:0a:00:02:02)
+DHCPREQUEST on vio0 to 255.255.255.255
+DHCPACK from 10.0.2.2 (52:55:0a:00:02:02)
+bound to 10.0.2.15 -- renewal in 43200
+seconds.
+
+IPv6 address for vio0? (or 'rtsol' or 'none') [none] 
+Available network interfaces are: vio0 vlan0.
+Which network interface do you wish to configure? (or 'done') [done] 
+
+Using DNS domainname my.domain
+Using DNS nameservers at 10.0.2.3
+
+Password for root account? (will not echo) [12345]
+Password for root account? (again) [12345]
+Start sshd(8) by default? [yes] yes
+Do you expect to run the X Window System?  [yes] no
+
+Change the default console to com0? [no] yes
+Which speed should com0 use? (or 'done') [9600] 
+
+Setup a user? (enter a lower-case loginname, or 'no') [no] miles
+Full name for user miles? [miles] 
+Password for user miles? (will not echo) [12345]
+Password for user miles? (again) [12345]
+
+WARNING: root is targeted by password guessing attacks, pubkeys are safer.
+Allow root ssh login? (yes, no, prohibit-password) [no] yes
+
+What timezone are you in? ('?' for list) [US/Eastern] 
+
+## Disk Layout editing
+
+Available disks are: sd0.
+Which disk is the root disk? ('?' for details) [sd0] 
+No valid MBR or GPT.
+Use (W)hole disk MBR, whole disk (G)PT or (E)dit? [whole] 
+Setting OpenBSD MBR partition to whole sd0...done.
+
+  The auto-allocated layout for sd0 is:
+  #                size           offset  fstype [fsize bsize  cpg]
+  a:           953.9M               64  4.2BSD   2048 16384    1 # /
+  b:           256.0M          1953664    swap
+  c:          5120.0M                0  unused
+  d:          3072.0M          2477952  4.2BSD   2048 16384    1 # /usr
+  e:           832.5M          8769408  4.2BSD   2048 16384    1 # /home
+  Use (A)uto layout, (E)dit auto layout, or create (C)ustom layout? [a]
+
+** Choose 'E' (for EDIT)
+** Delete all paritions (except C = auto-unused)
+  > d a
+  > d b
+  > d d
+  > d e
+
+** Add one large partition
+  > a a
+  offset: [64] 
+  size: [10474316] 4.3G
+  FS type: [4.2BSD] 
+  mount point: [none] /
+
+** Add one swap partition
+  > a b
+  offset: [9028512] 
+  size: [1445868]  
+  FS type: [swap] 
+
+** View changes
+
+  > p g
+  OpenBSD area: 64-10474380; size: 5.0G; free: 0.0G
+  #              size           offset  fstype [fsize bsize  cpg]
+  a:             4.3G               64  4.2BSD   2048 16384    1 # /
+  b:             0.7G          9028512    swap
+  c:             5.0G                0  unused
+
+** Write changes and exit
+  > w
+  > x
+
+  /dev/rsd0a: 4408.4MB in 9028448 sectors of 512 bytes
+  22 cylinder groups of 202.47MB, 12958 blocks, 25984 inodes each
+  /dev/sd0a (8c9a661b7022b2a2.a) on /mnt type ffs (rw, asynchronous, local)
+
+Let's install the sets!
+
+Location of sets? (cd0 disk http or 'done') [cd0] 
+Pathname to the sets? (or 'done') [6.0/amd64] 
+
+Set name(s)? (or 'abort' or 'done') [done] ?
+[X] bsd           [X] base60.tgz    [X] game60.tgz    [X] xfont60.tgz
+[X] bsd.rd        [X] comp60.tgz    [X] xbase60.tgz   [X] xserv60.tgz
+[ ] bsd.mp        [X] man60.tgz     [X] xshare60.tgz
+Set name(s)? (or 'abort' or 'done') [done] 
+
+** Remove X11 related packages by typing:
+    -xbase60.tgz [enter]
+    -xshare60.tgz [enter]
+    -xfont60.tgz [enter]
+    -xserv60.tgz [enter]
+
+** View final packages by typing '?' [enter]:
+
+Set name(s)? (or 'abort' or 'done') [done] ?
+[X] bsd           [X] base60.tgz    [X] game60.tgz    [ ] xfont60.tgz
+[X] bsd.rd        [X] comp60.tgz    [ ] xbase60.tgz   [ ] xserv60.tgz
+[ ] bsd.mp        [X] man60.tgz     [ ] xshare60.tgz
+Set name(s)? (or 'abort' or 'done') [done] 
+
+** enter 'done' [enter] to continue
+
+Set name(s)? (or 'abort' or 'done') [done] done
+Directory does not contain SHA256.sig. Continue without verification? [no] yes
+Installing bsd          100% |**************************| 10004 KB    00:00
+Installing bsd.rd       100% |**************************|  7581 KB    00:00
+Installing base59.tgz   100% |**************************| 51606 KB    00:07
+Extracting etc.tgz      100% |**************************|   188 KB    00:00
+Installing comp59.tgz   100% |**************************| 50520 KB    00:07
+Installing man59.tgz    100% |**************************|  8779 KB    00:01
+Installing game59.tgz   100% |**************************|  2724 KB    00:00
+Location of sets? (cd0 disk http or 'done') [done] done
+
+To boot the new system, enter 'reboot' at the command prompt.
+When you login to your new system the first time, please read your mail
+using the 'mail' command.
+CONGRATULATIONS! Your OpenBSD install has been successfully completed!
+
+
+** type 'reboot' [enter] to reboot into the newly installed system.
+
+# reboot
+
+
+
+Clean-Install setup
+===================
+
+Shorten Boottimeout:
+
+    echo "set timeout 1" >> /etc/boot.conf
+
+After first boot, enable 'doas' (sudo's replacement):
+(Note: exteremely permissive and insecure setup, but suitible for pretest).
+
+    echo "permit nopass root" > /etc/doas.conf
+    echo "permit nopass miles" >> /etc/doas.conf
+
+Prepare package installation:
+
+    echo 'PKG_PATH="ftp://mirror.jmu.edu/pub/OpenBSD/$(uname -r)/packages/$(machine -a)/"' >> .profile
+    echo 'export PKG_PATH' >> .profile
+
+Shutdown the machine:
+
+    shutdown -p now
+
+
+
+Build-Ready setup
+=================
+
+Login as root:
+
+    echo gperf wget nano help2man libtool xz git bison \
+         gmake bzip2 | xargs -n1 pkg_add -v
+
+    pkg_add -v autoconf-2.69p2
+    pkg_add -v automake-1.15p0
+    pkg_add -v rsync-3.1.2p0
+
+Login as 'miles':
+
+    echo AUTOMAKE_VERSION=1.15 >> ~/.profile
+    echo AUTOCONF_VERSION=2.69 >> ~/.profile
+    echo export AUTOMAKE_VERSION AUTOCONF_VERSION >> ~/.profile
+
+(copy misc_scripts/pretest-* scripts into the VM, then)
+
+    doas mv pretest-* /usr/local/bin/
+    doas chmod a+x /usr/local/bin/pretest-*
+    doas chown root:wheel /usr/local/bin/pretest-*
+
+Shutdown the machine:
+
+    shutdown -p now
+
+URLS
+====
+http://files.housegordon.org/pretest/v0.1/openbsd60.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/openbsd60.build-ready.qcow2.xz
+
+Sizes
+=====
+openbsd60.clean-install.qcow2.xz    75M   503M
+openbsd60.build-ready.qcow2.xz      85M   567M

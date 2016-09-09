@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.15
+autopoint-version: missing
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: no-version
+gmake-version: GNU Make 4.2.1
+makeinfo-version: makeinfo (GNU texinfo) 4.8
+git-version: git version 2.9.0
+wget-version: GNU Wget 1.18 built on openbsd6.0.
+rsync-version: rsync  version 3.1.2  protocol version 31
+gcc-version: gcc (GCC) 4.2.1 20070719 
+cc-version: cc (GCC) 4.2.1 20070719 
+uname-s: OpenBSD
+uname-r: 6.0
+uname-m: amd64
+uname-p: amd64
+uname-i: 
+uname-o: 
+uname-v: GENERIC#2148

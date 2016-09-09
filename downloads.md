@@ -23,11 +23,12 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 
 ## Clean-Install images
 
-* [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz)
-* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.clean-install.qcow2.xz)
-* [OpenBSD 5.7](http://files.housegordon.org/pretest/v0.1/openbsd57.clean-install.qcow2.xz)
-* [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.clean-install.qcow2.xz)
+* [OpenBSD 6.0](http://files.housegordon.org/pretest/v0.1/openbsd60.clean-install.qcow2.xz)
 * [OpenBSD 5.9](http://files.housegordon.org/pretest/v0.1/openbsd59.clean-install.qcow2.xz)
+* [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.clean-install.qcow2.xz)
+* [OpenBSD 5.7](http://files.housegordon.org/pretest/v0.1/openbsd57.clean-install.qcow2.xz)
+* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.clean-install.qcow2.xz)
+* [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.clean-install.qcow2.xz)
 * [NetBSD 7.0](http://files.housegordon.org/pretest/v0.1/netbsd70.clean-install.qcow2.xz)
 * [NetBSD 6.1.4](http://files.housegordon.org/pretest/v0.1/netbsd614.clean-install.qcow2.xz)
 * [FreeBSD 10.3](http://files.housegordon.org/pretest/v0.1/freebsd103.clean-install.qcow2.xz)
@@ -63,11 +64,12 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 
 ## Build-Ready images
 
-* [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz)
-* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.build-ready.qcow2.xz)
-* [OpenBSD 5.7](http://files.housegordon.org/pretest/v0.1/openbsd57.build-ready.qcow2.xz)
-* [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.build-ready.qcow2.xz)
+* [OpenBSD 6.0](http://files.housegordon.org/pretest/v0.1/openbsd60.build-ready.qcow2.xz)
 * [OpenBSD 5.9](http://files.housegordon.org/pretest/v0.1/openbsd59.build-ready.qcow2.xz)
+* [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.build-ready.qcow2.xz)
+* [OpenBSD 5.7](http://files.housegordon.org/pretest/v0.1/openbsd57.build-ready.qcow2.xz)
+* [OpenBSD 5.6](http://files.housegordon.org/pretest/v0.1/openbsd56.build-ready.qcow2.xz)
+* [OpenBSD 5.5](http://files.housegordon.org/pretest/v0.1/openbsd55.build-ready.qcow2.xz)
 * [NetBSD 7.0](http://files.housegordon.org/pretest/v0.1/netbsd70.build-ready.qcow2.xz)
 * [NetBSD 6.1.4](http://files.housegordon.org/pretest/v0.1/netbsd614.build-ready.qcow2.xz)
 * [FreeBSD 10.3](http://files.housegordon.org/pretest/v0.1/freebsd103.build-ready.qcow2.xz)

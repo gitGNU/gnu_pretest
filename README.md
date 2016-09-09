@@ -130,7 +130,7 @@ Read the manual for detailed setup information and usage examples:
 * DilOS 1.3.7.18 (Illumous/OpenSolaris-based system)
 * FreeBSD 10.3, 10.1, 10, 9.3
 * NetBSD 6.1.4, 7.0
-* OpenBSD 5.9, 5.8, 5.7, 5.6, 5.5
+* OpenBSD 6.0, 5.9, 5.8, 5.7, 5.6, 5.5
 * MirBSD 10
 * GNU-Hurd (Debian/Hurd) 0.7, 0.6, 0.5
 * MINIX R3.3.0
