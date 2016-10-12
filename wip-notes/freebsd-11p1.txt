@@ -1,0 +1,100 @@
+Welcome, would oyu like to begin? [install]
+
+KeyMap selection? [continue with default]
+
+Set Hostname? [fbsd11p1]
+
+Choose Optional Components: deselect "lib32", keep only "ports".
+
+Partitioning:
+  Select:  AUTO (UFS) Guided Disk Setup
+  Select: [ENTIRE DISK]
+  Partition Scheme: [GPT]
+
+ ??vtbd0           5.0 GB  MBR
+ ??  vtbd0s1       5.0 GB  BSD
+ ??    vtbd0s1a    4.7 GB  freebsd-ufs    /
+ ??    vtbd0s1b    256 MB  freebsd-swap   none
+
+  Review PAritioning: [finish]
+  Confirmation: [click COMMIT]
+
+Root password: [12345]
+
+
+Network Configuration:
+ Network interface? [vtnet0]
+ Would you like IPv4? [yes]
+ Would you like DHCP? [yes]
+ Would you like IPv6? [no]
+ Would you like to change resolver? [no, keep default]
+
+Tiemzone:
+  America
+  48 - Eastern / EDT
+
+"System Configuration" - which services to start a boot?
+select 'sshd', 'dumpdev'
+
+System Security Hardening:
+  Insert stack guard page ahead of the growable segments
+
+Would you like to add users? yes
+
+   username: [miles]
+   full name: [miles]
+   uid: [leave empty for default]
+   login group: [miles]
+   invite into other groups: [wheell
+   login class: [default]
+   shell: [sh]
+   home directory: [/home/miles]
+   home directory permissions: [leave empty for defaults[
+   use password-based auth: [yes]
+   use empty password: [no]
+   use random password: [no]
+   password: [12345]
+   confirm: [12345]
+   lock-out account after creation: [no]
+   OK? [yes]
+
+   Add another user: [no]
+
+"Final Configuration" - select "Exit"
+
+"Manual Configuration" - would you like to open shell? no
+
+"Complete" - select "reboot"
+
+
+first boot
+----------
+
+   echo 'console="comconsole,vidconsole"' >> /boot/loader.conf
+
+   env ASSUME_ALWAYS_YES=YES pkg update
+   env ASSUME_ALWAYS_YES=YES pkg install sudo
+   sed -i.bak '/^# %wheel.*NOPASSWD:/s/^# //' /usr/local/etc/sudoers
+
+   echo 'autoboot_delay="1"' >> /boot/loader.conf
+
+
+build-reardy
+---------
+
+   echo pkgconf gperf autoconf automake git bison wget rsync \
+     help2man nano libtool gettext texinfo \
+     | xargs -n1 env ASSUME_ALWAYS_YES=YES pkg install
+
+
+
+final
+-----
+
+freebsd11p1.clean-install.qcow2  280M  850G
+freebsd11p1.build-ready.qcow2    348M  1.1G
+
+
+URL
+http://files.housegordon.org/pretest/v0.1/freebsd11p1.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/freebsd11p1.build-ready.qcow2.xz
