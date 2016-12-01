@@ -1,0 +1,101 @@
+Fedora 25
+=========
+
+NOTE:
+  for some strange reason, the server net-install CD image
+  failed to boot under QEMU, used the full server DVD image instead.
+
+1. In graphical menu, select "Install Fedora 25"
+
+2. Language: English
+
+3. Setup network
+    click Network & Hostname.
+    Ensure 'ensX' is enabled by clicking on the "OFF/ON" button,
+    Set Hostname to fedora25 (edit-box on bottom of the screen)
+    click done (blue botton on top-left corner)
+
+4. Software Selection
+    select "Fedora Custom Operating System" (left side),
+    Select Add-Ons (right side):
+      "Guest Agent" + "Standard" + "Headless Management"
+
+    click done (blue botton on top-left corner)
+
+5. Select "Installation Destination"
+      Select vda disk (should have a checkmark on it, if not, click on it).
+      At the bootom of the screen, select:
+         Partition: automatically configure partitioning
+         Do NOT select "Encrypt my data"
+      click done (blue botton on top-left corner)
+6. Start Installation
+
+7. During Installation:
+   7.1. set root password: 12345 .
+        (because it's a weak password, you'll need to click "done" twice).
+   7.2. Add user 'miles' password '12345'.
+        mark 'make this user administrator'.
+        (because it's a weak password, you'll need to click "done" twice).
+
+8. Reboot
+
+
+Clean Install
+=============
+
+Login as 'root' password '12345'.
+
+Enable sudo without password for 'wheel' group members:
+
+    sed -i '/^%wheel/s/^/#/' /etc/sudoers
+    sed -i '/^# %wheel.*NOPASSWD:/s/^# //' /etc/sudoers
+
+Reduce bootloader wait time:
+
+   sed -i -e '/^GRUB_TIMEOUT=/s/=.*/=1/' /etc/default/grub
+
+Enable Serial Console:
+
+    sed  -i -e '/^GRUB_TERMINAL_OUTPUT/s/=.*$/="serial console"/' \
+	 -e '/^GRUB_TERMINAL_OUTPUT/iGRUB_TERMINAL_INPUT="serial console"' \
+         -e '/^GRUB_TERMINAL_OUTPUT/aGRUB_SERIAL_COMMAND="serial --unit=0 --speed=9600 --word=8 --parity=no --stop=1"' \
+         -e '/GRUB_CMDLINE_LINUX=/s/quiet//' \
+         -e '/GRUB_CMDLINE_LINUX=/s/"$/ text console=ttyS0,9600n8 console=tty0"/' \
+         /etc/default/grub
+
+Update GRUB bootloader configuration:
+
+     grub2-mkconfig -o /boot/grub2/grub.cfg
+
+Shutdown:
+
+     shutdown -P now
+
+
+Build Tools
+===========
+
+Update software:
+
+    dnf -y update
+    dnf groupinstall -y "Development Tools"
+    dnf -y install wget gperf gettext-devel texinfo automake autoconf nano
+    dnf -y install help2man ncurses-devel libtool bison flex patch bzip2
+    dnf -y install strace ltrace
+    dnf -y install redhat-lsb-core
+    dnf -y install glibc-all-langpacks
+
+Use disk-based /tmp (instead of memory-based tmpfs) - For build-automation we use VMs with very little memory. (see http://fedoraproject.org/wiki/Features/tmp-on-tmpfs.)
+
+    systemctl mask tmp.mount
+
+
+
+Images
+======
+
+http://files.housegordon.org/pretest/v0.1/fedora25.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/fedora25.build-ready.qcow2.xz
+
+fedora25.clean-install.qcow2.xz     415M  1.4G
+fedora25.build-ready.qcow2.xz       628M  1.8G
