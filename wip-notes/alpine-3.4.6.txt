@@ -1,0 +1,113 @@
+Alpine Linux 3.4.6
+==================
+
+Download from: https://alpinelinux.org/
+ISO URL: https://fr.alpinelinux.org/alpine/v3.4/releases/x86_64/alpine-3.4.6-x86_64.iso
+
+Installation
+------------
+Boot from CD/ISO, select boot option "grsec" (if not automatically selected),
+Login as root (no password), run 'setup-alpine'.
+
+1. Select keyboard layout: us
+2. Select variant:  us
+3. Enter hostname: 'alp333'
+4. (network) which one do you want to initialize: eth0
+5. Ip address for eth0: dhcp
+6. do you want any manual network config: no
+7. change password for root: 12345
+   (ignore 'bad password' warning, and retype again)
+   retype password: 12345
+   (the password will be rejected once, enter it again).
+8. Which timezone are you: UTC
+9. HTTP/FTP proxy: none
+10. Enter mirror number: f (for autodetect)
+11. which SSH server: openssh
+12. which disks would you like to use?: vda
+13. (disks) how would you like to use it?: sys
+14. Warning: erase the above disks and continue?: y
+
+[[installation is complete]]
+
+back on terminal, type "reboot" to reboot from disk.
+
+
+First Boot
+----------
+
+Login as root, pw '12345'.
+
+1. Enable Root Login on SSH:
+
+   sed -i -e '/PermitRootLogin/s/.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+   (restart sshd if needed: `rc-service sshd restart`)
+
+1. Enable serial console
+   (http://wiki.alpinelinux.org/wiki/Enable_Serial_Console_on_Boot)
+
+   sed -i -e '/^default_kernel_opts=/s/=.*/="console=ttyS0,9600 console=tty0"/' \
+          -e '/^verbose=/s/=.*/=1/' \
+          -e '/^hidden=/s/=.*/=/' \
+          -e '/^timeout=/s/=.*/=1/' \
+          -e '/^serial_port=/s/=.*/=0/' \
+          -e '/^serial_baud=/s/=.*/=9600/' \
+          /etc/update-extlinux.conf
+
+   then run:
+       $ ~# update-extlinux
+       Updating extlinux configuration.
+       Found kernel: /boot/vmlinuz-grsec
+       Found initramfs: /boot/initramfs-grsec
+       1 entries found.
+       Installing libutil.c32 libcom32.c32 mboot.c32 menu.c32 vesamenu.c32 to /boot.
+       /boot is device /dev/vda1
+
+
+   Enable login console on serial port:
+
+       sed -i -e '/ttyS0/s/^#//' -e '/ttyS0/s/115200/9600/' /etc/inittab
+
+3. Add user 'miles':
+
+    # adduser -g "" miles
+    Changing password for miles
+    New password: [12345]
+    Bad password: too short
+    Retype password: [12345]
+    Password for miles changed by root
+
+4. Install 'sudo', enable password-less sudo for user 'miles':
+
+        apk add sudo
+        sed -i -e '/%wheel.*NOPASSWD/s/^# *//' /etc/sudoers
+        adduser miles wheel
+
+
+5. Stop the VM with `poweroff`
+
+6. Save as 'clean-install'.
+
+
+Build-Ready
+===========
+
+Start vm with: ./pretest-run.pl -S --console -p 2222 ./alpine-3.3.3.qcow2
+Login with 'miles' pw '12345', switch to root with `sudo su -l`.
+
+1. Install gcc+peripherals ( http://wiki.alpinelinux.org/wiki/GCC )
+
+        apk add build-base
+        apk add automake autoconf gperf bison flex make gettext \
+                patch bzip2 curl wget git xz rsync texinfo
+
+
+Results
+=======
+
+http://files.housegordon.org/pretest/v0.1/alpine-3.4.6.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/alpine-3.4.6.build-ready.qcow2.xz
+
+alpine-3.4.6.clean-install.qcow2.xz 84M   320M
+alpine-3.4.6.build-ready.qcow2.xz   129M  561M
+

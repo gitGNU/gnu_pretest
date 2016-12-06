@@ -1,5 +1,7 @@
 alpine-3.3.3.clean-install.qcow2.xz 83M   423M
 alpine-3.3.3.build-ready.qcow2.xz   127M  659M
+alpine-3.4.6.clean-install.qcow2.xz 84M   320M
+alpine-3.4.6.build-ready.qcow2.xz   129M  561M
 centos65.build-ready.qcow2.xz       270M  1.3G
 centos65.clean-install.qcow2.xz     313M  1.4G
 centos7.build-ready.qcow2.xz        395M  1.4G
