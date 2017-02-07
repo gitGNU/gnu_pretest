@@ -118,7 +118,21 @@ http://pretest.nongnu.org</a>.<br/>
 {% endfor %}
 </table>
 
+<h2>Download Log Files</h2>
 
+<table class="details">
+{% for f in tar_files %}
+<tr>
+  <td><a target="_blank"
+         href="{{ url_for("gettarfile", id=build.id, filename=f) }}">{{ f }}
+  </a></td>
+  <td>
+    <code>
+      curl -JLO {{ url_for("gettarfile", id=build.id, filename=f,_external=True) }}
+    </code>
+  </td>
+</tr>
+{% endfor %}
 </table>
 
 </body>

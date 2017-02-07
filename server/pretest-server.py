@@ -26,11 +26,13 @@ from subprocess import Popen,PIPE
 import yaml
 from flask import Flask, url_for, request, g,\
                   redirect, Response, send_from_directory, \
-                    render_template
+                    render_template, send_file
 from werkzeug import secure_filename
 import tarfile
 import sqlite3
 import logging
+import tempfile
+import shutil
 
 # These will be set by commandline parameters
 db_filename = "pretest.db"
@@ -337,6 +339,39 @@ def getfile(id,filename):
     return send_from_directory(storage_directory, tarfile,as_attachment=True,
                                 attachment_filename=filename)
 
+@app.route("/g/<int:id>/<path:filename>")
+def gettarfile(id,filename):
+    """
+    Explore the content of a tarfile - list files, allow downloads
+    """
+    id = int(id)
+
+    reports = query_db('select id,basename,tarfile,system_id from pretest_reports where id = %d' % (id),one=True)
+    if reports is None:
+        app.logger.error("got invalid ID: '%s' (not found in DB)" % ( id ) )
+        return Response("invalid ID"), 400
+
+    base = reports['basename']
+    tarfilename = reports['tarfile']
+    sys_id = reports['system_id']
+
+    filepath = os.path.join(storage_directory,tarfilename)
+    if not os.path.exists(filepath):
+        app.logger.error("got non-existing ID: '%s'" % ( id ) )
+        return Response("invalid ID"), 400
+
+    tar = tarfile.open(filepath, "r:bz2")
+    in_fp = tar.extractfile(filename)
+    out_fp = tempfile.NamedTemporaryFile(delete=False)
+    shutil.copyfileobj(in_fp,out_fp)
+    out_fp.seek(0)
+    app.logger.info(out_fp.name)
+
+    att_filename = secure_filename(sys_id + "--" + os.path.basename(filename))
+    return send_file(out_fp, as_attachment=True,mimetype="text/plain",
+                     attachment_filename=att_filename)
+
+
 @app.route("/d/<int:id>")
 def details(id):
     id = int(id)
@@ -379,6 +414,8 @@ def details(id):
     except:
         pass
 
+    tar_files = [ x.name for x in tar if x.isreg() ]
+
     tar.close()
 
     return render_template('details.html',
@@ -389,7 +426,8 @@ def details(id):
                 log_tail=log_tail,
                 log_tail_filename=log_tail_filename,
                 test_log_filename=test_log_filename,
-                test_log_lines=test_log_lines
+                test_log_lines=test_log_lines,
+                tar_files=tar_files
             )
 
 def save_file(fileobj):
