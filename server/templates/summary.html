@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
 <head>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 <title>PreTest Build Reports</title>
 
 <style>
@@ -39,42 +41,54 @@ a.build {
 
 <body>
 
-<h1>Pretest Build Reports</h1>
+<h1>Pretest Build Report for {{ basename }}</h1>
 
-For more information see <a href="http://pretest.nongnu.org">
-http://pretest.nongnu.org</a>.<br/>
 <br/>
 
 <table class="reports">
  <thead>
  <tr>
-   <th>Upload Time<br/><small>click for details</small></th>
-   <th>Project</th>
    <th>System</th>
    <th>Status</th>
-   <th>Download logs (<a href="{{url_for("tarhelp")}}">what's inside?</a>)</th>
+   <th>Time</th>
  </tr>
  </thead>
  <tbody>
-{% for r in reports %}
+{% for r in builds %}
 <tr>
-  <td><a class="build" href="{{url_for("details",id=r.id)}}">{{ r.time }}</a></td>
   <td>
-    <a href="{{url_for("build_summary",basename=r.basename)}}">
-      {{ r.basename }}
+    <a href="{{url_for("details",id=r.id) }}">
+      {{ r.system_id }}
     </a>
   </td>
-  <td>{{ r.system_id }}</td>
+
   <td>
     <div class="{% if r.status=="ok" %}status_ok{% else %}status_notok{% endif %}">
     {{ r.status }}
     </div>
   </td>
-  <td><a href="./s/{{ r.id }}/{{r.basename}}.pretest-build-report.build-{{r.id}}.tar.bz2">
-      {{r.basename}}.pretest-build-report.build-{{r.id}}.tar.bz2</a></td>
+
+  <td>
+    {{ r.time }}
+  </td>
+
 </tr>
 {% endfor %}
 </table>
+
+
+<h3>Textual report</h3>
+
+<pre>
+No failures on the following:
+{%- for r in builds -%}
+{% if r.status == "ok" %}
+  {{ r.system_id }}
+{%- endif -%}
+{%- endfor -%}
+
+</pre>
+
 
 </body>
 </html>

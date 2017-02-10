@@ -436,6 +436,24 @@ def details(id):
                 tar_files=tar_files
             )
 
+@app.route("/q/<basename>")
+def build_summary(basename):
+    sql="""
+select
+   id,system_id,status,timestamp,
+   datetime(timestamp, 'unixepoch', 'localtime') as time
+from pretest_reports where basename = :basename
+order by status, system_id
+"""
+    reports = query_db(sql, { "basename" : basename});
+
+    if reports is None:
+        app.logger.error("got invalid ID: '%s' (not found in DB)" % ( basename ) )
+        return Response("invalid basename"), 400
+
+    return render_template('summary.html', builds=reports, basename=basename)
+
+
 def save_file(fileobj):
     filepath = get_random_id(storage_directory) + ".tar.bz2"
     fileobj.save(filepath)
@@ -480,4 +498,3 @@ if __name__ == "__main__":
     create_pretest_db(dbconn)
 
     app.run(host=args.ip, port=args.port, debug=args.debug)
-

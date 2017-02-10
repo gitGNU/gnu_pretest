@@ -52,7 +52,11 @@ http://pretest.nongnu.org</a>.<br/>
 
 <tr>
   <th>Project:</th>
-  <td>{{ build.basename }}</td>
+  <td>
+    <a href="{{url_for("build_summary",basename=build.basename)}}">
+      {{ build.basename }}
+    </a>
+  </td>
 </tr>
 <tr>
   <th>Source:</th>
