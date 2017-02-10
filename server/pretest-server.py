@@ -346,6 +346,9 @@ def gettarfile(id,filename):
     """
     id = int(id)
 
+    inlined = (request.args.get('inlined',0) == "1")
+    as_attachment = not inlined
+
     reports = query_db('select id,basename,tarfile,system_id from pretest_reports where id = %d' % (id),one=True)
     if reports is None:
         app.logger.error("got invalid ID: '%s' (not found in DB)" % ( id ) )
@@ -368,7 +371,9 @@ def gettarfile(id,filename):
     app.logger.info(out_fp.name)
 
     att_filename = secure_filename(sys_id + "--" + os.path.basename(filename))
-    return send_file(out_fp, as_attachment=True,mimetype="text/plain",
+    return send_file(out_fp,
+                     mimetype="text/plain",
+                     as_attachment=as_attachment,
                      attachment_filename=att_filename)
 
 
@@ -414,7 +419,8 @@ def details(id):
     except:
         pass
 
-    tar_files = [ x.name for x in tar if x.isreg() ]
+    tar_files = [{"filename" : x.name, "size" : x.size }
+                 for x in tar if x.isreg() ]
 
     tar.close()
 

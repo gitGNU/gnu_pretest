@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
 <head>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 <title>PreTest Build Reports - build {{ build.id }} details</title>
 
 <style>
@@ -123,12 +125,29 @@ http://pretest.nongnu.org</a>.<br/>
 <table class="details">
 {% for f in tar_files %}
 <tr>
-  <td><a target="_blank"
-         href="{{ url_for("gettarfile", id=build.id, filename=f) }}">{{ f }}
-  </a></td>
+  <td>
+    <a target="_blank"
+         href="{{ url_for("gettarfile", id=build.id, filename=f.filename, inlined=1) }}">
+      <i class="fa fa-eye"></i>
+    </a>
+  </td>
+
+
+  <td>
+    <a target="_blank"
+         href="{{ url_for("gettarfile", id=build.id, filename=f.filename) }}">
+      <i class="fa fa-download"></i>
+      {{ f.filename }}
+    </a>
+  </td>
+
+  <td>
+    {{ f.size | filesizeformat}}
+  </td>
+
   <td>
     <code>
-      curl -JLO {{ url_for("gettarfile", id=build.id, filename=f,_external=True) }}
+      curl -JLO '{{ url_for("gettarfile", id=build.id, filename=f.filename,_external=True) }}'
     </code>
   </td>
 </tr>
