@@ -52,6 +52,8 @@ netbsd70.build-ready.qcow2.xz       429M  1.2G
 netbsd70.clean-install.qcow2.xz     331M  917M
 netbsd614.build-ready.qcow2.xz      216M  909M
 netbsd614.clean-install.qcow2.xz    119M  646M
+openbsd61.clean-install.qcow2.xz    72M   480M
+openbsd61.build-ready.qcow2.xz      354M  1.9G
 openbsd60.clean-install.qcow2.xz    75M   503M
 openbsd60.build-ready.qcow2.xz      85M   567M
 openbsd59.clean-install.qcow2.xz    72M   482M

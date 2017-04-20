@@ -23,6 +23,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 
 ## Clean-Install images
 
+* [OpenBSD 6.1](http://files.housegordon.org/pretest/v0.1/openbsd61.clean-install.qcow2.xz)
 * [OpenBSD 6.0](http://files.housegordon.org/pretest/v0.1/openbsd60.clean-install.qcow2.xz)
 * [OpenBSD 5.9](http://files.housegordon.org/pretest/v0.1/openbsd59.clean-install.qcow2.xz)
 * [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.clean-install.qcow2.xz)
@@ -67,6 +68,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 
 ## Build-Ready images
 
+* [OpenBSD 6.1](http://files.housegordon.org/pretest/v0.1/openbsd61.build-ready.qcow2.xz)
 * [OpenBSD 6.0](http://files.housegordon.org/pretest/v0.1/openbsd60.build-ready.qcow2.xz)
 * [OpenBSD 5.9](http://files.housegordon.org/pretest/v0.1/openbsd59.build-ready.qcow2.xz)
 * [OpenBSD 5.8](http://files.housegordon.org/pretest/v0.1/openbsd58.build-ready.qcow2.xz)
