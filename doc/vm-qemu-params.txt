@@ -1,0 +1,32 @@
+debian7-kfreebsd    disk_if  ide
+debian7-kfreebsd    net_if    e1000
+
+dilos137            graphic_if  std
+dilos137            machine     pc-1.1
+dilos137            min_ram     768
+
+hurd05              disk_if     ide
+hurd05              net_if      rtl8139
+
+hurd06              disk_if     ide
+hurd06              net_if      rtl8139
+
+hurd07              disk_if     ide
+hurd07              net_if      rtl8139
+
+minixR330           graphic_if  std
+
+mirbsd10            disk_if     ide
+mirbsd10            net_if      1000
+
+openindiana151a8    disk_if     ide
+openindiana151a8    net_if      e1000
+openindiana151a8    graphic_if  std
+openindiana151a8    machine     pc-1.1
+openindiana151a8    min_ram     1024
+
+openindiana-hipster-20150330  disk_if     ide
+openindiana-hipster-20150330  net_if      e1000
+openindiana-hipster-20150330  graphic_if  std
+openindiana-hipster-20150330  machine     pc-1.1
+openindiana-hipster-20150330  min_ram     1024

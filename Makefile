@@ -9,9 +9,14 @@ clean:
 
 .PHONY: website
 website: web/versions/index.html \
-	 web/manual/index.html
+	 web/manual/index.html \
+	 gen-data
 
-os-versions.html:
+.PHONY: gen-data
+gen-data:
+	./misc_scripts/update-website.py
+
+os-versions.html: doc/vm-sizes.txt
 	misc_scripts/build-os-versions-table.sh
 
 web/versions/index.html: os-versions.html

@@ -1,0 +1,45 @@
+alpine-3.3.3			Alpine-Linux 3.3.3
+alpine-3.4.6			Alpine-Linux 3.4.6
+centos65			CentOS 6.5
+centos7				CentOS 7.0
+debian76			Debian 7.6
+debian76.compilers-pack		Debian 7.6 + Cross Compilers
+debian7-kfreebsd		Debian 7/kFreeBSD
+debian81			Debian 8.1
+dilos137			DilOS 1.3.7
+fedora20			Fedora 20
+fedora21			Fedora 21
+fedora22			Fedora 22
+fedora23			Fedora 23
+fedora24			Fedora 24
+fedora25			Fedora 25
+freebsd10			FreeBSD 10
+freebsd101			FreeBSD 10.1
+freebsd103			FreeBSD 10.3
+freebsd11p1			FreeBSD 11-p1
+freebsd93			FreeBSD 9.3
+gnewsense31			gNewSense 3.1 (Debian based)
+hurd05				GNU-Hurd 0.5
+hurd06				GNU-Hurd 0.6
+hurd07				GNU-Hurd 0.7
+minixR330			Minix R3.3.0
+mirbsd10			MirBSD 10
+netbsd614			NetBSD 6.1.4
+netbsd70			NetBSD 7.0
+openbsd55			OpenBSD 5.5
+openbsd56			OpenBSD 5.6
+openbsd57			OpenBSD 5.7
+openbsd58			OpenBSD 5.8
+openbsd59			OpenBSD 5.9
+openbsd60			OpenBSD 6.0
+openbsd61			OpenBSD 6.1
+openindiana151a8		OpenIndiana 151a8
+openindiana-hipster-20150330    OpenIndiana-Hipster 2015-03-30
+opensuse131			OpenSUSE 13.1
+opensuse132			OpenSUSE 13.2
+opensuse421			OpenSUSE LEAP 42.1
+trisquel601			Trisquel 6.0.1 (Ubuntu 12 LTS)
+trisquel7			Trisquel 7 (Ubuntu 14.04 LTS)
+ubuntu14			Ubuntu 14.04 LTS
+ubuntu15			Ubuntu 15.04
+ubuntu1604			Ubuntu 16.04 LTS
