@@ -268,7 +268,7 @@ if echo "$SOURCE" | grep -E -q '^git://|\.git$' ; then
         || die "source ($SOURCE) is not a valid remote git repository"
     GIT_REPO=$SOURCE
 elif echo "$SOURCE" |
-	grep -E -q '^(ht|f)tp://[A-Za-z0-9\_\.\/:-]*\.tar\.(gz|bz2|xz)' ; then
+	grep -E -q '^(https?|ftp)://[A-Za-z0-9\_\.\/:-]*\.tar\.(gz|bz2|xz)' ; then
     ## a remote tarball source
     TMP1=$(basename "$SOURCE") || die "failed to get basename of '$SOURCE'"
     TARBALL="$DIR/$TMP1"
