@@ -1,0 +1,19 @@
+autoconf-version: autoconf (GNU Autoconf) 2.69
+automake-version: automake (GNU automake) 1.15
+autopoint-version: /usr/bin/autopoint (GNU gettext-tools) 0.19.8.1
+autoreconf-version: autoreconf (GNU Autoconf) 2.69
+make-version: GNU Make 4.2.1
+gmake-version: missing
+makeinfo-version: texi2any (GNU texinfo) 6.3
+git-version: git version 2.11.1
+wget-version: GNU Wget 1.18 built on linux-musl.
+rsync-version: rsync  version 3.1.2  protocol version 31
+gcc-version: gcc (Alpine 6.2.1) 6.2.1 20160822
+cc-version: cc (Alpine 6.2.1) 6.2.1 20160822
+uname-s: Linux
+uname-r: 4.9.24-0-virtgrsec
+uname-m: x86_64
+uname-p: unknown
+uname-i: unknown
+uname-o: Linux
+uname-v: #1-Alpine SMP Tue Apr 25 08:46:50 GMT 2017

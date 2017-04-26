@@ -63,6 +63,7 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.clean-install.qcow2.xz)
 * [OpenIndiana 151a8](http://files.housegordon.org/pretest/v0.1/openindiana151a8.clean-install.qcow2.xz)
 * [Debian 7 GNU/kFreeBSD](http://files.housegordon.org/pretest/v0.1/debian7-kfreebsd.clean-install.qcow2.xz)
+* [Alpine-3.5.2](http://files.housegordon.org/pretest/v0.1/alpine-3.5.2.clean-install.qcow2.xz)
 * [Alpine-3.4.6](http://files.housegordon.org/pretest/v0.1/alpine-3.4.6.clean-install.qcow2.xz)
 * [Alpine-3.3.3](http://files.housegordon.org/pretest/v0.1/alpine-3.3.3.clean-install.qcow2.xz)
 
@@ -110,5 +111,6 @@ For easier start-up, use the [pretest-run.sh](http://git.savannah.gnu.org/cgit/p
 * [DilOS 1.3.7](http://files.housegordon.org/pretest/v0.1/dilos137.build-ready.qcow2.xz)
 * [OpenIndiana 151a8](http://files.housegordon.org/pretest/v0.1/openindiana151a8.build-ready.qcow2.xz)
 * [Debian 7 GNU/kFreeBSD](http://files.housegordon.org/pretest/v0.1/debian7-kfreebsd.build-ready.qcow2.xz)
+* [Alpine-3.5.2](http://files.housegordon.org/pretest/v0.1/alpine-3.5.2.build-ready.qcow2.xz)
 * [Alpine-3.4.6](http://files.housegordon.org/pretest/v0.1/alpine-3.4.6.build-ready.qcow2.xz)
 * [Alpine-3.3.3](http://files.housegordon.org/pretest/v0.1/alpine-3.3.3.build-ready.qcow2.xz)

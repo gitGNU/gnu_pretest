@@ -1,0 +1,126 @@
+Alpine Linux 3.5.2
+==================
+
+Download from: https://alpinelinux.org/
+ISO URL: https://nl.alpinelinux.org/alpine/v3.5/releases/x86_64/alpine-virt-3.5.2-x86_64.iso
+
+Used the 'Virtual' flavor (similar to 'standard' but slimmed-down kernel for virtual machines)
+
+Installation
+------------
+Boot from CD/ISO, select boot option "grsec" (if not automatically selected),
+Login as root (no password), run 'setup-alpine'.
+
+1. Select keyboard layout: us
+2. Select variant:  us
+3. Enter hostname: 'alp352'
+4. (network) which one do you want to initialize: eth0
+5. Ip address for eth0: dhcp
+6. do you want any manual network config: no
+7. change password for root: 12345
+   (ignore 'bad password' warning, and retype again)
+   retype password: 12345
+   (the password will be rejected once, enter it again).
+8. Which timezone are you: UTC
+9. HTTP/FTP proxy: none
+10. Enter mirror number: f (for autodetect)
+11. which SSH server: openssh
+12. which disks would you like to use?: vda
+13. (disks) how would you like to use it?: sys
+14. Warning: erase the above disks and continue?: y
+
+[[installation is complete]]
+
+back on terminal, type "reboot" to reboot from disk.
+
+
+First Boot
+----------
+
+Login as root, no password required.
+
+0. To automate all the steps below, run:
+
+     wget http://git.savannah.gnu.org/cgit/pretest.git/plain/wip-notes/alpine-3.5.2-setup.sh
+     sh ./alpine-3.5.2-setup.sh
+
+     wget http://mirror.leaseweb.com/alpine/edge/main/x86_64/linux-virtgrsec-4.9.24-r0.apk
+     apk add linux-virtgrsec-4.9.24-r0.apk
+
+1. A Bug on Alpine 3.5.X causes SSHD to hang during
+   boot for several minutes.
+   details here: https://bugs.alpinelinux.org/issues/6635
+
+   The solution is to upgrade the system to 'edge'
+   (the development rolling-release), as explained here:
+      https://wiki.alpinelinux.org/wiki/Upgrading_Alpine
+
+       sed -i -e '/^#/!s/^/#/' -e '/edge\/main/s/^#//' /etc/apk/repositories
+       apk upgrade --update-cache --available
+       sync
+       reboot
+
+2. Enable Root Login on SSH:
+
+   sed -i -e '/PermitRootLogin/s/.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+   rc-service sshd restart
+
+3. Enable serial console
+   (http://wiki.alpinelinux.org/wiki/Enable_Serial_Console_on_Boot)
+
+   sed -i -e '/^default_kernel_opts=/s/=.*/="console=ttyS0,9600 console=tty0"/' \
+          -e '/^verbose=/s/=.*/=1/' \
+          -e '/^hidden=/s/=.*/=/' \
+          -e '/^timeout=/s/=.*/=1/' \
+          -e '/^serial_port=/s/=.*/=0/' \
+          -e '/^serial_baud=/s/=.*/=9600/' \
+          /etc/update-extlinux.conf
+
+   then run:
+       # update-extlinux
+       Updating extlinux configuration.
+       Found kernel: /boot/vmlinuz-grsec
+       Found initramfs: /boot/initramfs-grsec
+       1 entries found.
+       Installing libutil.c32 libcom32.c32 mboot.c32 menu.c32 vesamenu.c32 to /boot.
+       /boot is device /dev/vda1
+
+
+   Login on serial-console (ttyS0) is already enabled in /etc/inittab -
+   no changes needed.
+
+
+3. Add user 'miles':
+
+    adduser -g "" -D miles
+    echo "miles:12345" | chpasswd
+
+4. Install 'sudo', enable password-less sudo for user 'miles':
+
+    apk add sudo
+    sed -i -e '/%wheel.*NOPASSWD/s/^# *//' /etc/sudoers
+    adduser miles wheel
+
+5. Stop the VM with `poweroff`
+
+6. Save as 'clean-install'.
+
+
+Build-Ready
+===========
+
+Start vm with: ./pretest-run.pl -S --console -p 2222 ./alpine-3.3.3.qcow2
+Login with 'miles' pw '12345', switch to root with `sudo su -l`.
+
+1. Install gcc+peripherals ( http://wiki.alpinelinux.org/wiki/GCC )
+
+        apk add build-base
+        apk add automake autoconf gperf bison flex make gettext
+        apk add patch bzip2 curl wget git xz rsync texinfo
+
+
+Results
+=======
+
+http://files.housegordon.org/pretest/v0.1/alpine-3.5.2.clean-install.qcow2.xz
+http://files.housegordon.org/pretest/v0.1/alpine-3.5.2.build-ready.qcow2.xz

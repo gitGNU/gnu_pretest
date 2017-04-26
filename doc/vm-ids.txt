@@ -1,5 +1,6 @@
 alpine-3.3.3			Alpine-Linux 3.3.3
 alpine-3.4.6			Alpine-Linux 3.4.6
+alpine-3.5.2                    Alpine-Linux 3.5.2
 centos65			CentOS 6.5
 centos7				CentOS 7.0
 debian76			Debian 7.6
